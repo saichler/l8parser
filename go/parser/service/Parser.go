@@ -1,4 +1,4 @@
-package parsing
+package service
 
 import (
 	"github.com/saichler/l8parser/go/parser/rules"

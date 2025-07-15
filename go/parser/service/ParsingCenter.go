@@ -1,4 +1,4 @@
-package parsing
+package service
 
 import (
 	"github.com/saichler/l8pollaris/go/pollaris"
