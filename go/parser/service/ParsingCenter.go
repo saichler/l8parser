@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-func (this *ParsingService) JobComplete(job *types.Job, resources ifs.IResources) {
+func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResources) {
 	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
 	if err != nil {
 		resources.Logger().Error("ParsingCenter:" + err.Error())

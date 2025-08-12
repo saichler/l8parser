@@ -22,7 +22,7 @@ func (this *ParsingService) Activate(serviceName string, serviceArea byte,
 	this.resources = r
 	this.resources.Registry().Register(&types.CMap{})
 	this.resources.Registry().Register(&types.CTable{})
-	this.resources.Registry().Register(&types.Job{})
+	this.resources.Registry().Register(&types.CJob{})
 	this.elem = args[0]
 	this.primaryKey = args[1].(string)
 	vnic, ok := l.(ifs.IVNic)
@@ -41,7 +41,7 @@ func (this *ParsingService) DeActivate() error {
 }
 
 func (this *ParsingService) Post(pb ifs.IElements, vnic ifs.IVNic) ifs.IElements {
-	job := pb.Element().(*types.Job)
+	job := pb.Element().(*types.CJob)
 	vnic.Resources().Logger().Info("Received Job ", job.PollarisName, ":", job.JobName, " completed!")
 	this.JobComplete(job, this.resources)
 	return nil

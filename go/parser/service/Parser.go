@@ -28,7 +28,7 @@ func newParser() *_Parser {
 	return p
 }
 
-func (this *_Parser) Parse(job *types.Job, any interface{}, resources ifs.IResources) error {
+func (this *_Parser) Parse(job *types.CJob, any interface{}, resources ifs.IResources) error {
 	workSpace := make(map[string]interface{})
 	enc := object.NewDecode(job.Result, 0, resources.Registry())
 	data, err := enc.Get()
