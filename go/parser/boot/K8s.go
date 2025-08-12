@@ -56,6 +56,6 @@ func createBaseK8sPoll(name string) *types.Poll {
 	poll.Name = name
 	poll.Timeout = DEFAULT_TIMEOUT
 	poll.Cadence = DEFAULT_CADENCE
-	poll.Protocol = types.Protocol_K8s
+	poll.Protocol = types.Protocol_PK8s
 	return poll
 }

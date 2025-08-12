@@ -31,7 +31,7 @@ func createSystemMibPoll(p *types.Pollaris) {
 
 func createVendor() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "networkbox.info.vendor"
+	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("cisco", ".1.3.6.1.2.1.1.1.0", "Cisco"))
 	attr.Rules = append(attr.Rules, createContainsRule("ubuntu", ".1.3.6.1.2.1.1.1.0", "Ubuntu Linux"))
@@ -40,7 +40,7 @@ func createVendor() *types.Attribute {
 
 func createSysName() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "networkbox.info.sysname"
+	attr.PropertyId = "networkdevice.equipmentinfo.systemname"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.5.0"))
 	return attr
@@ -48,7 +48,7 @@ func createSysName() *types.Attribute {
 
 func createVersion() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "networkbox.info.vendor"
+	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("cisco", ".1.3.6.1.2.1.1.1.0", "Cisco"))
 	attr.Rules = append(attr.Rules, createContainsRule("ubuntu", ".1.3.6.1.2.1.1.1.0", "Ubuntu Linux"))
@@ -101,6 +101,6 @@ func createBaseSNMPPoll(jobName string) *types.Poll {
 	poll.Name = jobName
 	poll.Timeout = DEFAULT_TIMEOUT
 	poll.Cadence = DEFAULT_CADENCE
-	poll.Protocol = types.Protocol_SNMPV2
+	poll.Protocol = types.Protocol_PSNMPV2
 	return poll
 }

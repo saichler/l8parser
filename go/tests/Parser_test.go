@@ -28,7 +28,10 @@ func TestParser(t *testing.T) {
 		poll.Cadence = 3
 	}
 
-	device := utils_collector.CreateDevice("192.168.86.179", serviceArea)
+	//use opensim to simulate this device with this ip
+	//https://github.com/saichler/opensim
+	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
+	device := utils_collector.CreateDevice("10.10.10.1", serviceArea)
 
 	vnic := topo.VnicByVnetNum(2, 2)
 	vnic.Resources().Registry().Register(pollaris.PollarisService{})
@@ -40,7 +43,7 @@ func TestParser(t *testing.T) {
 
 	vnic.Resources().Registry().Register(&parsing.ParsingService{})
 	vnic.Resources().Services().Activate(parsing.ServiceType, device.ParsingService.ServiceName, byte(device.ParsingService.ServiceArea),
-		vnic.Resources(), vnic, &types2.NetworkBox{}, "Id")
+		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id")
 
 	vnic.Resources().Registry().Register(&utils_inventory.MockOrmService{})
 	vnic.Resources().Services().Activate(utils_inventory.ServiceType, device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea),
