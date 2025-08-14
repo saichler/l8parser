@@ -32,7 +32,7 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 			resources.Logger().Error("No Vnic to notify inventory")
 			return
 		}
-		_, err = this.vnic.Single(job.IService.ServiceName, byte(job.IService.ServiceArea),
+		_, err = this.vnic.Proximity(job.IService.ServiceName, byte(job.IService.ServiceArea),
 			ifs.PATCH, elem)
 		if err != nil {
 			this.vnic.Resources().Logger().Error(err.Error())
