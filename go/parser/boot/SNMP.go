@@ -22,7 +22,7 @@ func CreateSNMPBootPolls() *types.Pollaris {
 func createSystemMibPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("systemMib")
 	poll.What = ".1.3.6.1.2.1.1"
-	poll.Operation = types.Operation_Map
+	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
