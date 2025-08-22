@@ -35,7 +35,7 @@ func createPodsPoll(p *types.Pollaris) {
 
 func createNodesTable() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "cluster.nodes"
+	attr.PropertyId = "k8scluster.nodes"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createToTable(10, 0))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -44,7 +44,7 @@ func createNodesTable() *types.Attribute {
 
 func createPodsTable() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "cluster.pods"
+	attr.PropertyId = "k8scluster.pods"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createToTable(10, 6))
 	attr.Rules = append(attr.Rules, createTableToMap())
