@@ -12,6 +12,7 @@ func CreateK8sBootPolls() *types.Pollaris {
 	k8sPollaris.Polling = make(map[string]*types.Poll)
 	createNodesPoll(k8sPollaris)
 	createPodsPoll(k8sPollaris)
+	createLogs(k8sPollaris)
 	return k8sPollaris
 }
 
@@ -58,4 +59,22 @@ func createBaseK8sPoll(name string) *types.Poll {
 	poll.Cadence = DEFAULT_CADENCE
 	poll.Protocol = types.Protocol_PK8s
 	return poll
+}
+
+func createLogs(p *types.Pollaris) {
+	poll := createBaseK8sPoll("logs")
+	poll.What = "logs -n |namespace| |podname|"
+	poll.Cadence = -1
+	poll.Operation = types.Operation_OGet
+	p.Polling[poll.Name] = poll
+}
+
+func LogsJob(cluster, context, namespace, podname string) *types.CJob {
+	job := &types.CJob{}
+	job.DeviceId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "logs"
+	job.Arguments = map[string]string{"namespace": namespace, "podname": podname}
+	return job
 }
