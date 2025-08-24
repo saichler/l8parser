@@ -13,6 +13,7 @@ func CreateK8sBootPolls() *types.Pollaris {
 	createNodesPoll(k8sPollaris)
 	createPodsPoll(k8sPollaris)
 	createLogs(k8sPollaris)
+	createDetails(k8sPollaris)
 	return k8sPollaris
 }
 
@@ -69,12 +70,30 @@ func createLogs(p *types.Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
+func createDetails(p *types.Pollaris) {
+	poll := createBaseK8sPoll("details")
+	poll.What = "get pods -o json -n $namespace $podname"
+	poll.Cadence = -1
+	poll.Operation = types.Operation_OGet
+	p.Polling[poll.Name] = poll
+}
+
 func LogsJob(cluster, context, namespace, podname string) *types.CJob {
 	job := &types.CJob{}
 	job.DeviceId = cluster
 	job.HostId = context
 	job.PollarisName = "kubernetes"
 	job.JobName = "logs"
+	job.Arguments = map[string]string{"namespace": namespace, "podname": podname}
+	return job
+}
+
+func DetailsJob(cluster, context, namespace, podname string) *types.CJob {
+	job := &types.CJob{}
+	job.DeviceId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "details"
 	job.Arguments = map[string]string{"namespace": namespace, "podname": podname}
 	return job
 }
