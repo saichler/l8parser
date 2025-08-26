@@ -1,0 +1,76 @@
+package boot
+
+import (
+	"github.com/saichler/l8collector/go/collector/common"
+	"github.com/saichler/l8pollaris/go/types"
+)
+
+// CreateFortinetFirewallBootPolls creates collection and parsing Pollaris model for Fortinet firewalls
+func CreateFortinetFirewallBootPolls() *types.Pollaris {
+	polaris := &types.Pollaris{}
+	polaris.Name = "fortinet-firewall"
+	polaris.Groups = []string{common.BOOT_GROUP}
+	polaris.Polling = make(map[string]*types.Poll)
+	createFortinetSystemPoll(polaris)
+	createFortinetInterfacesPoll(polaris)
+	createFortinetSessionsPoll(polaris)
+	createFortinetVpnPoll(polaris)
+	return polaris
+}
+
+// Fortinet device-specific polling functions
+func createFortinetSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("fortinetSystem")
+	poll.What = ".1.3.6.1.4.1.12356.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createFortinetVendor())
+	poll.Attributes = append(poll.Attributes, createSysName())
+	poll.Attributes = append(poll.Attributes, createFortinetVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createFortinetInterfacesPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("fortinetInterfaces")
+	poll.What = ".1.3.6.1.2.1.2.2.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createInterfaceName())
+	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
+	p.Polling[poll.Name] = poll
+}
+
+func createFortinetSessionsPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("fortinetSessions")
+	poll.What = ".1.3.6.1.4.1.12356.101.4.1.8"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createActiveSessions())
+	p.Polling[poll.Name] = poll
+}
+
+func createFortinetVpnPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("fortinetVpn")
+	poll.What = ".1.3.6.1.4.1.12356.101.12.2.3.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createVpnTunnelStatus())
+	p.Polling[poll.Name] = poll
+}
+
+// Fortinet-specific attribute creation functions
+func createFortinetVendor() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createContainsRule("fortinet", ".1.3.6.1.2.1.1.1.0", "Fortinet"))
+	return attr
+}
+
+func createFortinetVersion() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.version"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.1.1.0"))
+	return attr
+}
