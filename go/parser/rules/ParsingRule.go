@@ -24,8 +24,8 @@ func getStringInput(resources ifs.IResources, input interface{}, params map[stri
 		}
 		strData := m.Data[from.Value]
 		if strData == nil || len(strData) == 0 {
-			resources.Logger().Error("Value for From ", from.Name, " is blank")
-			return "", errors.New("Value for From " + from.Name + " is blank")
+			resources.Logger().Error("Value for From ", from.Value, " is blank")
+			return "", errors.New("Value for From " + from.Value + " is blank")
 		}
 		enc := object.NewDecode(strData, 0, resources.Registry())
 		strInt, _ := enc.Get()
