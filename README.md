@@ -127,32 +127,81 @@ poll := &types.Poll{
 
 ## SNMP Support
 
-L8Parser includes built-in support for SNMP data parsing with pre-configured MIB-2 rules:
+L8Parser includes comprehensive support for SNMP data parsing with vendor-specific configurations:
 
-### System Information
-- **Vendor Detection**: Automatically detects device vendors (Cisco, Ubuntu Linux, etc.)
-- **System Name**: Extracts system names from SNMP sysName OID
-- **System Description**: Processes system description strings
+### Multi-Vendor Support
 
-### Example SNMP Configuration
+The parser now supports vendor-specific device configurations with automatic OID-based detection:
+
+- **Cisco**: Switches and Routers with enterprise OID `.1.3.6.1.4.1.9.`
+- **Juniper**: Routers with enterprise OID `.1.3.6.1.4.1.2636.`
+- **Palo Alto**: Firewalls with enterprise OID `.1.3.6.1.4.1.25461.`
+- **Fortinet**: Firewalls with enterprise OID `.1.3.6.1.4.1.12356.`
+- **Arista**: Switches with enterprise OID `.1.3.6.1.4.1.30065.`
+- **Nokia**: Routers with enterprise OID `.1.3.6.1.4.1.6527.`
+- **Huawei**: Routers with enterprise OID `.1.3.6.1.4.1.2011.`
+- **Dell**: Servers with enterprise OID `.1.3.6.1.4.1.674.`
+- **HPE**: Servers with enterprise OID `.1.3.6.1.4.1.232.`
+
+### Device Detection and Polling
 
 ```go
-func CreateSNMPBootPolls() *types.Pollaris {
-    snmpPolaris := &types.Pollaris{
-        Name:   "mib2",
-        Groups: []string{"boot"},
+// Automatic device detection by sysOID
+polaris := GetPollarisByOid(".1.3.6.1.4.1.9.1.122.0") // Returns Cisco switch configuration
+
+// Get all available vendor models
+models := GetAllPolarisModels() // Returns slice of all vendor-specific Pollaris models
+```
+
+### Vendor-Specific Features
+
+Each vendor configuration includes device-specific polling for:
+- **System Information**: Vendor, version, serial numbers
+- **Interface Monitoring**: Status, speed, MTU, names
+- **Hardware Monitoring**: Modules, power supplies, fans, temperature
+- **Performance Metrics**: CPU, memory, utilization
+- **Device-Specific Attributes**: Routing tables, firewall sessions, etc.
+
+### File Organization
+
+SNMP configurations are organized by vendor in separate files:
+- `cisco.go` - Cisco switches and routers
+- `juniper.go` - Juniper routers  
+- `paloalto.go` - Palo Alto firewalls
+- `fortinet.go` - Fortinet firewalls
+- `arista.go` - Arista switches
+- `nokia.go` - Nokia routers
+- `huawei.go` - Huawei routers
+- `dell.go` - Dell servers
+- `hpe.go` - HPE servers
+- `SNMP.go` - Common utilities and generic polling
+
+### Group Classification
+
+Each vendor model uses specific group classifications:
+- Generic SNMP: `["boot"]` (common.BOOT_GROUP)
+- Vendor models: `[vendor_name, vendor-device_type]` (e.g., `["cisco", "cisco-switch"]`)
+
+### Example Cisco Switch Configuration
+
+```go
+func CreateCiscoSwitchBootPolls() *types.Pollaris {
+    polaris := &types.Pollaris{
+        Name:   "cisco-switch",
+        Groups: []string{"cisco", "cisco-switch"},
         Polling: map[string]*types.Poll{
-            "systemMib": {
+            "ciscoSystem": {
                 What:      ".1.3.6.1.2.1.1",
                 Operation: types.Operation_OMap,
                 Attributes: []*types.Attribute{
-                    createVendorAttribute(),
-                    createSysNameAttribute(),
+                    createCiscoVendor(),
+                    createSysName(),
+                    createCiscoVersion(),
                 },
             },
         },
     }
-    return snmpPolaris
+    return polaris
 }
 ```
 

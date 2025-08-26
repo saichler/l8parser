@@ -274,16 +274,16 @@
                 
                 <div class="stats">
                     <div class="stat-item">
+                        <span class="stat-number">9</span>
+                        <span>Vendor Support</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">11</span>
+                        <span>Device Models</span>
+                    </div>
+                    <div class="stat-item">
                         <span class="stat-number">4</span>
                         <span>Rule Types</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">SNMP</span>
-                        <span>MIB-2 Support</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">Go 1.23.8</span>
-                        <span>Language</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-number">Real-time</span>
@@ -303,8 +303,8 @@
                         <p>Flexible parsing engine with pluggable rules that can be configured to handle various data transformation scenarios.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>SNMP Support</h4>
-                        <p>Built-in support for SNMP data parsing with MIB-2 compatibility, including automatic vendor detection.</p>
+                        <h4>Multi-Vendor SNMP Support</h4>
+                        <p>Comprehensive SNMP support for 9 major vendors with automatic OID-based device detection and vendor-specific configurations.</p>
                     </div>
                     <div class="feature-card">
                         <h4>Protocol Agnostic</h4>
@@ -364,6 +364,33 @@
                     <div class="feature-card">
                         <h4>Rule Engine</h4>
                         <p><code>go/parser/rules/</code> - Collection of parsing rules for data transformation</p>
+                    </div>
+                </div>
+
+                <h3>SNMP Boot Configurations</h3>
+                <p>Vendor-specific SNMP polling configurations are organized in separate modules:</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Network Vendors</h4>
+                        <p><code>cisco.go</code> - Cisco switches/routers<br>
+                        <code>juniper.go</code> - Juniper routers<br>
+                        <code>arista.go</code> - Arista switches<br>
+                        <code>nokia.go</code> - Nokia routers</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Security Vendors</h4>
+                        <p><code>paloalto.go</code> - Palo Alto firewalls<br>
+                        <code>fortinet.go</code> - Fortinet firewalls</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Server Vendors</h4>
+                        <p><code>dell.go</code> - Dell servers<br>
+                        <code>hpe.go</code> - HPE servers<br>
+                        <code>huawei.go</code> - Huawei routers</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Common Framework</h4>
+                        <p><code>SNMP.go</code> - Common utilities, generic polling, and device detection functions</p>
                     </div>
                 </div>
 
@@ -454,16 +481,41 @@ poll := &types.Poll{
 }</code>
                 </div>
 
-                <h3>SNMP Support Features</h3>
+                <h3>Multi-Vendor SNMP Support</h3>
+                <p>L8Parser now includes comprehensive vendor-specific SNMP configurations with automatic device detection:</p>
+                
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>Vendor Detection</h4>
-                        <p>Automatically detects device vendors (Cisco, Ubuntu Linux, etc.) from SNMP system descriptions</p>
+                        <h4>Network Equipment</h4>
+                        <p><strong>Cisco:</strong> Switches & Routers (.1.3.6.1.4.1.9.)<br>
+                        <strong>Juniper:</strong> Routers (.1.3.6.1.4.1.2636.)<br>
+                        <strong>Arista:</strong> Switches (.1.3.6.1.4.1.30065.)<br>
+                        <strong>Nokia:</strong> Routers (.1.3.6.1.4.1.6527.)</p>
                     </div>
                     <div class="feature-card">
-                        <h4>System Information</h4>
-                        <p>Extracts system names and descriptions from standard SNMP MIB-2 OIDs</p>
+                        <h4>Security Appliances</h4>
+                        <p><strong>Palo Alto:</strong> Firewalls (.1.3.6.1.4.1.25461.)<br>
+                        <strong>Fortinet:</strong> Firewalls (.1.3.6.1.4.1.12356.)</p>
                     </div>
+                    <div class="feature-card">
+                        <h4>Servers & Infrastructure</h4>
+                        <p><strong>Dell:</strong> Servers (.1.3.6.1.4.1.674.)<br>
+                        <strong>HPE:</strong> Servers (.1.3.6.1.4.1.232.)<br>
+                        <strong>Huawei:</strong> Routers (.1.3.6.1.4.1.2011.)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Automatic Detection</h4>
+                        <p>OID-based device identification with vendor-specific polling configurations for hardware monitoring, performance metrics, and device-specific attributes.</p>
+                    </div>
+                </div>
+
+                <h3>Device Detection API</h3>
+                <div class="code-block">
+<code>// Automatic device detection by sysOID
+polaris := GetPollarisByOid(".1.3.6.1.4.1.9.1.122.0") // Returns Cisco switch config
+
+// Get all available vendor models
+models := GetAllPolarisModels() // Returns slice of all 11 device models</code>
                 </div>
             </section>
 
