@@ -79,38 +79,38 @@ func GetPollarisByOid(sysOid string) *types.Pollaris {
 // GetAllPolarisModels returns a slice of all available Pollaris models
 func GetAllPolarisModels() []*types.Pollaris {
 	models := make([]*types.Pollaris, 0)
-	
+
 	// Generic SNMP
 	models = append(models, CreateSNMPBootPolls())
-	
+
 	// Cisco devices
 	models = append(models, CreateCiscoSwitchBootPolls())
 	models = append(models, CreateCiscoRouterBootPolls())
-	
+
 	// Juniper devices
 	models = append(models, CreateJuniperRouterBootPolls())
-	
+
 	// Palo Alto devices
 	models = append(models, CreatePaloAltoFirewallBootPolls())
-	
+
 	// Fortinet devices
 	models = append(models, CreateFortinetFirewallBootPolls())
-	
+
 	// Arista devices
 	models = append(models, CreateAristaSwitchBootPolls())
-	
+
 	// Nokia devices
 	models = append(models, CreateNokiaRouterBootPolls())
-	
+
 	// Huawei devices
 	models = append(models, CreateHuaweiRouterBootPolls())
-	
+
 	// Dell devices
 	models = append(models, CreateDellServerBootPolls())
-	
+
 	// HPE devices
 	models = append(models, CreateHPEServerBootPolls())
-	
+
 	return models
 }
 
@@ -174,6 +174,7 @@ func createSystemMibPoll(p *types.Pollaris) {
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createVendor())
+	poll.Attributes = append(poll.Attributes, createSysName())
 	poll.Attributes = append(poll.Attributes, createSysName())
 	p.Polling[poll.Name] = poll
 }

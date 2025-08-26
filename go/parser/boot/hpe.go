@@ -1,7 +1,6 @@
 package boot
 
 import (
-	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8pollaris/go/types"
 )
 
@@ -9,7 +8,7 @@ import (
 func CreateHPEServerBootPolls() *types.Pollaris {
 	polaris := &types.Pollaris{}
 	polaris.Name = "hpe-server"
-	polaris.Groups = []string{common.BOOT_GROUP}
+	polaris.Groups = []string{"hpe", "hpe-server"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createHPESystemPoll(polaris)
 	createHPEStoragePoll(polaris)

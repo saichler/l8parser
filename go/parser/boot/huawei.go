@@ -1,7 +1,6 @@
 package boot
 
 import (
-	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8pollaris/go/types"
 )
 
@@ -9,7 +8,7 @@ import (
 func CreateHuaweiRouterBootPolls() *types.Pollaris {
 	polaris := &types.Pollaris{}
 	polaris.Name = "huawei-router"
-	polaris.Groups = []string{common.BOOT_GROUP}
+	polaris.Groups = []string{"huawei", "huawei-router"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createHuaweiSystemPoll(polaris)
 	createHuaweiInterfacesPoll(polaris)

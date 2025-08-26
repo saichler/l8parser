@@ -1,7 +1,6 @@
 package boot
 
 import (
-	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8pollaris/go/types"
 )
 
@@ -9,7 +8,7 @@ import (
 func CreateJuniperRouterBootPolls() *types.Pollaris {
 	polaris := &types.Pollaris{}
 	polaris.Name = "juniper-router"
-	polaris.Groups = []string{common.BOOT_GROUP}
+	polaris.Groups = []string{"juniper", "juniper-router"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createJuniperSystemPoll(polaris)
 	createJuniperInterfacesPoll(polaris)

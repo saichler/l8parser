@@ -1,6 +1,9 @@
 package tests
 
 import (
+	"testing"
+	"time"
+
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8collector/go/collector/devices"
 	"github.com/saichler/l8collector/go/collector/service"
@@ -11,8 +14,6 @@ import (
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
-	"testing"
-	"time"
 )
 
 func TestMain(m *testing.M) {
@@ -76,30 +77,5 @@ func TestParser(t *testing.T) {
 		vnic.Resources().Logger().Fail(t, "Expected 1 patch count in mock")
 		return
 	}
-
-	/*
-		defer func() {
-			deActivateDeviceAndPollConfigServices(cfg, 0)
-		}()
-	*/
-	/*
-		cl := topo.VnicByVnetNum(1, 1)
-		err = cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
-		if err != nil {
-			panic(err)
-		}
-		time.Sleep(time.Second * 3)
-		mp, ok := vnic.Resources().Services().ServiceHandler(device.ParsingService.ServiceName, byte(device.ParsingService.ServiceArea))
-		if !ok {
-			panic("No mock service found")
-		}
-		mock := mp.(*utils_collector.MockParsingService)
-		for k, v := range mock.JobsCounts() {
-			for k1, v1 := range v {
-				if v1 != 1 {
-					vnic.Resources().Logger().Fail(t, "Expected 1 but got ", v1, " job ", k, ":", k1)
-				}
-			}
-		}*/
 
 }

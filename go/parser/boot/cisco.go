@@ -1,7 +1,6 @@
 package boot
 
 import (
-	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8pollaris/go/types"
 )
 
@@ -9,7 +8,7 @@ import (
 func CreateCiscoSwitchBootPolls() *types.Pollaris {
 	polaris := &types.Pollaris{}
 	polaris.Name = "cisco-switch"
-	polaris.Groups = []string{common.BOOT_GROUP}
+	polaris.Groups = []string{"cisco", "cisco-switch"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createCiscoSystemPoll(polaris)
 	createCiscoInterfacesPoll(polaris)
@@ -24,7 +23,7 @@ func CreateCiscoSwitchBootPolls() *types.Pollaris {
 func CreateCiscoRouterBootPolls() *types.Pollaris {
 	polaris := &types.Pollaris{}
 	polaris.Name = "cisco-router"
-	polaris.Groups = []string{common.BOOT_GROUP}
+	polaris.Groups = []string{"cisco", "cisco-router"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createCiscoSystemPoll(polaris)
 	createCiscoInterfacesPoll(polaris)
