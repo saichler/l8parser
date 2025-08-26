@@ -2,10 +2,11 @@ package rules
 
 import (
 	"errors"
+	"strconv"
+
 	"github.com/saichler/l8pollaris/go/types"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
-	"strconv"
 )
 
 type ParsingRule interface {
@@ -22,6 +23,10 @@ func getStringInput(resources ifs.IResources, input interface{}, params map[stri
 			return "", resources.Logger().Error("missing 'from' key in map input")
 		}
 		strData := m.Data[from.Value]
+		if strData == nil || len(strData) == 0 {
+			resources.Logger().Error("Value for From ", from.Name, " is blank")
+			return "", errors.New("Value for From " + from.Name + " is blank")
+		}
 		enc := object.NewDecode(strData, 0, resources.Registry())
 		strInt, _ := enc.Get()
 		str, ok := strInt.(string)
