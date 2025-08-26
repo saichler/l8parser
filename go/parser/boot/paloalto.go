@@ -11,6 +11,7 @@ func CreatePaloAltoFirewallBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"paloalto", "paloalto-firewall"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createPaloAltoSystemPoll(polaris)
+	createPaloAltoMibSystemPoll(polaris)
 	createPaloAltoInterfacesPoll(polaris)
 	createPaloAltoSessionsPoll(polaris)
 	createPaloAltoThreatsPoll(polaris)
@@ -23,9 +24,17 @@ func createPaloAltoSystemPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createPaloAltoVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createPaloAltoMibSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("paloAltoMibSystem")
+	poll.What = ".1.3.6.1.2.1.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createPaloAltoVersion())
 	p.Polling[poll.Name] = poll
 }
 
@@ -41,7 +50,7 @@ func createPaloAltoInterfacesPoll(p *types.Pollaris) {
 
 func createPaloAltoSessionsPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoSessions")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.3"
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createActiveSessions())
@@ -50,7 +59,7 @@ func createPaloAltoSessionsPoll(p *types.Pollaris) {
 
 func createPaloAltoThreatsPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoThreats")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.5"
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createThreatCount())

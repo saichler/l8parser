@@ -11,6 +11,7 @@ func CreateAristaSwitchBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"arista", "arista-switch"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createAristaSystemPoll(polaris)
+	createAristaMibSystemPoll(polaris)
 	createAristaInterfacesPoll(polaris)
 	createAristaEnvironmentalPoll(polaris)
 	return polaris
@@ -19,12 +20,20 @@ func CreateAristaSwitchBootPolls() *types.Pollaris {
 // Arista device-specific polling functions
 func createAristaSystemPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("aristaSystem")
+	poll.What = ".1.3.6.1.4.1.30065.1.3.1.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createAristaVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createAristaMibSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("aristaMibSystem")
 	poll.What = ".1.3.6.1.2.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createAristaVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createAristaVersion())
 	p.Polling[poll.Name] = poll
 }
 
@@ -41,7 +50,7 @@ func createAristaInterfacesPoll(p *types.Pollaris) {
 
 func createAristaEnvironmentalPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("aristaEnvironmental")
-	poll.What = ".1.3.6.1.4.1.30065.3.1.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createTemperatureSensors())

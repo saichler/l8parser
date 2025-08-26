@@ -17,7 +17,8 @@ func CreateCiscoSwitchBootPolls() *types.Pollaris {
 	createCiscoModulesPoll(polaris)
 	createCiscoPowerSupplyPoll(polaris)
 	createCiscoFanPoll(polaris)
-	createCiscoCpuMemoryPoll(polaris)
+	createCiscoCpuPoll(polaris)
+	createCiscoMemoryPoll(polaris)
 	return polaris
 }
 
@@ -33,7 +34,8 @@ func CreateCiscoRouterBootPolls() *types.Pollaris {
 	createCiscoInterfacesPoll(polaris)
 	createCiscoRouterModulesPoll(polaris)
 	createCiscoPowerSupplyPoll(polaris)
-	createCiscoCpuMemoryPoll(polaris)
+	createCiscoCpuPoll(polaris)
+	createCiscoMemoryPoll(polaris)
 	createCiscoRoutingPoll(polaris)
 	return polaris
 }
@@ -82,7 +84,7 @@ func createCiscoInterfacesPoll(p *types.Pollaris) {
 
 func createCiscoModulesPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ciscoModules")
-	poll.What = ".1.3.6.1.4.1.9.9.117.1.1.2.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createModuleName())
@@ -93,7 +95,7 @@ func createCiscoModulesPoll(p *types.Pollaris) {
 
 func createCiscoPowerSupplyPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ciscoPowerSupply")
-	poll.What = ".1.3.6.1.4.1.9.9.13.1.5.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createPowerSupplyStatus())
@@ -103,26 +105,34 @@ func createCiscoPowerSupplyPoll(p *types.Pollaris) {
 
 func createCiscoFanPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ciscoFans")
-	poll.What = ".1.3.6.1.4.1.9.9.13.1.4.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createFanStatus())
 	p.Polling[poll.Name] = poll
 }
 
-func createCiscoCpuMemoryPoll(p *types.Pollaris) {
-	poll := createBaseSNMPPoll("ciscoCpuMemory")
+func createCiscoCpuPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("ciscoCpu")
 	poll.What = ".1.3.6.1.4.1.9.9.109.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createCpuUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createCiscoMemoryPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("ciscoMemory")
+	poll.What = ".1.3.6.1.4.1.9.9.48.1.1.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createMemoryUtilization())
 	p.Polling[poll.Name] = poll
 }
 
 func createCiscoRouterModulesPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ciscoRouterModules")
-	poll.What = ".1.3.6.1.4.1.9.9.117.1.2.1.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createRouteProcessorStatus())

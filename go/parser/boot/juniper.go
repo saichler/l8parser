@@ -11,6 +11,7 @@ func CreateJuniperRouterBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"juniper", "juniper-router"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createJuniperSystemPoll(polaris)
+	createJuniperMibSystemPoll(polaris)
 	createJuniperInterfacesPoll(polaris)
 	createJuniperChassisComponentsPoll(polaris)
 	createJuniperRoutingEnginePoll(polaris)
@@ -23,9 +24,17 @@ func createJuniperSystemPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.4.1.2636.3.1.2"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createJuniperVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createJuniperMibSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("juniperMibSystem")
+	poll.What = ".1.3.6.1.2.1.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createJuniperVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createJuniperVersion())
 	p.Polling[poll.Name] = poll
 }
 
@@ -42,7 +51,7 @@ func createJuniperInterfacesPoll(p *types.Pollaris) {
 
 func createJuniperChassisComponentsPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("juniperChassis")
-	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createChassisComponentStatus())

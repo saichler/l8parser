@@ -11,6 +11,7 @@ func CreateDellServerBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"dell", "dell-server"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createDellSystemPoll(polaris)
+	createDellMibSystemPoll(polaris)
 	createDellStoragePoll(polaris)
 	createDellPowerThermalPoll(polaris)
 	return polaris
@@ -22,15 +23,23 @@ func createDellSystemPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.4.1.674.10892.5.1.3.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createDellVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createDellMibSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("dellMibSystem")
+	poll.What = ".1.3.6.1.2.1.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createDellVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createDellVersion())
 	p.Polling[poll.Name] = poll
 }
 
 func createDellStoragePoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("dellStorage")
-	poll.What = ".1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1"
+	poll.What = ".1.3.6.1.2.1.25.2.3.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createDiskStatus())
@@ -39,7 +48,7 @@ func createDellStoragePoll(p *types.Pollaris) {
 
 func createDellPowerThermalPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("dellPowerThermal")
-	poll.What = ".1.3.6.1.4.1.674.10892.5.4.600.20.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createPowerSupplyStatus())

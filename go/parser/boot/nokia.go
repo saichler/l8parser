@@ -11,6 +11,7 @@ func CreateNokiaRouterBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"nokia", "nokia-router"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createNokiaSystemPoll(polaris)
+	createNokiaMibSystemPoll(polaris)
 	createNokiaInterfacesPoll(polaris)
 	createNokiaCardsPoll(polaris)
 	return polaris
@@ -22,9 +23,17 @@ func createNokiaSystemPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createNokiaVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createNokiaMibSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("nokiaMibSystem")
+	poll.What = ".1.3.6.1.2.1.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createNokiaVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createNokiaVersion())
 	p.Polling[poll.Name] = poll
 }
 
@@ -40,7 +49,7 @@ func createNokiaInterfacesPoll(p *types.Pollaris) {
 
 func createNokiaCardsPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("nokiaCards")
-	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.3.2.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createCardStatus())

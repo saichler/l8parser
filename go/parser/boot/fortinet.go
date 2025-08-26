@@ -11,6 +11,7 @@ func CreateFortinetFirewallBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"fortinet", "fortinet-firewall"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createFortinetSystemPoll(polaris)
+	createFortinetMibSystemPoll(polaris)
 	createFortinetInterfacesPoll(polaris)
 	createFortinetSessionsPoll(polaris)
 	createFortinetVpnPoll(polaris)
@@ -23,9 +24,17 @@ func createFortinetSystemPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.4.1.12356.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createFortinetVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createFortinetMibSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("fortinetMibSystem")
+	poll.What = ".1.3.6.1.2.1.1"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createFortinetVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createFortinetVersion())
 	p.Polling[poll.Name] = poll
 }
 
@@ -44,7 +53,7 @@ func createFortinetSessionsPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.4.1.12356.101.4.1.8"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
-	poll.Attributes = append(poll.Attributes, createActiveSessions())
+	poll.Attributes = append(poll.Attributes, createFortinetActiveSessions())
 	p.Polling[poll.Name] = poll
 }
 
@@ -53,7 +62,7 @@ func createFortinetVpnPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.4.1.12356.101.12.2.3.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
-	poll.Attributes = append(poll.Attributes, createVpnTunnelStatus())
+	poll.Attributes = append(poll.Attributes, createFortinetVpnTunnelStatus())
 	p.Polling[poll.Name] = poll
 }
 
@@ -71,5 +80,21 @@ func createFortinetVersion() *types.Attribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.1.1.0"))
+	return attr
+}
+
+func createFortinetActiveSessions() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.activeconnections"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.101.4.1.8.0"))
+	return attr
+}
+
+func createFortinetVpnTunnelStatus() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.networklinks.linkstatus"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.101.12.2.3.1.3"))
 	return attr
 }

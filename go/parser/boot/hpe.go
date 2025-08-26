@@ -11,6 +11,7 @@ func CreateHPEServerBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"hpe", "hpe-server"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createHPESystemPoll(polaris)
+	createHPEMibSystemPoll(polaris)
 	createHPEStoragePoll(polaris)
 	createHPEPowerThermalPoll(polaris)
 	return polaris
@@ -19,18 +20,26 @@ func CreateHPEServerBootPolls() *types.Pollaris {
 // HPE server-specific polling functions
 func createHPESystemPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("hpeSystem")
-	poll.What = ".1.3.6.1.4.1.232.2"
+	poll.What = ".1.3.6.1.4.1.232.2.2.4.2"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createHPEVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createHPEMibSystemPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("hpeMibSystem")
+	poll.What = ".1.3.6.1.2.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createHPEVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createHPEVersion())
 	p.Polling[poll.Name] = poll
 }
 
 func createHPEStoragePoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("hpeStorage")
-	poll.What = ".1.3.6.1.4.1.232.3.2.5.1.1"
+	poll.What = ".1.3.6.1.2.1.25.2.3.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createDiskStatus())
@@ -39,7 +48,7 @@ func createHPEStoragePoll(p *types.Pollaris) {
 
 func createHPEPowerThermalPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("hpePowerThermal")
-	poll.What = ".1.3.6.1.4.1.232.6.2.6.7.1"
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createPowerSupplyStatus())
