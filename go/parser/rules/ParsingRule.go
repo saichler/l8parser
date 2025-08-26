@@ -18,6 +18,9 @@ type ParsingRule interface {
 func getStringInput(resources ifs.IResources, input interface{}, params map[string]*types.Parameter) (string, error) {
 	m, ok := input.(*types.CMap)
 	if ok {
+		if len(m.Data) == 0 {
+			return "", resources.Logger().Error("no data found in map")
+		}
 		from := params[From]
 		if from == nil {
 			return "", resources.Logger().Error("missing 'from' key in map input")
