@@ -11,6 +11,8 @@ func CreateCiscoSwitchBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"cisco", "cisco-switch"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createCiscoSystemPoll(polaris)
+	createCiscoVersionPoll(polaris)
+	createCiscoSerialPoll(polaris)
 	createCiscoInterfacesPoll(polaris)
 	createCiscoModulesPoll(polaris)
 	createCiscoPowerSupplyPoll(polaris)
@@ -26,6 +28,8 @@ func CreateCiscoRouterBootPolls() *types.Pollaris {
 	polaris.Groups = []string{"cisco", "cisco-router"}
 	polaris.Polling = make(map[string]*types.Poll)
 	createCiscoSystemPoll(polaris)
+	createCiscoVersionPoll(polaris)
+	createCiscoSerialPoll(polaris)
 	createCiscoInterfacesPoll(polaris)
 	createCiscoRouterModulesPoll(polaris)
 	createCiscoPowerSupplyPoll(polaris)
@@ -43,7 +47,23 @@ func createCiscoSystemPoll(p *types.Pollaris) {
 	poll.Attributes = append(poll.Attributes, createCiscoVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
 	poll.Attributes = append(poll.Attributes, createSysOid())
+	p.Polling[poll.Name] = poll
+}
+
+func createCiscoVersionPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("ciscoVersion")
+	poll.What = ".1.3.6.1.4.1.9.9.25.1.1.1.2"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createCiscoVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createCiscoSerialPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("ciscoSerial")
+	poll.What = ".1.3.6.1.4.1.9.3.6.3"
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createCiscoSerial())
 	p.Polling[poll.Name] = poll
 }
