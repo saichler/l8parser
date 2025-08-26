@@ -25,6 +25,7 @@ func TestPolling(t *testing.T) {
 	if len(m) > 0 {
 		t.Fail()
 	}
+
 }
 
 func CheckPollaris() map[string]string {

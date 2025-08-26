@@ -37,6 +37,14 @@ func TestParser(t *testing.T) {
 	vnic := topo.VnicByVnetNum(2, 2)
 	vnic.Resources().Registry().Register(pollaris.PollarisService{})
 	vnic.Resources().Services().Activate(pollaris.ServiceType, pollaris.ServiceName, serviceArea, vnic.Resources(), vnic)
+
+	p := pollaris.Pollaris(vnic.Resources())
+	err := p.Add(snmpPolls, false)
+	if err != nil {
+		vnic.Resources().Logger().Fail(t, err.Error())
+		return
+	}
+
 	vnic.Resources().Registry().Register(devices.DeviceService{})
 	vnic.Resources().Services().Activate(devices.ServiceType, devices.ServiceName, serviceArea, vnic.Resources(), vnic)
 	vnic.Resources().Registry().Register(service.CollectorService{})
@@ -51,13 +59,6 @@ func TestParser(t *testing.T) {
 		vnic.Resources(), vnic)
 
 	time.Sleep(time.Second)
-
-	p := pollaris.Pollaris(vnic.Resources())
-	err := p.Add(snmpPolls, false)
-	if err != nil {
-		vnic.Resources().Logger().Fail(t, err.Error())
-		return
-	}
 
 	cl := topo.VnicByVnetNum(1, 1)
 	err = cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
