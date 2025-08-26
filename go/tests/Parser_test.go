@@ -6,11 +6,11 @@ import (
 	"github.com/saichler/l8collector/go/collector/service"
 	"github.com/saichler/l8collector/go/tests/utils_collector"
 	"github.com/saichler/l8inventory/go/tests/utils_inventory"
-	types2 "github.com/saichler/l8inventory/go/types"
 	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8types/go/ifs"
+	types2 "github.com/saichler/probler/go/types"
 	"testing"
 	"time"
 )
@@ -101,4 +101,5 @@ func TestParser(t *testing.T) {
 				}
 			}
 		}*/
+
 }

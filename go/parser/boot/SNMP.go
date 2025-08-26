@@ -1,10 +1,11 @@
 package boot
 
 import (
+	"strconv"
+
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/types"
-	"strconv"
 )
 
 var DEFAULT_CADENCE int64 = 300
@@ -38,9 +39,17 @@ func createVendor() *types.Attribute {
 	return attr
 }
 
+func createSysOid() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.sysoid"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.2.0"))
+	return attr
+}
+
 func createSysName() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.systemname"
+	attr.PropertyId = "networkdevice.equipmentinfo.sysname"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.5.0"))
 	return attr
