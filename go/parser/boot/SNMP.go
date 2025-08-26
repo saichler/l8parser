@@ -130,7 +130,7 @@ func isCiscoSwitchOid(sysOid string) bool {
 	if !strings.HasPrefix(normalizedOid, ".") {
 		normalizedOid = "." + normalizedOid
 	}
-	
+
 	// Cisco switch specific OIDs (Catalyst series)
 	switchOids := []string{
 		".1.3.6.1.4.1.9.1.122",  // Catalyst 2960
@@ -226,7 +226,7 @@ func createSystemMibPoll(p *types.Pollaris) {
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createSysName())
+	poll.Attributes = append(poll.Attributes, createSysOid())
 	p.Polling[poll.Name] = poll
 }
 
@@ -320,7 +320,7 @@ func createInterfaceName() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.name"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("2"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.2"))
 	return attr
 }
 
@@ -328,7 +328,7 @@ func createInterfaceStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("8"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8"))
 	return attr
 }
 
@@ -336,7 +336,7 @@ func createInterfaceSpeed() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.speed"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("5"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.5"))
 	return attr
 }
 
@@ -344,7 +344,7 @@ func createInterfaceMtu() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.mtu"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("4"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.4"))
 	return attr
 }
 
@@ -353,7 +353,7 @@ func createModuleName() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.name"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("2"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2"))
 	return attr
 }
 
@@ -361,7 +361,7 @@ func createModuleModel() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.model"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("13"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13"))
 	return attr
 }
 
@@ -369,7 +369,7 @@ func createModuleStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("5"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5"))
 	return attr
 }
 
@@ -377,7 +377,7 @@ func createChassisComponentStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("6"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.6"))
 	return attr
 }
 
@@ -386,7 +386,7 @@ func createPowerSupplyStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("3"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3"))
 	return attr
 }
 
@@ -394,7 +394,7 @@ func createPowerSupplyModel() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.model"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("2"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2"))
 	return attr
 }
 
@@ -402,7 +402,7 @@ func createFanStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("3"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3"))
 	return attr
 }
 
@@ -410,7 +410,7 @@ func createTemperatureSensors() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.temperaturecelsius"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("4"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.4"))
 	return attr
 }
 
@@ -419,7 +419,7 @@ func createCpuUtilization() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("5"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.9.9.109.1.1.1.1.5"))
 	return attr
 }
 
@@ -427,7 +427,7 @@ func createMemoryUtilization() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("12"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.9.9.48.1.1.1.6"))
 	return attr
 }
 
@@ -435,7 +435,7 @@ func createRoutingEngineUtilization() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.utilizationpercent"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("8"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.13.1.8"))
 	return attr
 }
 
@@ -444,7 +444,7 @@ func createRouteProcessorStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("5"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5"))
 	return attr
 }
 
@@ -452,7 +452,7 @@ func createRoutingTableEntry() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.ipaddress"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("1"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.4.21.1.1"))
 	return attr
 }
 
@@ -460,7 +460,7 @@ func createCardStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("9"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.9"))
 	return attr
 }
 
@@ -469,7 +469,7 @@ func createActiveSessions() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.activeconnections"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("0"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.3.1.0"))
 	return attr
 }
 
@@ -477,7 +477,7 @@ func createThreatCount() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.networkhealth.alerts.count"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("0"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.2.1.0"))
 	return attr
 }
 
@@ -485,7 +485,7 @@ func createVpnTunnelStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.networklinks.linkstatus"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("3"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.4.1.3"))
 	return attr
 }
 
@@ -494,6 +494,6 @@ func createDiskStatus() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.processes.status"
 	attr.Rules = make([]*types.Rule, 0)
-	attr.Rules = append(attr.Rules, createSetRule("4"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.2.3.1.4"))
 	return attr
 }
