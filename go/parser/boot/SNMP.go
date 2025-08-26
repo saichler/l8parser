@@ -116,10 +116,21 @@ func GetAllPolarisModels() []*types.Pollaris {
 
 // OID matching helper functions
 func isCiscoOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.9.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.9.")
 }
 
 func isCiscoSwitchOid(sysOid string) bool {
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	
 	// Cisco switch specific OIDs (Catalyst series)
 	switchOids := []string{
 		".1.3.6.1.4.1.9.1.122",  // Catalyst 2960
@@ -129,7 +140,7 @@ func isCiscoSwitchOid(sysOid string) bool {
 		".1.3.6.1.4.1.9.1.1146", // Catalyst 6500
 	}
 	for _, switchOid := range switchOids {
-		if strings.HasPrefix(sysOid, switchOid) {
+		if strings.HasPrefix(normalizedOid, switchOid) {
 			return true
 		}
 	}
@@ -137,35 +148,75 @@ func isCiscoSwitchOid(sysOid string) bool {
 }
 
 func isJuniperOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.2636.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.2636.")
 }
 
 func isPaloAltoOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.25461.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.25461.")
 }
 
 func isFortinetOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.12356.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.12356.")
 }
 
 func isAristaOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.30065.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.30065.")
 }
 
 func isNokiaOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.6527.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.6527.")
 }
 
 func isHuaweiOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.2011.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.2011.")
 }
 
 func isDellOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.674.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.674.")
 }
 
 func isHPEOid(sysOid string) bool {
-	return strings.HasPrefix(sysOid, ".1.3.6.1.4.1.232.")
+	// Normalize OID by ensuring it starts with a dot
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.232.")
 }
 
 func createSystemMibPoll(p *types.Pollaris) {
