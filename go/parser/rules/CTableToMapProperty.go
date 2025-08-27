@@ -2,26 +2,27 @@ package rules
 
 import (
 	"errors"
+	"reflect"
+	"strings"
+
 	"github.com/saichler/l8pollaris/go/types"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
 	"github.com/saichler/reflect/go/reflect/properties"
-	"reflect"
-	"strings"
 )
 
-type TableToMap struct{}
+type CTableToMapProperty struct{}
 
-func (this *TableToMap) Name() string {
-	return "TableToMap"
+func (this *CTableToMapProperty) Name() string {
+	return "CTableToMapProperty"
 }
 
-func (this *TableToMap) ParamNames() []string {
+func (this *CTableToMapProperty) ParamNames() []string {
 	return []string{""}
 }
 
-func (this *TableToMap) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}) error {
+func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}) error {
 	table, ok := workSpace[Output].(*types.CTable)
 	if !ok {
 		return errors.New("Workspace had an invalid output object")

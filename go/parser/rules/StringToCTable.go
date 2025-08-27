@@ -1,24 +1,25 @@
 package rules
 
 import (
+	"strings"
+
 	"github.com/saichler/l8pollaris/go/types"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
-	"strings"
 )
 
-type ToTable struct{}
+type StringToCTable struct{}
 
-func (this *ToTable) Name() string {
-	return "ToTable"
+func (this *StringToCTable) Name() string {
+	return "StringToCTable"
 }
 
-func (this *ToTable) ParamNames() []string {
+func (this *StringToCTable) ParamNames() []string {
 	return []string{"columns", "keycolumn"}
 }
 
-func (this *ToTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}) error {
+func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}) error {
 	input, ok := workSpace[Input].(string)
 	if !ok {
 		return nil

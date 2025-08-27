@@ -32,7 +32,12 @@ func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]inter
 	if output == nil {
 		return resources.Logger().Error("Nil 'output' parameter")
 	}
-	str, err := getStringInput(resources, input, params)
+	value, kind, err := GetValueInput(resources, input, params)
+	if err != nil {
+		return err
+	}
+	
+	str, err := convertToString(resources, value, kind)
 	if err != nil {
 		return err
 	}

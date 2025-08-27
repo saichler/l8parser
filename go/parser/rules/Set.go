@@ -24,7 +24,7 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 		return resources.Logger().Error("nil input for job")
 	}
 
-	str, err := getStringInput(resources, input, params)
+	value, _, err := GetValueInput(resources, input, params)
 	if err != nil {
 		return err
 	}
@@ -35,9 +35,15 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 			return resources.Logger().Error("error parsing instance path", err.Error())
 		}
 		if instance != nil {
-			instance.Set(any, str)
+			if instance.Node().TypeName == "string" {
+				value = string(value.([]byte))
+			}
+			_, _, err := instance.Set(any, value)
+			if err != nil {
+				return resources.Logger().Error("error setting property value:", err.Error())
+			}
 		}
 	}
-	workSpace[Output] = str
+	workSpace[Output] = value
 	return nil
 }

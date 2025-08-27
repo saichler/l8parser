@@ -21,9 +21,9 @@ func newParser() *_Parser {
 	p.rules[con.Name()] = con
 	set := &rules.Set{}
 	p.rules[set.Name()] = set
-	totable := &rules.ToTable{}
+	totable := &rules.StringToCTable{}
 	p.rules[totable.Name()] = totable
-	tableToMap := &rules.TableToMap{}
+	tableToMap := &rules.CTableToMapProperty{}
 	p.rules[tableToMap.Name()] = tableToMap
 	return p
 }
