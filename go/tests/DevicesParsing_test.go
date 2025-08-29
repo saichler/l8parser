@@ -71,5 +71,5 @@ func TestFullDevicesParsing(t *testing.T) {
 		//time.Sleep(time.Second)
 	}
 
-	time.Sleep(time.Second * 300)
+	time.Sleep(time.Second * 10)
 }
