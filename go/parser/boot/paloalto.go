@@ -50,7 +50,7 @@ func createPaloAltoInterfacesPoll(p *types.Pollaris) {
 
 func createPaloAltoSessionsPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoSessions")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.1"
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createActiveSessions())
@@ -59,7 +59,7 @@ func createPaloAltoSessionsPoll(p *types.Pollaris) {
 
 func createPaloAltoThreatsPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoThreats")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2.1"
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createThreatCount())

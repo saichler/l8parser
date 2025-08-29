@@ -20,7 +20,7 @@ func CreateDellServerBootPolls() *types.Pollaris {
 // Dell server-specific polling functions
 func createDellSystemPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("dellSystem")
-	poll.What = ".1.3.6.1.4.1.674.10892.5.1.3.1"
+	poll.What = ".1.3.6.1.4.1.674.10892.5.1.3"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createDellVersion())

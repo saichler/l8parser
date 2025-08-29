@@ -55,7 +55,7 @@ func (this *_Parser) Parse(job *types.CJob, any interface{}, resources ifs.IReso
 			if !ok {
 				return resources.Logger().Error("Cannot find parsing rule ", rData.Name)
 			}
-			err = ruleImpl.Parse(resources, workSpace, rData.Params, any)
+			err = ruleImpl.Parse(resources, workSpace, rData.Params, any, poll.What)
 			if err != nil {
 				return err
 			}

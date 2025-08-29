@@ -20,7 +20,7 @@ func CreateHPEServerBootPolls() *types.Pollaris {
 // HPE server-specific polling functions
 func createHPESystemPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("hpeSystem")
-	poll.What = ".1.3.6.1.4.1.232.2.2.4.2"
+	poll.What = ".1.3.6.1.4.1.232.2.2.4"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createHPEVersion())

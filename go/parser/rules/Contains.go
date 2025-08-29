@@ -1,10 +1,11 @@
 package rules
 
 import (
+	"strings"
+
 	"github.com/saichler/l8pollaris/go/types"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/reflect/go/reflect/properties"
-	"strings"
 )
 
 type Contains struct{}
@@ -17,7 +18,7 @@ func (this *Contains) ParamNames() []string {
 	return []string{"what"}
 }
 
-func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}) error {
+func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
 	input := workSpace[Input]
 	what := params[What]
 	output := params[Output]
@@ -32,11 +33,11 @@ func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]inter
 	if output == nil {
 		return resources.Logger().Error("Nil 'output' parameter")
 	}
-	value, kind, err := GetValueInput(resources, input, params)
+	value, kind, err := GetValueInput(resources, input, params, pollWhat)
 	if err != nil {
 		return err
 	}
-	
+
 	str, err := convertToString(resources, value, kind)
 	if err != nil {
 		return err

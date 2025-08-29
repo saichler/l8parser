@@ -20,7 +20,7 @@ func CreateAristaSwitchBootPolls() *types.Pollaris {
 // Arista device-specific polling functions
 func createAristaSystemPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("aristaSystem")
-	poll.What = ".1.3.6.1.4.1.30065.1.3.1.1"
+	poll.What = ".1.3.6.1.4.1.30065.1.3.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createAristaVersion())

@@ -27,7 +27,7 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 		elem := newElem.Interface()
 		err := Parser.Parse(job, elem, resources)
 		if err != nil {
-			panic(job.PollarisName + ":" + job.JobName + ":" + err.Error())
+			panic(job.DeviceId + ":" + job.PollarisName + ":" + job.JobName + ":" + err.Error())
 		}
 		if this.vnic == nil {
 			resources.Logger().Error("No Vnic to notify inventory")

@@ -22,7 +22,7 @@ func (this *CTableToMapProperty) ParamNames() []string {
 	return []string{""}
 }
 
-func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}) error {
+func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
 	table, ok := workSpace[Output].(*types.CTable)
 	if !ok {
 		return errors.New("Workspace had an invalid output object")

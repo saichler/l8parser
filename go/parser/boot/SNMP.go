@@ -475,7 +475,7 @@ func createActiveSessions() *types.Attribute {
 
 func createThreatCount() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.count"
+	attr.PropertyId = "networkdevice.networkhealth.alertcount"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.2.1.0"))
 	return attr

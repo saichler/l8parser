@@ -19,7 +19,7 @@ func (this *StringToCTable) ParamNames() []string {
 	return []string{"columns", "keycolumn"}
 }
 
-func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}) error {
+func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
 	input, ok := workSpace[Input].(string)
 	if !ok {
 		return nil

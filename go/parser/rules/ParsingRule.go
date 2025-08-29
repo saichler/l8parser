@@ -13,7 +13,7 @@ import (
 type ParsingRule interface {
 	Name() string
 	ParamNames() []string
-	Parse(ifs.IResources, map[string]interface{}, map[string]*types.Parameter, interface{}) error
+	Parse(ifs.IResources, map[string]interface{}, map[string]*types.Parameter, interface{}, string) error
 }
 
 func convertToString(resources ifs.IResources, value interface{}, kind reflect.Kind) (string, error) {
@@ -39,11 +39,11 @@ func convertToString(resources ifs.IResources, value interface{}, kind reflect.K
 }
 
 // GetValueInput extracts any value type from input data and returns the value, its reflect.Kind, and any error
-func GetValueInput(resources ifs.IResources, input interface{}, params map[string]*types.Parameter) (interface{}, reflect.Kind, error) {
+func GetValueInput(resources ifs.IResources, input interface{}, params map[string]*types.Parameter, pollWhat string) (interface{}, reflect.Kind, error) {
 	m, ok := input.(*types.CMap)
 	if ok {
 		if len(m.Data) == 0 {
-			return nil, reflect.Invalid, resources.Logger().Error("no data found in map")
+			return nil, reflect.Invalid, resources.Logger().Error("no data found in map:" + pollWhat)
 		}
 		from := params[From]
 		if from == nil {
@@ -64,17 +64,17 @@ func GetValueInput(resources ifs.IResources, input interface{}, params map[strin
 		}
 		return value, reflect.TypeOf(value).Kind(), nil
 	}
-	
+
 	byts, ok := input.([]byte)
 	if ok {
 		return byts, reflect.Slice, nil
 	}
-	
+
 	// Handle direct values
 	if input != nil {
 		return input, reflect.TypeOf(input).Kind(), nil
 	}
-	
+
 	return nil, reflect.Invalid, resources.Logger().Error("unsupported input type")
 }
 

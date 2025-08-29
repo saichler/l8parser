@@ -54,7 +54,7 @@ func createCiscoSystemPoll(p *types.Pollaris) {
 
 func createCiscoVersionPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ciscoVersion")
-	poll.What = ".1.3.6.1.4.1.9.9.25.1.1.1.2"
+	poll.What = ".1.3.6.1.4.1.9.9.25.1.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createCiscoVersion())
@@ -63,7 +63,7 @@ func createCiscoVersionPoll(p *types.Pollaris) {
 
 func createCiscoSerialPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ciscoSerial")
-	poll.What = ".1.3.6.1.4.1.9.3.6.3"
+	poll.What = ".1.3.6.1.4.1.9.3.6"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createCiscoSerial())

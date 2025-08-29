@@ -20,7 +20,7 @@ func CreateHuaweiRouterBootPolls() *types.Pollaris {
 // Huawei device-specific polling functions
 func createHuaweiSystemPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("huaweiSystem")
-	poll.What = ".1.3.6.1.4.1.2011.5.25.1.1.1"
+	poll.What = ".1.3.6.1.4.1.2011.5.25.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createHuaweiVersion())

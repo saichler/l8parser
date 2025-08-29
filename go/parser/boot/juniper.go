@@ -21,7 +21,7 @@ func CreateJuniperRouterBootPolls() *types.Pollaris {
 // Juniper device-specific polling functions
 func createJuniperSystemPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("juniperSystem")
-	poll.What = ".1.3.6.1.4.1.2636.3.1.2"
+	poll.What = ".1.3.6.1.4.1.2636.3.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createJuniperVersion())
@@ -60,7 +60,7 @@ func createJuniperChassisComponentsPoll(p *types.Pollaris) {
 
 func createJuniperRoutingEnginePoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("juniperRoutingEngine")
-	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.8"
+	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createRoutingEngineUtilization())
