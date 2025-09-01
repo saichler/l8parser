@@ -25,9 +25,10 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 		field := newElem.Elem().FieldByName(this.primaryKey)
 		field.Set(reflect.ValueOf(job.DeviceId))
 		elem := newElem.Interface()
-		err := Parser.Parse(job, elem, resources)
+		err = Parser.Parse(job, elem, resources)
 		if err != nil {
-			panic(job.DeviceId + ":" + job.PollarisName + ":" + job.JobName + ":" + err.Error())
+			resources.Logger().Error("ParsingCenter: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " - ")
+			return
 		}
 		if this.vnic == nil {
 			resources.Logger().Error("No Vnic to notify inventory")

@@ -11,6 +11,15 @@ import "google.golang.org/protobuf/encoding/protojson"
 
 func TestDevices(t *testing.T) {
 	deviceList := Devices()
+	/*
+		for _, device := range deviceList.List {
+			if device.Equipmentinfo.SysName == "NY-CORE-01" {
+				for _, phy := range device.Physicals {
+					fmt.Println(phy)
+				}
+				panic("dddd")
+			}
+		}*/
 	_, err := protojson.Marshal(deviceList)
 	if err != nil {
 		t.Error(err)

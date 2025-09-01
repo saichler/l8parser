@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L8Parser - Network Data Parsing Service</title>
     <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #f7f3e9 0%, #e8ddd4 100%);
+            --accent-gradient: linear-gradient(135deg, #a08873 0%, #8b745f 100%);
+            --highlight-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #4a4a4a;
+            --text-secondary: #6b5b4a;
+            --text-accent: #8b745f;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,10 +24,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
+            font-family: 'Georgia', serif;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--primary-bg);
+            min-height: 100vh;
         }
 
         .container {
@@ -25,33 +38,56 @@
         }
 
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--highlight-gradient);
             color: white;
-            padding: 2rem 0;
+            padding: 3rem 0;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        header .container {
+            position: relative;
+            z-index: 1;
         }
 
         header h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 0.5rem;
-            font-weight: 700;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 700px;
             margin: 0 auto;
+            font-style: italic;
         }
 
         nav {
-            background: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 0;
+            box-shadow: var(--shadow-soft);
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(139, 116, 95, 0.2);
         }
 
         nav ul {
@@ -59,78 +95,104 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
         nav a {
             text-decoration: none;
-            color: #667eea;
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+            color: var(--text-accent);
+            font-weight: 500;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
             transition: all 0.3s ease;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
         }
 
         nav a:hover {
-            background: #667eea;
+            background: var(--accent-gradient);
             color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
         }
 
         main {
-            padding: 3rem 0;
+            padding: 4rem 0;
         }
 
         section {
-            background: white;
-            margin: 2rem 0;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            margin: 3rem 0;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
         }
 
         h2 {
-            color: #667eea;
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 0.5rem;
+            color: var(--text-accent);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+            border-bottom: 3px solid;
+            border-image: var(--accent-gradient) 1;
+            padding-bottom: 0.8rem;
+            letter-spacing: 1px;
         }
 
         h3 {
-            color: #555;
-            font-size: 1.3rem;
-            margin: 1.5rem 0 1rem 0;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            margin: 2rem 0 1.2rem 0;
+            font-weight: 500;
         }
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin: 2.5rem 0;
         }
 
         .feature-card {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 5px solid;
+            border-image: var(--accent-gradient) 1;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .feature-card h4 {
-            color: #667eea;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
+            color: var(--text-accent);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
         .code-block {
-            background: #2d3748;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
             color: #f7fafc;
-            padding: 1.5rem;
-            border-radius: 8px;
+            padding: 2rem;
+            border-radius: 15px;
             overflow-x: auto;
             font-family: 'Courier New', monospace;
-            margin: 1rem 0;
-            line-height: 1.4;
+            margin: 1.5rem 0;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .code-block code {
@@ -142,84 +204,124 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin: 2rem 0;
+            gap: 1.5rem;
+            margin: 3rem 0;
         }
 
         .flow-step {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--accent-gradient);
             color: white;
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 1.5rem;
+            border-radius: 15px;
             text-align: center;
             flex: 1;
-            min-width: 200px;
+            min-width: 220px;
             position: relative;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.3s ease;
+        }
+
+        .flow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
         }
 
         .flow-step:not(:last-child)::after {
             content: '→';
             position: absolute;
-            right: -1rem;
+            right: -1.2rem;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.5rem;
-            color: #667eea;
+            font-size: 2rem;
+            color: var(--text-accent);
+            font-weight: bold;
         }
 
         .btn {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--accent-gradient);
             color: white;
-            padding: 0.8rem 2rem;
+            padding: 1rem 2.5rem;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: 600;
-            transition: transform 0.3s ease;
-            margin: 0.5rem 0.5rem 0.5rem 0;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0.8rem 0.8rem 0.8rem 0;
+            box-shadow: var(--shadow-soft);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            background: var(--highlight-gradient);
         }
 
         .github-link {
-            background: #333;
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+        }
+
+        .github-link:hover {
+            background: linear-gradient(135deg, #444 0%, #666 100%);
         }
 
         footer {
-            background: #2d3748;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
             color: white;
             text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
         }
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
         }
 
         .stat-item {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--accent-gradient);
             color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
+            padding: 2rem;
+            border-radius: 15px;
             text-align: center;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: var(--highlight-gradient);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .highlight-box h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            opacity: 0.95;
         }
 
         @media (max-width: 768px) {
             header h1 {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
 
             nav ul {
@@ -240,7 +342,12 @@
             }
 
             section {
-                padding: 1.5rem;
+                padding: 2rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
         }
     </style>
@@ -249,7 +356,7 @@
     <header>
         <div class="container">
             <h1>L8Parser</h1>
-            <p>A powerful parsing service for processing network data in the Layer8 ecosystem</p>
+            <p>A powerful, rule-based parsing service for processing network data in the Layer8 ecosystem</p>
         </div>
     </header>
 
@@ -259,6 +366,7 @@
                 <li><a href="#overview">Overview</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#recent-updates">Recent Updates</a></li>
                 <li><a href="#installation">Installation</a></li>
                 <li><a href="#usage">Usage</a></li>
                 <li><a href="#testing">Testing</a></li>
@@ -270,7 +378,7 @@
         <div class="container">
             <section id="overview">
                 <h2>Overview</h2>
-                <p>L8Parser is part of the Layer8 network management ecosystem and serves as the data transformation layer between data collection and inventory management. It processes raw data collected by l8collector and applies configurable parsing rules to extract meaningful information that can be stored in the inventory.</p>
+                <p>L8Parser serves as the intelligent data transformation layer within the Layer8 network management ecosystem. It processes raw data collected by l8collector, applying sophisticated parsing rules to extract meaningful information for inventory management. With support for multiple protocols and vendors, L8Parser ensures data consistency and reliability across diverse network infrastructures.</p>
                 
                 <div class="stats">
                     <div class="stat-item">
@@ -299,88 +407,129 @@
                 <h2>Features</h2>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>Rule-Based Parsing</h4>
-                        <p>Flexible parsing engine with pluggable rules that can be configured to handle various data transformation scenarios.</p>
+                        <h4>Advanced Rule-Based Parsing</h4>
+                        <p>Sophisticated parsing engine with pluggable rules including Contains, Set, StringToCTable, and CTableToMapProperty for comprehensive data transformation scenarios.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>PropertyId Path Injection</h4>
+                        <p>Intelligent property path resolution with automatic slice index and map key injection using reflect.Kind values for complex nested data structures.</p>
                     </div>
                     <div class="feature-card">
                         <h4>Multi-Vendor SNMP Support</h4>
-                        <p>Comprehensive SNMP support for 9 major vendors with automatic OID-based device detection and vendor-specific configurations.</p>
+                        <p>Comprehensive SNMP support for 9 major vendors with automatic OID-based device detection and vendor-specific configurations optimized for hardware monitoring.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Protocol Agnostic</h4>
-                        <p>Extensible architecture supporting multiple collection protocols beyond SNMP.</p>
+                        <h4>Protocol Buffer Integration</h4>
+                        <p>Seamless protobuf integration with field name mapping and type-safe data structure handling for consistent inventory representation.</p>
                     </div>
                     <div class="feature-card">
                         <h4>Real-time Processing</h4>
-                        <p>Event-driven processing of collector jobs with concurrent rule execution for optimal performance.</p>
+                        <p>Event-driven processing of collector jobs with concurrent rule execution and optimized memory management for high-performance data transformation.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Service Integration</h4>
-                        <p>Seamless integration with Layer8 service architecture including inventory and collector services.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Error Handling</h4>
-                        <p>Comprehensive error handling with validation, parsing error recovery, and graceful degradation.</p>
+                        <h4>Enhanced Error Handling</h4>
+                        <p>Comprehensive error handling with property resolution validation, parsing error recovery, and graceful degradation for robust operation.</p>
                     </div>
                 </div>
             </section>
 
+            <section id="recent-updates">
+                <h2>Recent Updates</h2>
+                <div class="highlight-box">
+                    <h4>🚀 Latest Enhancements</h4>
+                    <p>Recent improvements include PropertyId injection functionality, enhanced field name mappings, and comprehensive protobuf integration fixes.</p>
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>PropertyId Path Enhancement</h4>
+                        <p>Implemented intelligent PropertyId injection with slice indices and map keys using format <code>&lt;{reflect.Kind}value&gt;</code> for complex data structures like interfaces, modules, and power supplies.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Field Name Mapping Optimization</h4>
+                        <p>Refined field name mappings to correctly handle protobuf field names, removing incorrect underscore transformations while preserving necessary collection mappings.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Rule Engine Improvements</h4>
+                        <p>Updated Set rule to handle different data types directly without string conversion, improved error handling, and enhanced property resolution for better reliability.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>SNMP Configuration Fixes</h4>
+                        <p>Corrected SNMP OID relationships ensuring poll.What represents walk OIDs and attr.Params["from"] contains specific leaf OIDs for accurate data collection.</p>
+                    </div>
+                </div>
+
+                <h3>Technical Improvements</h3>
+                <ul style="margin-left: 2rem; color: var(--text-secondary);">
+                    <li><strong>Protocol Buffer Compatibility:</strong> All PropertyId values now correctly map to NetworkDevice protobuf model fields</li>
+                    <li><strong>Collection Indexing:</strong> Support for repeated fields with proper index injection for physicals, logicals, interfaces, modules, etc.</li>
+                    <li><strong>Type Safety:</strong> Enhanced type handling in Set rule eliminating string conversion assumptions</li>
+                    <li><strong>Error Resilience:</strong> Improved property resolution with better error messages and validation</li>
+                </ul>
+            </section>
+
             <section id="architecture">
                 <h2>Architecture</h2>
-                <h3>Processing Flow</h3>
+                <h3>Enhanced Processing Flow</h3>
                 <div class="architecture-flow">
                     <div class="flow-step">
                         <strong>Job Reception</strong><br>
-                        Receive completed collection jobs from l8collector
+                        Receive completed collection jobs from l8collector with enhanced validation
+                    </div>
+                    <div class="flow-step">
+                        <strong>PropertyId Processing</strong><br>
+                        Apply intelligent path injection and field name mapping
                     </div>
                     <div class="flow-step">
                         <strong>Rule Application</strong><br>
-                        Apply configured parsing rules based on Pollaris configuration
-                    </div>
-                    <div class="flow-step">
-                        <strong>Data Transformation</strong><br>
-                        Transform raw data into structured objects
+                        Execute configured parsing rules with type-safe processing
                     </div>
                     <div class="flow-step">
                         <strong>Inventory Update</strong><br>
-                        Send parsed objects to inventory service
+                        Send validated objects to inventory service
                     </div>
                 </div>
 
                 <h3>Core Components</h3>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>Parser Service</h4>
-                        <p><code>go/parser/service/Parser.go</code> - Main parsing engine that processes jobs</p>
+                        <h4>Enhanced Set Rule</h4>
+                        <p><code>Set.go</code> - Advanced property setting with PropertyId injection, field mapping, and type-safe value handling</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Collection Rules</h4>
+                        <p><code>StringToCTable.go</code>, <code>CTableToMapProperty.go</code> - Specialized rules for table and map transformations</p>
                     </div>
                     <div class="feature-card">
                         <h4>Parsing Service</h4>
-                        <p><code>go/parser/service/ParsingService.go</code> - Service wrapper implementing Layer8 service interface</p>
+                        <p><code>ParsingService.go</code> - Service wrapper with improved error handling and job management</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Parsing Center</h4>
-                        <p><code>go/parser/service/ParsingCenter.go</code> - Job completion handler and inventory integration</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Rule Engine</h4>
-                        <p><code>go/parser/rules/</code> - Collection of parsing rules for data transformation</p>
+                        <h4>SNMP Boot Configurations</h4>
+                        <p>Vendor-specific configurations with corrected OID relationships and optimized polling strategies</p>
                     </div>
                 </div>
 
+                <h3>PropertyId Injection System</h3>
+                <div class="highlight-box">
+                    <h4>Intelligent Path Resolution</h4>
+                    <p>The new PropertyId injection system automatically resolves complex nested paths by injecting slice indices and map keys. For example, <code>networkdevice.physicals.interfaces.name</code> becomes <code>networkdevice.physicals&lt;{24}physical-0&gt;.interfaces&lt;{2}0&gt;.name</code> for proper property resolution.</p>
+                </div>
+
                 <h3>SNMP Boot Configurations</h3>
-                <p>Vendor-specific SNMP polling configurations are organized in separate modules:</p>
+                <p>Comprehensive vendor-specific SNMP polling configurations with corrected OID relationships:</p>
                 <div class="feature-grid">
                     <div class="feature-card">
                         <h4>Network Vendors</h4>
-                        <p><code>cisco.go</code> - Cisco switches/routers<br>
-                        <code>juniper.go</code> - Juniper routers<br>
+                        <p><code>cisco.go</code> - Cisco switches/routers with routing support<br>
+                        <code>juniper.go</code> - Juniper routers with chassis monitoring<br>
                         <code>arista.go</code> - Arista switches<br>
                         <code>nokia.go</code> - Nokia routers</p>
                     </div>
                     <div class="feature-card">
                         <h4>Security Vendors</h4>
                         <p><code>paloalto.go</code> - Palo Alto firewalls<br>
-                        <code>fortinet.go</code> - Fortinet firewalls</p>
+                        <code>fortinet.go</code> - Fortinet firewalls with connection monitoring</p>
                     </div>
                     <div class="feature-card">
                         <h4>Server Vendors</h4>
@@ -389,39 +538,40 @@
                         <code>huawei.go</code> - Huawei routers</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Common Framework</h4>
-                        <p><code>SNMP.go</code> - Common utilities, generic polling, and device detection functions</p>
+                        <h4>Enhanced Framework</h4>
+                        <p><code>SNMP.go</code> - Common utilities with improved OID handling, device detection, and property mapping</p>
                     </div>
                 </div>
 
-                <h3>Parsing Rules</h3>
-                <ul>
-                    <li><strong>Contains</strong> - Searches for specific text patterns in data</li>
-                    <li><strong>Set</strong> - Directly sets values to object properties</li>
-                    <li><strong>ToTable</strong> - Converts data into tabular format</li>
-                    <li><strong>TableToMap</strong> - Transforms tables into key-value maps</li>
+                <h3>Advanced Parsing Rules</h3>
+                <ul style="margin-left: 2rem; color: var(--text-secondary);">
+                    <li><strong>Contains</strong> - Pattern matching with enhanced text search capabilities</li>
+                    <li><strong>Set</strong> - Direct property setting with type-safe value handling and PropertyId injection</li>
+                    <li><strong>StringToCTable</strong> - String to table conversion with improved parsing</li>
+                    <li><strong>CTableToMapProperty</strong> - Table to map transformation for complex data structures</li>
                 </ul>
             </section>
 
             <section id="installation">
                 <h2>Installation</h2>
                 <h3>Prerequisites</h3>
-                <ul>
+                <ul style="margin-left: 2rem; color: var(--text-secondary);">
                     <li>Go 1.23.8 or higher</li>
                     <li>Access to Layer8 ecosystem modules</li>
+                    <li>Protocol Buffer compiler (for development)</li>
                 </ul>
 
                 <h3>Dependencies</h3>
-                <p>The project depends on several Layer8 modules:</p>
-                <ul>
-                    <li><code>l8collector</code> - Data collection framework</li>
-                    <li><code>l8inventory</code> - Inventory management</li>
-                    <li><code>l8pollaris</code> - Polling configuration</li>
-                    <li><code>l8types</code> - Common types and interfaces</li>
-                    <li><code>l8services</code> - Service framework</li>
+                <p>The project integrates with several Layer8 modules:</p>
+                <ul style="margin-left: 2rem; color: var(--text-secondary);">
+                    <li><code>l8collector</code> - Enhanced data collection framework</li>
+                    <li><code>l8inventory</code> - Inventory management with protobuf support</li>
+                    <li><code>l8pollaris</code> - Advanced polling configuration</li>
+                    <li><code>l8types</code> - Common types and enhanced interfaces</li>
+                    <li><code>reflect</code> - Property reflection and manipulation</li>
                 </ul>
 
-                <h3>Build</h3>
+                <h3>Build & Test</h3>
                 <div class="code-block">
 <code># Clone the repository
 git clone https://github.com/saichler/l8parser
@@ -429,50 +579,70 @@ git clone https://github.com/saichler/l8parser
 # Navigate to the Go module
 cd l8parser/go
 
-# Run the build script
-./test.sh</code>
+# Run the enhanced build and test script
+./test.sh
+
+# Run specific tests
+go test ./tests -v</code>
                 </div>
-                <p>The test.sh script will initialize Go modules, fetch dependencies, run security checks, execute unit tests with coverage, and generate coverage reports.</p>
+                <p>The enhanced test script includes security checks, comprehensive unit tests, coverage analysis, and integration testing with improved error handling.</p>
             </section>
 
             <section id="usage">
                 <h2>Usage</h2>
-                <h3>Basic Integration</h3>
+                <h3>Enhanced Integration</h3>
                 <div class="code-block">
 <code>import (
     "github.com/saichler/l8parser/go/parser/service"
     "github.com/saichler/l8types/go/ifs"
 )
 
-// Create and activate parsing service
+// Create parsing service with enhanced error handling
 parsingService := &service.ParsingService{}
 err := parsingService.Activate(
     "parsing-service",
     serviceArea,
     resources,
     vnic,
-    &NetworkDevice{}, // Target object type
+    &NetworkDevice{}, // Target protobuf object
     "Id",            // Primary key field
 )</code>
                 </div>
 
-                <h3>SNMP Configuration Example</h3>
+                <h3>PropertyId Injection Example</h3>
                 <div class="code-block">
-<code>// SNMP polling configuration with parsing rules
+<code>// PropertyId with automatic injection for nested collections
+attr := &types.Attribute{
+    PropertyId: "networkdevice.physicals.interfaces.name",
+    Rules: []*types.Rule{
+        {
+            Name: "Set",
+            Params: map[string]*types.Parameter{
+                "from": {Value: ".1.3.6.1.2.1.2.2.1.2.1"},
+            },
+        },
+    },
+}
+
+// Automatically becomes:
+// "networkdevice.physicals<{24}physical-0>.interfaces<{2}0>.name"</code>
+                </div>
+
+                <h3>Advanced SNMP Configuration</h3>
+                <div class="code-block">
+<code>// Enhanced SNMP polling with corrected OID relationships
 poll := &types.Poll{
     Name:      "systemMib",
-    What:      ".1.3.6.1.2.1.1", // SNMP OID
+    What:      ".1.3.6.1.2.1.1",     // Walk OID (container)
     Operation: types.Operation_OMap,
     Attributes: []*types.Attribute{
         {
-            PropertyId: "networkdevice.equipmentinfo.vendor",
+            PropertyId: "networkdevice.equipmentinfo.sysname",
             Rules: []*types.Rule{
                 {
-                    Name: "Contains",
+                    Name: "Set",
                     Params: map[string]*types.Parameter{
-                        "what":   {Value: "cisco"},
-                        "from":   {Value: ".1.3.6.1.2.1.1.1.0"},
-                        "output": {Value: "Cisco"},
+                        "from": {Value: ".1.3.6.1.2.1.1.5.0"}, // Specific leaf OID
                     },
                 },
             },
@@ -481,87 +651,89 @@ poll := &types.Poll{
 }</code>
                 </div>
 
-                <h3>Multi-Vendor SNMP Support</h3>
-                <p>L8Parser now includes comprehensive vendor-specific SNMP configurations with automatic device detection:</p>
-                
+                <h3>Field Name Mapping</h3>
+                <div class="highlight-box">
+                    <h4>Automatic Field Resolution</h4>
+                    <p>The enhanced parser automatically handles field name mappings between PropertyId paths and protobuf fields. Collection names like "powersupplies" map to "power_supplies" while individual fields use camelCase directly (e.g., "sysname" → "SysName").</p>
+                </div>
+
+                <h3>Enhanced Multi-Vendor Support</h3>
                 <div class="feature-grid">
                     <div class="feature-card">
                         <h4>Network Equipment</h4>
-                        <p><strong>Cisco:</strong> Switches & Routers (.1.3.6.1.4.1.9.)<br>
-                        <strong>Juniper:</strong> Routers (.1.3.6.1.4.1.2636.)<br>
-                        <strong>Arista:</strong> Switches (.1.3.6.1.4.1.30065.)<br>
-                        <strong>Nokia:</strong> Routers (.1.3.6.1.4.1.6527.)</p>
+                        <p><strong>Cisco:</strong> Enhanced switch/router support with routing tables<br>
+                        <strong>Juniper:</strong> Advanced chassis and interface monitoring<br>
+                        <strong>Arista:</strong> High-performance switch configurations<br>
+                        <strong>Nokia:</strong> Service router optimizations</p>
                     </div>
                     <div class="feature-card">
                         <h4>Security Appliances</h4>
-                        <p><strong>Palo Alto:</strong> Firewalls (.1.3.6.1.4.1.25461.)<br>
-                        <strong>Fortinet:</strong> Firewalls (.1.3.6.1.4.1.12356.)</p>
+                        <p><strong>Palo Alto:</strong> Firewall monitoring with threat detection<br>
+                        <strong>Fortinet:</strong> Enhanced security metrics and connection tracking</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Servers & Infrastructure</h4>
-                        <p><strong>Dell:</strong> Servers (.1.3.6.1.4.1.674.)<br>
-                        <strong>HPE:</strong> Servers (.1.3.6.1.4.1.232.)<br>
-                        <strong>Huawei:</strong> Routers (.1.3.6.1.4.1.2011.)</p>
+                        <h4>Server Infrastructure</h4>
+                        <p><strong>Dell:</strong> Comprehensive server health monitoring<br>
+                        <strong>HPE:</strong> Advanced hardware diagnostics<br>
+                        <strong>Huawei:</strong> Router performance and environmental monitoring</p>
                     </div>
                     <div class="feature-card">
                         <h4>Automatic Detection</h4>
-                        <p>OID-based device identification with vendor-specific polling configurations for hardware monitoring, performance metrics, and device-specific attributes.</p>
+                        <p>Enhanced OID-based detection with improved vendor identification and optimized polling configurations for each device type.</p>
                     </div>
-                </div>
-
-                <h3>Device Detection API</h3>
-                <div class="code-block">
-<code>// Automatic device detection by sysOID
-polaris := GetPollarisByOid(".1.3.6.1.4.1.9.1.122.0") // Returns Cisco switch config
-
-// Get all available vendor models
-models := GetAllPolarisModels() // Returns slice of all 11 device models</code>
                 </div>
             </section>
 
             <section id="testing">
                 <h2>Testing</h2>
-                <h3>Unit Tests</h3>
-                <p>Run the comprehensive test suite:</p>
+                <h3>Comprehensive Test Suite</h3>
+                <p>Enhanced testing framework with improved coverage:</p>
                 <div class="code-block">
 <code>cd go
-./test.sh</code>
+./test.sh  # Complete test suite with security checks
+
+# Individual test categories
+go test ./tests -run TestDevicesParsing -v
+go test ./tests -run TestPropertyInjection -v</code>
                 </div>
 
-                <h3>Test Coverage</h3>
-                <p>The test script generates detailed coverage reports covering:</p>
-                <ul>
-                    <li>Parser engine functionality</li>
-                    <li>Rule execution</li>
-                    <li>Service integration</li>
-                    <li>Error handling</li>
-                </ul>
-
-                <h3>Integration Testing</h3>
-                <p>The test suite includes integration tests that:</p>
-                <ul>
-                    <li>Simulate SNMP device responses</li>
-                    <li>Test end-to-end parsing workflows</li>
-                    <li>Validate inventory integration</li>
-                </ul>
-
-                <h3>Performance Features</h3>
+                <h3>Enhanced Test Coverage</h3>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>Concurrent Processing</h4>
-                        <p>Parallel rule execution for optimal performance</p>
+                        <h4>PropertyId Injection Testing</h4>
+                        <p>Comprehensive tests for slice index and map key injection with various data structures</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Field Name Mapping Validation</h4>
+                        <p>Verification of correct field name transformations and protobuf compatibility</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Rule Engine Testing</h4>
+                        <p>Enhanced rule execution tests including type safety and error handling scenarios</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Integration Testing</h4>
+                        <p>End-to-end testing with simulated SNMP responses and inventory integration validation</p>
+                    </div>
+                </div>
+
+                <h3>Performance Optimizations</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Enhanced Concurrent Processing</h4>
+                        <p>Optimized parallel rule execution with improved memory management</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Smart Caching</h4>
+                        <p>PropertyId resolution caching and reflection optimization for better performance</p>
                     </div>
                     <div class="feature-card">
                         <h4>Memory Efficiency</h4>
-                        <p>Streaming data processing to minimize memory usage</p>
+                        <p>Reduced memory footprint through optimized data structures and streaming processing</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Caching</h4>
-                        <p>Rule compilation and object reflection caching</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Monitoring</h4>
-                        <p>Processing time, throughput metrics, and health checks</p>
+                        <h4>Enhanced Monitoring</h4>
+                        <p>Detailed metrics for PropertyId resolution, parsing times, and error tracking</p>
                     </div>
                 </div>
             </section>
@@ -570,20 +742,20 @@ models := GetAllPolarisModels() // Returns slice of all 11 device models</code>
                 <h2>Related Projects</h2>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4><a href="https://github.com/saichler/l8collector" style="color: #667eea;">l8collector</a></h4>
-                        <p>Data collection framework</p>
+                        <h4><a href="https://github.com/saichler/l8collector" style="color: var(--text-accent);">l8collector</a></h4>
+                        <p>Enhanced data collection framework with improved SNMP support</p>
                     </div>
                     <div class="feature-card">
-                        <h4><a href="https://github.com/saichler/l8inventory" style="color: #667eea;">l8inventory</a></h4>
-                        <p>Inventory management</p>
+                        <h4><a href="https://github.com/saichler/l8inventory" style="color: var(--text-accent);">l8inventory</a></h4>
+                        <p>Inventory management with protobuf integration</p>
                     </div>
                     <div class="feature-card">
-                        <h4><a href="https://github.com/saichler/l8pollaris" style="color: #667eea;">l8pollaris</a></h4>
-                        <p>Polling configuration</p>
+                        <h4><a href="https://github.com/saichler/l8pollaris" style="color: var(--text-accent);">l8pollaris</a></h4>
+                        <p>Advanced polling configuration and management</p>
                     </div>
                     <div class="feature-card">
-                        <h4><a href="https://github.com/saichler/layer8" style="color: #667eea;">layer8</a></h4>
-                        <p>Core Layer8 framework</p>
+                        <h4><a href="https://github.com/saichler/layer8" style="color: var(--text-accent);">layer8</a></h4>
+                        <p>Core Layer8 framework and service architecture</p>
                     </div>
                 </div>
             </section>
@@ -593,12 +765,12 @@ models := GetAllPolarisModels() // Returns slice of all 11 device models</code>
     <footer>
         <div class="container">
             <p>&copy; 2025 L8Parser. Licensed under the Apache License, Version 2.0.</p>
-            <p>For issues, questions, or contributions, visit the <a href="https://github.com/saichler/l8parser" style="color: #667eea;">GitHub repository</a>.</p>
+            <p>For issues, questions, or contributions, visit the <a href="https://github.com/saichler/l8parser" style="color: #a08873;">GitHub repository</a>.</p>
         </div>
     </footer>
 
     <script>
-        // Smooth scrolling for navigation links
+        // Enhanced smooth scrolling for navigation links
         document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -612,14 +784,14 @@ models := GetAllPolarisModels() // Returns slice of all 11 device models</code>
             });
         });
 
-        // Add active state to navigation based on scroll position
+        // Enhanced navigation with smooth transitions
         window.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('section[id]');
             const navLinks = document.querySelectorAll('nav a[href^="#"]');
             
             let current = '';
             sections.forEach(section => {
-                const sectionTop = section.offsetTop - 100;
+                const sectionTop = section.offsetTop - 120;
                 if (window.scrollY >= sectionTop) {
                     current = section.getAttribute('id');
                 }
@@ -627,12 +799,36 @@ models := GetAllPolarisModels() // Returns slice of all 11 device models</code>
 
             navLinks.forEach(link => {
                 link.style.background = '';
-                link.style.color = '#667eea';
+                link.style.color = 'var(--text-accent)';
+                link.style.transform = '';
                 if (link.getAttribute('href') === `#${current}`) {
-                    link.style.background = '#667eea';
+                    link.style.background = 'var(--accent-gradient)';
                     link.style.color = 'white';
+                    link.style.transform = 'translateY(-2px)';
                 }
             });
+        });
+
+        // Add subtle animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
         });
     </script>
 </body>
