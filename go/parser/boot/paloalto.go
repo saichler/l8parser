@@ -12,7 +12,6 @@ func CreatePaloAltoFirewallBootPolls() *types.Pollaris {
 	polaris.Polling = make(map[string]*types.Poll)
 	createPaloAltoSystemPoll(polaris)
 	createPaloAltoMibSystemPoll(polaris)
-	createPaloAltoInterfacesPoll(polaris)
 	createPaloAltoSessionsPoll(polaris)
 	createPaloAltoThreatsPoll(polaris)
 	return polaris
@@ -39,12 +38,11 @@ func createPaloAltoMibSystemPoll(p *types.Pollaris) {
 }
 
 func createPaloAltoInterfacesPoll(p *types.Pollaris) {
-	poll := createBaseSNMPPoll("paloAltoInterfaces")
-	poll.What = ".1.3.6.1.2.1.2.2.1"
-	poll.Operation = types.Operation_OMap
+	poll := createBaseSNMPPoll("ifTable")
+	poll.What = ".1.3.6.1.2.1.2.2"
+	poll.Operation = types.Operation_OTable
 	poll.Attributes = make([]*types.Attribute, 0)
-	poll.Attributes = append(poll.Attributes, createInterfaceName())
-	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
+	poll.Attributes = append(poll.Attributes, createPaloAltoIfTableRule())
 	p.Polling[poll.Name] = poll
 }
 
@@ -64,6 +62,20 @@ func createPaloAltoThreatsPoll(p *types.Pollaris) {
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createThreatCount())
 	p.Polling[poll.Name] = poll
+}
+
+func createPaloAltoIfTableRule() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.physicals"
+	attr.Rules = make([]*types.Rule, 0)
+	
+	// Use custom rule to translate ifTable CTable to NetworkDevice.physicals
+	rule := &types.Rule{}
+	rule.Name = "IfTableToPhysicals"
+	rule.Params = make(map[string]*types.Parameter)
+	attr.Rules = append(attr.Rules, rule)
+	
+	return attr
 }
 
 // Palo Alto-specific attribute creation functions

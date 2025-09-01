@@ -20,6 +20,7 @@ func CreateSNMPBootPolls() *types.Pollaris {
 	snmpPolaris.Polling = make(map[string]*types.Poll)
 	createSystemMibPoll(snmpPolaris)
 	createIfTable(snmpPolaris)
+	createEntityMibPoll(snmpPolaris)
 	return snmpPolaris
 }
 
@@ -235,8 +236,18 @@ func createIfTable(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ifTable")
 	poll.What = ".1.3.6.1.2.1.2.2"
 	poll.Operation = types.Operation_OTable
+	poll.Cadence = -1 // Disable ifTable polling
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createIfTableRule())
+	p.Polling[poll.Name] = poll
+}
+
+func createEntityMibPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("entityMib")
+	poll.What = ".1.3.6.1.2.1.47.1.1"
+	poll.Operation = types.Operation_OTable
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createEntityMibRule())
 	p.Polling[poll.Name] = poll
 }
 
@@ -251,17 +262,28 @@ func createVendor() *types.Attribute {
 
 func createIfTableRule() *types.Attribute {
 	attr := &types.Attribute{}
-	attr.PropertyId = "networkdevice.physicals.<1>.ports"
+	attr.PropertyId = "networkdevice.physicals"
 	attr.Rules = make([]*types.Rule, 0)
 	
-	// First convert the SNMP table data to CTable format
-	stringToCTableRule := createToTable(22, 0) // ifTable has 22 columns, ifIndex is key (column 0)
-	attr.Rules = append(attr.Rules, stringToCTableRule)
+	// Use custom rule to translate ifTable CTable to NetworkDevice.physicals
+	rule := &types.Rule{}
+	rule.Name = "IfTableToPhysicals"
+	rule.Params = make(map[string]*types.Parameter)
+	attr.Rules = append(attr.Rules, rule)
 	
-	// Then map the CTable to the NetworkDevice model
-	tableToMapRule := createTableToMap()
-	tableToMapRule.Params[rules.KeyColumn] = &types.Parameter{Name: rules.KeyColumn, Value: "0"}
-	attr.Rules = append(attr.Rules, tableToMapRule)
+	return attr
+}
+
+func createEntityMibRule() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.physicals"
+	attr.Rules = make([]*types.Rule, 0)
+	
+	// Use custom rule to translate Entity MIB CTable to NetworkDevice.physicals
+	rule := &types.Rule{}
+	rule.Name = "EntityMibToPhysicals"
+	rule.Params = make(map[string]*types.Parameter)
+	attr.Rules = append(attr.Rules, rule)
 	
 	return attr
 }

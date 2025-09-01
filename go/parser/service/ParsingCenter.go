@@ -1,11 +1,15 @@
 package service
 
 import (
+	"fmt"
 	"reflect"
+	"strings"
+	"time"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/types"
 	"github.com/saichler/l8types/go/ifs"
+	types2 "github.com/saichler/probler/go/types"
 )
 
 func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResources) {
@@ -27,7 +31,7 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 		elem := newElem.Interface()
 		err = Parser.Parse(job, elem, resources)
 		if err != nil {
-			resources.Logger().Error("ParsingCenter: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " - ")
+			resources.Logger().Error("ParsingCenter: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " - ", err.Error())
 			return
 		}
 		if this.vnic == nil {
@@ -38,8 +42,16 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 			ifs.PATCH, elem)
 		if err != nil {
 			this.vnic.Resources().Logger().Error(err.Error())
+		} else {
+			name := jobFileName(job)
+			if strings.Contains(name, "ifTable") {
+				fmt.Println("*************************")
+				nd := elem.(*types2.NetworkDevice)
+				fmt.Println(nd)
+				fmt.Println("**********************")
+				time.Sleep(time.Second)
+			}
+			this.vnic.Resources().Logger().Info("Patch Job ", jobFileName(job))
 		}
-		this.vnic.Resources().Logger().Info("Sent model to ", job.IService.ServiceName,
-			" area ", job.IService.ServiceArea)
 	}
 }

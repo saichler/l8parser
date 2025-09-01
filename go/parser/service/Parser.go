@@ -25,6 +25,12 @@ func newParser() *_Parser {
 	p.rules[totable.Name()] = totable
 	tableToMap := &rules.CTableToMapProperty{}
 	p.rules[tableToMap.Name()] = tableToMap
+	debugTableToMap := &rules.DebugCTableToMapProperty{}
+	p.rules[debugTableToMap.Name()] = debugTableToMap
+	ifTableToPhysicals := &rules.IfTableToPhysicals{}
+	p.rules[ifTableToPhysicals.Name()] = ifTableToPhysicals
+	entityMibToPhysicals := &rules.EntityMibToPhysicals{}
+	p.rules[entityMibToPhysicals.Name()] = entityMibToPhysicals
 	return p
 }
 
@@ -43,6 +49,7 @@ func (this *_Parser) Parse(job *types.CJob, any interface{}, resources ifs.IReso
 	if poll.Attributes == nil {
 		return resources.Logger().Error("No attributes are defined on pollaris "+job.PollarisName, ":", job.JobName)
 	}
+
 	for _, attr := range poll.Attributes {
 		workSpace[rules.PropertyId] = attr.PropertyId
 		for _, rData := range attr.Rules {

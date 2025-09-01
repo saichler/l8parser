@@ -54,7 +54,7 @@ func TestFullDevicesParsing(t *testing.T) {
 
 	vnic.Resources().Registry().Register(&parsing.ParsingService{})
 	vnic.Resources().Services().Activate(parsing.ServiceType, netDevices[0].ParsingService.ServiceName, byte(netDevices[0].ParsingService.ServiceArea),
-		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id")
+		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", false)
 
 	vnic.Resources().Registry().Register(&utils_inventory.MockOrmService{})
 	vnic.Resources().Services().Activate(utils_inventory.ServiceType, netDevices[0].InventoryService.ServiceName, byte(netDevices[0].InventoryService.ServiceArea),
