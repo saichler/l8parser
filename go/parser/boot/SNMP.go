@@ -235,6 +235,7 @@ func createSystemMibPoll(p *types.Pollaris) {
 	poll.Attributes = append(poll.Attributes, createSystemModel())      // networkdevice.equipmentinfo.model
 	poll.Attributes = append(poll.Attributes, createSystemUptime())     // networkdevice.equipmentinfo.uptime
 	poll.Attributes = append(poll.Attributes, createSystemLocation())   // networkdevice.equipmentinfo.location
+	poll.Attributes = append(poll.Attributes, createSystemDeviceType()) // networkdevice.equipmentinfo.device_type
 	p.Polling[poll.Name] = poll
 }
 
@@ -1805,6 +1806,20 @@ func createSystemLocation() *types.Attribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.location"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.6.0")) // sysLocation
+	return attr
+}
+
+func createSystemDeviceType() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.device_type"
+	attr.Rules = make([]*types.Rule, 0)
+	// Use InferDeviceType rule that analyzes sysObjectID to determine device type
+	rule := &types.Rule{}
+	rule.Name = "InferDeviceType"
+	rule.Params = make(map[string]*types.Parameter)
+	// Pass the sysObjectID OID for analysis
+	rule.Params["From"] = &types.Parameter{Value: ".1.3.6.1.2.1.1.2.0"} // sysObjectID
+	attr.Rules = append(attr.Rules, rule)
 	return attr
 }
 

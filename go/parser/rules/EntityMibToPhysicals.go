@@ -3,6 +3,7 @@ package rules
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -113,41 +114,29 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 
 	// Initialize component maps
 	portMap := make(map[string]*types2.Port)
+	
+	// First, collect entity data from all columns for each entity
+	entityData := make(map[string]map[int]interface{}) // entityIndex -> column -> value
 
 	// Process each row in the Entity MIB table
 	for rowKey, row := range table.Rows {
 		entityIndex := fmt.Sprintf("%d", rowKey)
+		entityData[entityIndex] = make(map[int]interface{})
 		
 		// Handle multi-column Entity MIB table
 		if len(table.Columns) > 1 {
-			// Multi-column case - process all relevant columns for this entity
-			// Look for entPhysicalClass column (column 5)
+			// Multi-column case - collect data from all relevant columns
 			for colKey, colName := range table.Columns {
-				if colNum, err := strconv.Atoi(colName); err == nil && colNum == 5 {
-					// Found entPhysicalClass column
-					data, ok := row.Data[colKey]
-					if !ok {
-						continue
-					}
-					value := getEntityValue(data, resources)
-					if value == nil {
-						continue
-					}
-					
-					entityClassInt := 0
-					if classStr := fmt.Sprintf("%v", value); classStr != "" {
-						if val, err := strconv.Atoi(classStr); err == nil {
-							entityClassInt = val
+				if colNum, err := strconv.Atoi(colName); err == nil {
+					// Collect data from key columns
+					if colNum == 2 || colNum == 5 || colNum == 7 || colNum == 11 || colNum == 13 { // descr, class, name, serial, model
+						data, ok := row.Data[colKey]
+						if ok {
+							value := getEntityValue(data, resources)
+							if value != nil {
+								entityData[entityIndex][colNum] = value
+							}
 						}
-					}
-					
-					fmt.Printf("DEBUG EntityMibToPhysicals: Entity %s has class %d\n", entityIndex, entityClassInt)
-					if entityClassInt == EntPhysicalClassPort {
-						port := &types2.Port{
-							Id: entityIndex,
-						}
-						portMap[entityIndex] = port
-						fmt.Printf("DEBUG EntityMibToPhysicals: Found port entity %s with class %d\n", entityIndex, entityClassInt)
 					}
 				}
 			}
@@ -175,28 +164,56 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 				continue
 			}
 			value := getEntityValue(data, resources)
-			if value == nil {
-				continue
+			if value != nil {
+				entityData[entityIndex][entityColumn] = value
+			}
+		}
+	}
+	
+	// Now process the collected entity data to create ports and interfaces
+	for entityIndex, columns := range entityData {
+		// Check if this entity is a port (entPhysicalClass = 10)
+		if classValue, exists := columns[5]; exists { // column 5 = entPhysicalClass
+			entityClassInt := 0
+			if classStr := fmt.Sprintf("%v", classValue); classStr != "" {
+				if val, err := strconv.Atoi(classStr); err == nil {
+					entityClassInt = val
+				}
 			}
 			
-			// Store entity data by index and column for later processing
-			// For now, create a basic port for each entity index
-			if entityColumn == 5 { // entPhysicalClass
-				entityClassInt := 0
-				if classStr := fmt.Sprintf("%v", value); classStr != "" {
-					if val, err := strconv.Atoi(classStr); err == nil {
-						entityClassInt = val
+			fmt.Printf("DEBUG EntityMibToPhysicals: Entity %s has class %d\n", entityIndex, entityClassInt)
+			if entityClassInt == EntPhysicalClassPort {
+				// Create port with collected data
+				port := &types2.Port{
+					Id: entityIndex,
+				}
+				
+				// Create an interface for this port using Entity MIB data
+				iface := &types2.Interface{
+					Id: entityIndex,
+				}
+				
+				// Populate interface with Entity MIB data
+				if nameValue, exists := columns[7]; exists { // column 7 = entPhysicalName
+					// Entity MIB values typically come as []uint8, so use reflect.Slice
+					if name, err := convertToString(resources, nameValue, reflect.Slice); err == nil {
+						iface.Name = strings.TrimSpace(name)
+						fmt.Printf("DEBUG EntityMibToPhysicals: Port %s has name '%s'\n", entityIndex, iface.Name)
 					}
 				}
 				
-				fmt.Printf("DEBUG EntityMibToPhysicals: Entity %s has class %d\n", entityIndex, entityClassInt)
-				if entityClassInt == EntPhysicalClassPort {
-					port := &types2.Port{
-						Id: entityIndex,
+				if descrValue, exists := columns[2]; exists { // column 2 = entPhysicalDescr
+					if descr, err := convertToString(resources, descrValue, reflect.Slice); err == nil {
+						iface.Description = strings.TrimSpace(descr)
 					}
-					portMap[entityIndex] = port
-					fmt.Printf("DEBUG EntityMibToPhysicals: Found port entity %s with class %d\n", entityIndex, entityClassInt)
 				}
+				
+				// Add interface to port
+				port.Interfaces = make([]*types2.Interface, 1)
+				port.Interfaces[0] = iface
+				
+				portMap[entityIndex] = port
+				fmt.Printf("DEBUG EntityMibToPhysicals: Created port %s with interface '%s'\n", entityIndex, iface.Name)
 			}
 		}
 	}
@@ -235,3 +252,4 @@ func getEntityStringValue(data []byte, resources ifs.IResources) string {
 	
 	return strings.TrimSpace(fmt.Sprintf("%v", val))
 }
+

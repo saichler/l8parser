@@ -29,6 +29,8 @@ func newParser() *_Parser {
 	p.rules[ifTableToPhysicals.Name()] = ifTableToPhysicals
 	entityMibToPhysicals := &rules.EntityMibToPhysicals{}
 	p.rules[entityMibToPhysicals.Name()] = entityMibToPhysicals
+	inferDeviceType := &rules.InferDeviceType{}
+	p.rules[inferDeviceType.Name()] = inferDeviceType
 	return p
 }
 
