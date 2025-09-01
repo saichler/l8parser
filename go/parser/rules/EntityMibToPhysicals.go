@@ -118,10 +118,42 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 	for rowKey, row := range table.Rows {
 		entityIndex := fmt.Sprintf("%d", rowKey)
 		
-		// Determine which Entity MIB column this CTable represents
-		var entityColumn int
-		if len(table.Columns) == 1 {
+		// Handle multi-column Entity MIB table
+		if len(table.Columns) > 1 {
+			// Multi-column case - process all relevant columns for this entity
+			// Look for entPhysicalClass column (column 5)
+			for colKey, colName := range table.Columns {
+				if colNum, err := strconv.Atoi(colName); err == nil && colNum == 5 {
+					// Found entPhysicalClass column
+					data, ok := row.Data[colKey]
+					if !ok {
+						continue
+					}
+					value := getEntityValue(data, resources)
+					if value == nil {
+						continue
+					}
+					
+					entityClassInt := 0
+					if classStr := fmt.Sprintf("%v", value); classStr != "" {
+						if val, err := strconv.Atoi(classStr); err == nil {
+							entityClassInt = val
+						}
+					}
+					
+					fmt.Printf("DEBUG EntityMibToPhysicals: Entity %s has class %d\n", entityIndex, entityClassInt)
+					if entityClassInt == EntPhysicalClassPort {
+						port := &types2.Port{
+							Id: entityIndex,
+						}
+						portMap[entityIndex] = port
+						fmt.Printf("DEBUG EntityMibToPhysicals: Found port entity %s with class %d\n", entityIndex, entityClassInt)
+					}
+				}
+			}
+		} else {
 			// Single column case - get the column number from column name
+			var entityColumn int
 			for colKey, colName := range table.Columns {
 				if colKey == 0 {
 					if colNum, err := strconv.Atoi(colName); err == nil {
@@ -130,44 +162,43 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 					break
 				}
 			}
-		}
-		
-		// For now, we'll focus on the key columns that define entity structure
-		// Skip processing if this isn't one of the key columns we need
-		if entityColumn != 2 && entityColumn != 5 && entityColumn != 7 && entityColumn != 11 && entityColumn != 13 { // descr, class, name, serial, model
-			continue
-		}
-		
-		// Get the value for this column
-		data, ok := row.Data[0] // Data is always in column 0 for single-column CTable
-		if !ok {
-			continue
-		}
-		value := getEntityValue(data, resources)
-		if value == nil {
-			continue
-		}
-		
-		// Store entity data by index and column for later processing
-		// For now, create a basic port for each entity index
-		if entityColumn == 5 { // entPhysicalClass
-			entityClassInt := 0
-			if classStr := fmt.Sprintf("%v", value); classStr != "" {
-				if val, err := strconv.Atoi(classStr); err == nil {
-					entityClassInt = val
-				}
+			
+			// For now, we'll focus on the key columns that define entity structure
+			// Skip processing if this isn't one of the key columns we need
+			if entityColumn != 2 && entityColumn != 5 && entityColumn != 7 && entityColumn != 11 && entityColumn != 13 { // descr, class, name, serial, model
+				continue
 			}
 			
-			fmt.Printf("DEBUG EntityMibToPhysicals: Entity %s has class %d\n", entityIndex, entityClassInt)
-			if entityClassInt == EntPhysicalClassPort {
-				port := &types2.Port{
-					Id: entityIndex,
+			// Get the value for this column
+			data, ok := row.Data[0] // Data is always in column 0 for single-column CTable
+			if !ok {
+				continue
+			}
+			value := getEntityValue(data, resources)
+			if value == nil {
+				continue
+			}
+			
+			// Store entity data by index and column for later processing
+			// For now, create a basic port for each entity index
+			if entityColumn == 5 { // entPhysicalClass
+				entityClassInt := 0
+				if classStr := fmt.Sprintf("%v", value); classStr != "" {
+					if val, err := strconv.Atoi(classStr); err == nil {
+						entityClassInt = val
+					}
 				}
-				portMap[entityIndex] = port
-				fmt.Printf("DEBUG EntityMibToPhysicals: Found port entity %s with class %d\n", entityIndex, entityClassInt)
+				
+				fmt.Printf("DEBUG EntityMibToPhysicals: Entity %s has class %d\n", entityIndex, entityClassInt)
+				if entityClassInt == EntPhysicalClassPort {
+					port := &types2.Port{
+						Id: entityIndex,
+					}
+					portMap[entityIndex] = port
+					fmt.Printf("DEBUG EntityMibToPhysicals: Found port entity %s with class %d\n", entityIndex, entityClassInt)
+				}
 			}
 		}
-		
 	}
 
 	// Convert maps to slices and assign to physical component
