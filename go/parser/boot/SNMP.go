@@ -226,9 +226,15 @@ func createSystemMibPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.2.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
-	poll.Attributes = append(poll.Attributes, createVendor())
-	poll.Attributes = append(poll.Attributes, createSysName())
-	poll.Attributes = append(poll.Attributes, createSysOid())
+	poll.Attributes = append(poll.Attributes, createVendor())           // networkdevice.equipmentinfo.vendor
+	poll.Attributes = append(poll.Attributes, createSysName())          // networkdevice.equipmentinfo.sys_name  
+	poll.Attributes = append(poll.Attributes, createSysOid())           // networkdevice.equipmentinfo.sys_oid
+	poll.Attributes = append(poll.Attributes, createSystemDescription()) // networkdevice.equipmentinfo.hardware
+	poll.Attributes = append(poll.Attributes, createSystemSoftware())   // networkdevice.equipmentinfo.software
+	poll.Attributes = append(poll.Attributes, createSystemVersion())    // networkdevice.equipmentinfo.version
+	poll.Attributes = append(poll.Attributes, createSystemModel())      // networkdevice.equipmentinfo.model
+	poll.Attributes = append(poll.Attributes, createSystemUptime())     // networkdevice.equipmentinfo.uptime
+	poll.Attributes = append(poll.Attributes, createSystemLocation())   // networkdevice.equipmentinfo.location
 	p.Polling[poll.Name] = poll
 }
 
@@ -1773,5 +1779,55 @@ func createHealthAlertAcknowledgedAttribute() *types.Attribute {
 	attr.PropertyId = "networkdevice.networkhealth.alerts.acknowledged"
 	attr.Rules = make([]*types.Rule, 0)
 	// NOTE: Acknowledgement status managed by alerting system
+	return attr
+}
+
+// System MIB attribute functions for EquipmentInfo
+
+func createSystemDescription() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.hardware"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.1.0")) // sysDescr
+	return attr
+}
+
+func createSystemUptime() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.uptime"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.3.0")) // sysUpTime
+	return attr
+}
+
+func createSystemLocation() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.location"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.6.0")) // sysLocation
+	return attr
+}
+
+func createSystemSoftware() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.software"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.1.0")) // sysDescr (extract software info)
+	return attr
+}
+
+func createSystemVersion() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.version"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.1.0")) // sysDescr (extract version info)
+	return attr
+}
+
+func createSystemModel() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.model"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.1.0")) // sysDescr (extract model info)
 	return attr
 }
