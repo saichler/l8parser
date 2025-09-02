@@ -21,6 +21,8 @@ import (
 
 func TestPhysical(t *testing.T) {
 
+	ip := "10.20.30.18"
+
 	serviceArea := byte(0)
 	allPolls := boot.GetAllPolarisModels()
 	for _, snmpPolls := range allPolls {
@@ -34,7 +36,7 @@ func TestPhysical(t *testing.T) {
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	device := utils_collector.CreateDevice("10.20.30.1", serviceArea)
+	device := utils_collector.CreateDevice(ip, serviceArea)
 
 	vnic := topo.VnicByVnetNum(2, 2)
 	vnic.Resources().Registry().Register(pollaris.PollarisService{})
@@ -71,8 +73,14 @@ func TestPhysical(t *testing.T) {
 	time.Sleep(time.Second * 10)
 
 	inv := inventory.Inventory(vnic.Resources(), device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea))
-	elem := inv.ElementByKey("10.20.30.1")
+	elem := inv.ElementByKey(ip)
 	networkDevice := elem.(*types2.NetworkDevice)
+
+	marshalOptions := protojson.MarshalOptions{
+		UseEnumNumbers: true,
+	}
+	jsn, _ := marshalOptions.Marshal(networkDevice)
+	os.WriteFile("/tmp/NetworkDevice.json", jsn, 0644)
 
 	fmt.Printf("DEBUG: NetworkDevice has %d physicals\n", len(networkDevice.Physicals))
 
@@ -126,9 +134,4 @@ func TestPhysical(t *testing.T) {
 		vnic.Resources().Logger().Fail(t, "Unknown device status")
 		return
 	}
-	marshalOptions := protojson.MarshalOptions{
-		UseEnumNumbers: true,
-	}
-	jsn, _ := marshalOptions.Marshal(networkDevice)
-	os.WriteFile("/tmp/NetworkDevice.json", jsn, 0644)
 }

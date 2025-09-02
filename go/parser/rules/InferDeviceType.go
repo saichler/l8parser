@@ -86,7 +86,9 @@ func inferDeviceTypeFromOID(sysObjectID string) int32 {
 		// Cisco switches
 		if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.23") ||  // Catalyst switches
 		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.516") || // Catalyst 2960
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.717") {  // Catalyst 3750
+		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.717") ||  // Catalyst 3750
+		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1208") || // Catalyst 4500 series
+		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1404") {  // Additional Catalyst series
 			return DEVICE_TYPE_SWITCH
 		}
 		// Cisco ASA firewalls
@@ -151,6 +153,59 @@ func inferDeviceTypeFromOID(sysObjectID string) int32 {
 		return DEVICE_TYPE_STORAGE
 	}
 
+	// Huawei (1.3.6.1.4.1.2011) - Routers and Switches
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.2011") {
+		// Huawei NE series are typically routers
+		if strings.Contains(sysObjectIDLower, "ne") {
+			return DEVICE_TYPE_ROUTER
+		}
+		// Default Huawei to router (most common in enterprise)
+		return DEVICE_TYPE_ROUTER
+	}
+
+	// NEC (1.3.6.1.4.1.119) - Routers
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.119") {
+		return DEVICE_TYPE_ROUTER
+	}
+
+	// Check Point (1.3.6.1.4.1.2620) - Firewalls
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.2620") {
+		return DEVICE_TYPE_FIREWALL
+	}
+
+	// Nokia/Alcatel-Lucent (1.3.6.1.4.1.6527) - Routers
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.6527") {
+		return DEVICE_TYPE_ROUTER
+	}
+
+	// D-Link (1.3.6.1.4.1.171) - Switches and Network Equipment
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.171") {
+		// Most D-Link enterprise OIDs are switches
+		// The specific OID 1.3.6.1.4.1.171.10.139.2.1 is typically a managed switch
+		return DEVICE_TYPE_SWITCH
+	}
+
+	// FlexRadio Systems (1.3.6.1.4.1.8741) - Radio/Access Point equipment
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.8741") {
+		return DEVICE_TYPE_ACCESS_POINT
+	}
+
+	// Extreme Networks (1.3.6.1.4.1.1916) - Switches
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.1916") {
+		return DEVICE_TYPE_SWITCH
+	}
+
+	// IBM (1.3.6.1.4.1.2) - Servers and Enterprise Systems
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.2") {
+		return DEVICE_TYPE_SERVER
+	}
+
+	// Pattern-based detection fallback for device descriptions
+	deviceStatus := inferDeviceTypeFromDescriptionPatterns(sysObjectID)
+	if deviceStatus != DEVICE_TYPE_UNKNOWN {
+		return deviceStatus
+	}
+
 	// Default to unknown if no patterns match
 	return DEVICE_TYPE_UNKNOWN
 }
@@ -164,18 +219,23 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 		"router", "asr", "isr", "7200", "7300", "7400", "7500", "7600", 
 		"nexus", "mx", "ex", "qfx", "srx", "vmx", "vqfx", "routing",
 		"ospf", "bgp", "mpls", "cisco ios", "junos", "nx-os",
+		"ne8000", "ix3315", "crs-x", "7750", "7450", "vrp", "ios-xr",
 	}
 
 	// Switch patterns  
 	switchPatterns := []string{
 		"switch", "catalyst", "3750", "3560", "2960", "4500", "6500",
 		"switching", "vlan", "spanning-tree", "stp", "ethernet switch",
+		"7280r3", "arista", "eos", "nexus 9500",
+		"d-link", "dgs", "des", "dxs", "dlink",
+		"extreme", "exos", "summit", "x440", "x460", "x480",
 	}
 
 	// Firewall patterns
 	firewallPatterns := []string{
 		"firewall", "asa", "pix", "fortigate", "palo alto", "checkpoint", 
 		"fortios", "pan-os", "security", "utm", "ngfw", "threat",
+		"15600", "gaia", "600e",
 	}
 
 	// Load balancer patterns
@@ -188,12 +248,15 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 	accessPointPatterns := []string{
 		"access point", "wireless", "wifi", "ap", "wap", "aironet", 
 		"aruba", "ubiquiti", "unifi",
+		"flexradio", "flex radio", "radio",
 	}
 
 	// Server patterns
 	serverPatterns := []string{
 		"server", "dell", "hp", "hpe", "supermicro", "lenovo", "ibm",
 		"proliant", "poweredge", "system x", "blade", "rack",
+		"dl380", "r750", "idrac", "ilo", "gen10",
+		"aix", "pseries", "zseries", "mainframe",
 	}
 
 	// Storage patterns
@@ -244,6 +307,38 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 		return DEVICE_TYPE_SERVER
 	}
 
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.2011") { // Huawei
+		return DEVICE_TYPE_ROUTER
+	}
+
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.119") { // NEC
+		return DEVICE_TYPE_ROUTER
+	}
+
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.2620") { // Check Point
+		return DEVICE_TYPE_FIREWALL
+	}
+
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.6527") { // Nokia/Alcatel-Lucent
+		return DEVICE_TYPE_ROUTER
+	}
+
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.171") { // D-Link
+		return DEVICE_TYPE_SWITCH
+	}
+
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.8741") { // FlexRadio Systems
+		return DEVICE_TYPE_ACCESS_POINT
+	}
+
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.1916") { // Extreme Networks
+		return DEVICE_TYPE_SWITCH
+	}
+
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.2") { // IBM
+		return DEVICE_TYPE_SERVER
+	}
+
 	// Pattern-based detection (fallback to description analysis)
 	if containsAnyPattern(sysDescrLower, routerPatterns) {
 		return DEVICE_TYPE_ROUTER
@@ -288,6 +383,72 @@ func containsAnyPattern(text string, patterns []string) bool {
 		}
 	}
 	return false
+}
+
+func inferDeviceTypeFromDescriptionPatterns(sysObjectID string) int32 {
+	sysObjectIDLower := strings.ToLower(sysObjectID)
+
+	// Vendor-specific model patterns in OID or description
+	routerPatterns := []string{
+		"ne8000", "ix3315", "mx240", "mx960", "asr", "isr", "crs",
+		"7750", "7450", "router", "junos", "vrp", "ios-xr",
+	}
+
+	switchPatterns := []string{
+		"7280", "catalyst", "nexus", "ex4300", "qfx", "switch", 
+		"switching", "7280r3", "eos",
+		"d-link", "dgs", "des", "dxs", "dlink",
+		"extreme", "exos", "summit", "x440", "x460", "x480",
+	}
+
+	firewallPatterns := []string{
+		"15600", "checkpoint", "fortigate", "palo alto", "asa",
+		"firewall", "fortios", "gaia", "pan-os",
+	}
+
+	serverPatterns := []string{
+		"poweredge", "proliant", "server", "idrac", "ilo", 
+		"dl380", "r750", "blade",
+		"aix", "pseries", "zseries", "mainframe", "ibm",
+	}
+
+	loadBalancerPatterns := []string{
+		"big-ip", "f5", "netscaler", "load balancer", "adc",
+	}
+
+	accessPointPatterns := []string{
+		"wireless", "access point", "wifi", "aironet", "unifi",
+		"flexradio", "flex radio", "radio",
+	}
+
+	storagePatterns := []string{
+		"netapp", "emc", "storage", "san", "nas", "vnx", "unity",
+	}
+
+	// Check patterns
+	if containsAnyPattern(sysObjectIDLower, routerPatterns) {
+		return DEVICE_TYPE_ROUTER
+	}
+	if containsAnyPattern(sysObjectIDLower, switchPatterns) {
+		return DEVICE_TYPE_SWITCH
+	}
+	if containsAnyPattern(sysObjectIDLower, firewallPatterns) {
+		return DEVICE_TYPE_FIREWALL
+	}
+	if containsAnyPattern(sysObjectIDLower, serverPatterns) {
+		return DEVICE_TYPE_SERVER
+	}
+	if containsAnyPattern(sysObjectIDLower, loadBalancerPatterns) {
+		return DEVICE_TYPE_LOAD_BALANCER
+	}
+	if containsAnyPattern(sysObjectIDLower, accessPointPatterns) {
+		return DEVICE_TYPE_ACCESS_POINT
+	}
+	if containsAnyPattern(sysObjectIDLower, storagePatterns) {
+		return DEVICE_TYPE_STORAGE
+	}
+
+	return DEVICE_TYPE_UNKNOWN
 }
 
 func convertInterfaceToString(value interface{}) string {
