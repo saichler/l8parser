@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func TestPhysical(t *testing.T) {
@@ -32,7 +34,7 @@ func TestPhysical(t *testing.T) {
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	device := utils_collector.CreateDevice("10.20.30.3", serviceArea)
+	device := utils_collector.CreateDevice("10.20.30.1", serviceArea)
 
 	vnic := topo.VnicByVnetNum(2, 2)
 	vnic.Resources().Registry().Register(pollaris.PollarisService{})
@@ -66,10 +68,10 @@ func TestPhysical(t *testing.T) {
 	cl := topo.VnicByVnetNum(1, 1)
 	cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
 
-	time.Sleep(time.Second * 6)
+	time.Sleep(time.Second * 10)
 
 	inv := inventory.Inventory(vnic.Resources(), device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea))
-	elem := inv.ElementByKey("10.20.30.3")
+	elem := inv.ElementByKey("10.20.30.1")
 	networkDevice := elem.(*types2.NetworkDevice)
 
 	fmt.Printf("DEBUG: NetworkDevice has %d physicals\n", len(networkDevice.Physicals))
@@ -116,4 +118,17 @@ func TestPhysical(t *testing.T) {
 		vnic.Resources().Logger().Fail(t, "Unknown device type")
 		return
 	}
+	if networkDevice.Equipmentinfo.IpAddress == "" {
+		vnic.Resources().Logger().Fail(t, "Unknown device ip address")
+		return
+	}
+	if networkDevice.Equipmentinfo.DeviceStatus == types2.DeviceStatus_DEVICE_STATUS_UNKNOWN {
+		vnic.Resources().Logger().Fail(t, "Unknown device status")
+		return
+	}
+	marshalOptions := protojson.MarshalOptions{
+		UseEnumNumbers: true,
+	}
+	jsn, _ := marshalOptions.Marshal(networkDevice)
+	os.WriteFile("/tmp/NetworkDevice.json", jsn, 0644)
 }

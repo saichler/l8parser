@@ -31,6 +31,8 @@ func newParser() *_Parser {
 	p.rules[entityMibToPhysicals.Name()] = entityMibToPhysicals
 	inferDeviceType := &rules.InferDeviceType{}
 	p.rules[inferDeviceType.Name()] = inferDeviceType
+	mapToDeviceStatus := &rules.MapToDeviceStatus{}
+	p.rules[mapToDeviceStatus.Name()] = mapToDeviceStatus
 	return p
 }
 

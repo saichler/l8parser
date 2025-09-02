@@ -21,6 +21,8 @@ func CreateSNMPBootPolls() *types.Pollaris {
 	createSystemMibPoll(snmpPolaris)
 	createIfTable(snmpPolaris)
 	createEntityMibPoll(snmpPolaris)
+	createIpAddressPoll(snmpPolaris)
+	createDeviceStatusPoll(snmpPolaris)
 	return snmpPolaris
 }
 
@@ -258,6 +260,24 @@ func createEntityMibPoll(p *types.Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
+func createIpAddressPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("ipAddress")
+	poll.What = "ipaddress" // Static value instead of SNMP OID
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createIpAddress())
+	p.Polling[poll.Name] = poll
+}
+
+func createDeviceStatusPoll(p *types.Pollaris) {
+	poll := createBaseSNMPPoll("deviceStatus")
+	poll.What = "devicestatus" // Static value instead of SNMP OID
+	poll.Operation = types.Operation_OMap
+	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Attributes = append(poll.Attributes, createDeviceStatus())
+	p.Polling[poll.Name] = poll
+}
+
 func createVendor() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
@@ -359,6 +379,14 @@ func createSetRule(from string) *types.Rule {
 	rule.Name = "Set"
 	rule.Params = make(map[string]*types.Parameter)
 	addParameter("from", from, rule)
+	return rule
+}
+
+func createDeviceStatusRule() *types.Rule {
+	rule := &types.Rule{}
+	rule.Name = "MapToDeviceStatus"
+	rule.Params = make(map[string]*types.Parameter)
+	addParameter("from", "devicestatus", rule)
 	return rule
 }
 
@@ -1844,5 +1872,21 @@ func createSystemModel() *types.Attribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.model"
 	attr.Rules = make([]*types.Rule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.1.0")) // sysDescr (extract model info)
+	return attr
+}
+
+func createIpAddress() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.ipaddress"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createSetRule("ipaddress"))
+	return attr
+}
+
+func createDeviceStatus() *types.Attribute {
+	attr := &types.Attribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.devicestatus"
+	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = append(attr.Rules, createDeviceStatusRule())
 	return attr
 }
