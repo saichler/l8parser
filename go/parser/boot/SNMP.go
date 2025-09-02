@@ -18,11 +18,11 @@ func CreateSNMPBootPolls() *types.Pollaris {
 	snmpPolaris.Name = "mib2"
 	snmpPolaris.Groups = []string{common.BOOT_GROUP}
 	snmpPolaris.Polling = make(map[string]*types.Poll)
+	createIpAddressPoll(snmpPolaris)
+	createDeviceStatusPoll(snmpPolaris)
 	createSystemMibPoll(snmpPolaris)
 	createIfTable(snmpPolaris)
 	createEntityMibPoll(snmpPolaris)
-	createIpAddressPoll(snmpPolaris)
-	createDeviceStatusPoll(snmpPolaris)
 	return snmpPolaris
 }
 
@@ -228,16 +228,16 @@ func createSystemMibPoll(p *types.Pollaris) {
 	poll.What = ".1.3.6.1.2.1.1"
 	poll.Operation = types.Operation_OMap
 	poll.Attributes = make([]*types.Attribute, 0)
-	poll.Attributes = append(poll.Attributes, createVendor())           // networkdevice.equipmentinfo.vendor
-	poll.Attributes = append(poll.Attributes, createSysName())          // networkdevice.equipmentinfo.sys_name  
-	poll.Attributes = append(poll.Attributes, createSysOid())           // networkdevice.equipmentinfo.sys_oid
+	poll.Attributes = append(poll.Attributes, createVendor())            // networkdevice.equipmentinfo.vendor
+	poll.Attributes = append(poll.Attributes, createSysName())           // networkdevice.equipmentinfo.sys_name
+	poll.Attributes = append(poll.Attributes, createSysOid())            // networkdevice.equipmentinfo.sys_oid
 	poll.Attributes = append(poll.Attributes, createSystemDescription()) // networkdevice.equipmentinfo.hardware
-	poll.Attributes = append(poll.Attributes, createSystemSoftware())   // networkdevice.equipmentinfo.software
-	poll.Attributes = append(poll.Attributes, createSystemVersion())    // networkdevice.equipmentinfo.version
-	poll.Attributes = append(poll.Attributes, createSystemModel())      // networkdevice.equipmentinfo.model
-	poll.Attributes = append(poll.Attributes, createSystemUptime())     // networkdevice.equipmentinfo.uptime
-	poll.Attributes = append(poll.Attributes, createSystemLocation())   // networkdevice.equipmentinfo.location
-	poll.Attributes = append(poll.Attributes, createSystemDeviceType()) // networkdevice.equipmentinfo.device_type
+	poll.Attributes = append(poll.Attributes, createSystemSoftware())    // networkdevice.equipmentinfo.software
+	poll.Attributes = append(poll.Attributes, createSystemVersion())     // networkdevice.equipmentinfo.version
+	poll.Attributes = append(poll.Attributes, createSystemModel())       // networkdevice.equipmentinfo.model
+	poll.Attributes = append(poll.Attributes, createSystemUptime())      // networkdevice.equipmentinfo.uptime
+	poll.Attributes = append(poll.Attributes, createSystemLocation())    // networkdevice.equipmentinfo.location
+	poll.Attributes = append(poll.Attributes, createSystemDeviceType())  // networkdevice.equipmentinfo.device_type
 	p.Polling[poll.Name] = poll
 }
 
@@ -291,13 +291,13 @@ func createIfTableRule() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals"
 	attr.Rules = make([]*types.Rule, 0)
-	
+
 	// Use custom rule to translate ifTable CTable to NetworkDevice.physicals
 	rule := &types.Rule{}
 	rule.Name = "IfTableToPhysicals"
 	rule.Params = make(map[string]*types.Parameter)
 	attr.Rules = append(attr.Rules, rule)
-	
+
 	return attr
 }
 
@@ -305,13 +305,13 @@ func createEntityMibRule() *types.Attribute {
 	attr := &types.Attribute{}
 	attr.PropertyId = "networkdevice.physicals"
 	attr.Rules = make([]*types.Rule, 0)
-	
+
 	// Use custom rule to translate Entity MIB CTable to NetworkDevice.physicals
 	rule := &types.Rule{}
 	rule.Name = "EntityMibToPhysicals"
 	rule.Params = make(map[string]*types.Parameter)
 	attr.Rules = append(attr.Rules, rule)
-	
+
 	return attr
 }
 
@@ -398,7 +398,6 @@ func createBaseSNMPPoll(jobName string) *types.Poll {
 	poll.Protocol = types.Protocol_PSNMPV2
 	return poll
 }
-
 
 // Common network attribute functions (used by vendor-specific files)
 func createInterfaceName() *types.Attribute {
