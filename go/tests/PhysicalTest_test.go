@@ -79,6 +79,11 @@ func TestPhysical(t *testing.T) {
 		return
 	}
 
+	if networkDevice.Equipmentinfo.DeviceType == types2.DeviceType_DEVICE_TYPE_UNKNOWN {
+		vnic.Resources().Logger().Fail(t, "Unknown device type")
+		return
+	}
+
 	for physicalKey, physical := range networkDevice.Physicals {
 		fmt.Printf("DEBUG: Physical key '%s' has %d ports\n", physicalKey, len(physical.Ports))
 
@@ -106,5 +111,9 @@ func TestPhysical(t *testing.T) {
 		for portKey, port := range physical.Ports {
 			fmt.Printf("Port '%v': %+v\n", portKey, port)
 		}
+	}
+	if networkDevice.Equipmentinfo.DeviceType == types2.DeviceType_DEVICE_TYPE_UNKNOWN {
+		vnic.Resources().Logger().Fail(t, "Unknown device type")
+		return
 	}
 }

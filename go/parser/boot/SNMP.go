@@ -1818,7 +1818,7 @@ func createSystemDeviceType() *types.Attribute {
 	rule.Name = "InferDeviceType"
 	rule.Params = make(map[string]*types.Parameter)
 	// Pass the sysObjectID OID for analysis
-	rule.Params["From"] = &types.Parameter{Value: ".1.3.6.1.2.1.1.2.0"} // sysObjectID
+	rule.Params["from"] = &types.Parameter{Value: ".1.3.6.1.2.1.1.2.0"} // sysObjectID
 	attr.Rules = append(attr.Rules, rule)
 	return attr
 }
