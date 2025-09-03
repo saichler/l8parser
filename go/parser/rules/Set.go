@@ -109,11 +109,6 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 	}
 
 	modifiedId := strings.Join(result, ".")
-
-	// Log the modification for debugging
-	if modifiedId != propertyId {
-		fmt.Printf("PropertyId modified: %s -> %s\n", propertyId, modifiedId)
-	}
-
+	
 	return modifiedId
 }
