@@ -16,7 +16,7 @@ type ParsingRule interface {
 	Parse(ifs.IResources, map[string]interface{}, map[string]*types.Parameter, interface{}, string) error
 }
 
-func convertToString(resources ifs.IResources, value interface{}, kind reflect.Kind) (string, error) {
+func convertToString(value interface{}, kind reflect.Kind) (string, error) {
 	switch kind {
 	case reflect.String:
 		return value.(string), nil
@@ -24,7 +24,7 @@ func convertToString(resources ifs.IResources, value interface{}, kind reflect.K
 		if byts, ok := value.([]byte); ok {
 			return string(byts), nil
 		}
-		return "", resources.Logger().Error("slice is not []byte")
+		return "", errors.New("slice is not []byte")
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return strconv.FormatInt(reflect.ValueOf(value).Int(), 10), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -34,7 +34,7 @@ func convertToString(resources ifs.IResources, value interface{}, kind reflect.K
 	case reflect.Bool:
 		return strconv.FormatBool(value.(bool)), nil
 	default:
-		return "", resources.Logger().Error("unsupported type for string conversion:", kind.String())
+		return "", errors.New("unsupported type for string conversion: " + kind.String())
 	}
 }
 
@@ -43,24 +43,23 @@ func GetValueInput(resources ifs.IResources, input interface{}, params map[strin
 	m, ok := input.(*types.CMap)
 	if ok {
 		if len(m.Data) == 0 {
-			return nil, reflect.Invalid, resources.Logger().Error("no data found in map:" + pollWhat)
+			return nil, reflect.Invalid, errors.New("no data found in map:" + pollWhat)
 		}
 		from := params[From]
 		if from == nil {
-			return nil, reflect.Invalid, resources.Logger().Error("missing 'from' key in map input")
+			return nil, reflect.Invalid, errors.New("missing 'from' key in map input")
 		}
 		rawData := m.Data[from.Value]
 		if rawData == nil || len(rawData) == 0 {
-			resources.Logger().Error("Value for From ", from.Value, " is blank")
 			return nil, reflect.Invalid, errors.New("Value for From " + from.Value + " is blank")
 		}
 		enc := object.NewDecode(rawData, 0, resources.Registry())
 		value, err := enc.Get()
 		if err != nil {
-			return nil, reflect.Invalid, resources.Logger().Error("failed to decode value:", err.Error())
+			return nil, reflect.Invalid, errors.New("failed to decode value: " + err.Error())
 		}
 		if value == nil {
-			return nil, reflect.Invalid, resources.Logger().Error("failed to decode value")
+			return nil, reflect.Invalid, errors.New("failed to decode value")
 		}
 		return value, reflect.TypeOf(value).Kind(), nil
 	}
@@ -75,7 +74,7 @@ func GetValueInput(resources ifs.IResources, input interface{}, params map[strin
 		return input, reflect.TypeOf(input).Kind(), nil
 	}
 
-	return nil, reflect.Invalid, resources.Logger().Error("unsupported input type")
+	return nil, reflect.Invalid, errors.New("unsupported input type")
 }
 
 func getIntInput(workSpace map[string]interface{}, paramName string) (int, error) {

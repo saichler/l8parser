@@ -38,7 +38,7 @@ func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]inter
 		return err
 	}
 
-	str, err := convertToString(resources, value, kind)
+	str, err := convertToString(value, kind)
 	if err != nil {
 		return err
 	}

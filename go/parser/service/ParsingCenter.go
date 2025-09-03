@@ -8,6 +8,13 @@ import (
 	"github.com/saichler/l8types/go/ifs"
 )
 
+func (this *ParsingService) createElementInstance(job *types.CJob) interface{} {
+	newElem := reflect.New(reflect.ValueOf(this.elem).Elem().Type())
+	field := newElem.Elem().FieldByName(this.primaryKey)
+	field.Set(reflect.ValueOf(job.DeviceId))
+	return newElem.Interface()
+}
+
 func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResources) {
 	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
 	if err != nil {
@@ -21,13 +28,10 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 	}
 
 	if job.Error == "" && poll.Attributes != nil {
-		newElem := reflect.New(reflect.ValueOf(this.elem).Elem().Type())
-		field := newElem.Elem().FieldByName(this.primaryKey)
-		field.Set(reflect.ValueOf(job.DeviceId))
-		elem := newElem.Interface()
+		elem := this.createElementInstance(job)
 		err = Parser.Parse(job, elem, resources)
 		if err != nil {
-			resources.Logger().Error("ParsingCenter: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " - ", err.Error())
+			resources.Logger().Error("ParsingCenter.JobComplete: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " - ", err.Error())
 			return
 		}
 		if this.vnic == nil {
@@ -38,7 +42,7 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 		if err != nil {
 			this.vnic.Resources().Logger().Error(err.Error())
 		} else {
-			this.vnic.Resources().Logger().Info("Patch Job ", jobFileName(job))
+			resources.Logger().Info("ParsingCenter.JobComplete: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " Patch Sent")
 		}
 	}
 }

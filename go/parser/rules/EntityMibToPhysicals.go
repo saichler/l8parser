@@ -174,13 +174,13 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 				// Populate interface with Entity MIB data
 				if nameValue, exists := columns[7]; exists { // column 7 = entPhysicalName
 					// Entity MIB values typically come as []uint8, so use reflect.Slice
-					if name, err := convertToString(resources, nameValue, reflect.Slice); err == nil {
+					if name, err := convertToString(nameValue, reflect.Slice); err == nil {
 						iface.Name = strings.TrimSpace(name)
 					}
 				}
 
 				if descrValue, exists := columns[2]; exists { // column 2 = entPhysicalDescr
-					if descr, err := convertToString(resources, descrValue, reflect.Slice); err == nil {
+					if descr, err := convertToString(descrValue, reflect.Slice); err == nil {
 						iface.Description = strings.TrimSpace(descr)
 					}
 				}

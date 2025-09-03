@@ -61,13 +61,11 @@ func (this *InferDeviceType) Parse(resources ifs.IResources, workSpace map[strin
 	}
 
 	sysObjectID := convertInterfaceToString(value)
-	fmt.Printf("DEBUG InferDeviceType: sysObjectID='%s'\n", sysObjectID)
 
 	// Infer device type based on sysObjectID patterns
 	deviceType := inferDeviceTypeFromOID(sysObjectID)
 	networkDevice.Equipmentinfo.DeviceType = types2.DeviceType(deviceType)
-
-	fmt.Printf("DEBUG InferDeviceType: Inferred device type: %d\n", deviceType)
+	
 	return nil
 }
 
@@ -78,22 +76,22 @@ func inferDeviceTypeFromOID(sysObjectID string) int32 {
 	// Cisco (1.3.6.1.4.1.9) - Most common enterprise network vendor
 	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9") {
 		// Cisco routers typically have specific sub-OIDs
-		if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1") ||  // Old Cisco routers
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.12") ||   // ISR/ASR series
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.222") { // Newer routers
+		if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1") || // Old Cisco routers
+			strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.12") || // ISR/ASR series
+			strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.222") { // Newer routers
 			return DEVICE_TYPE_ROUTER
 		}
 		// Cisco switches
-		if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.23") ||  // Catalyst switches
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.516") || // Catalyst 2960
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.717") ||  // Catalyst 3750
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1208") || // Catalyst 4500 series
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1404") {  // Additional Catalyst series
+		if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.23") || // Catalyst switches
+			strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.516") || // Catalyst 2960
+			strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.717") || // Catalyst 3750
+			strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1208") || // Catalyst 4500 series
+			strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1404") { // Additional Catalyst series
 			return DEVICE_TYPE_SWITCH
 		}
 		// Cisco ASA firewalls
 		if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.745") || // ASA 5500 series
-		   strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1069") { // ASA 5585
+			strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.9.1.1069") { // ASA 5585
 			return DEVICE_TYPE_FIREWALL
 		}
 		// Default Cisco to router (most common)
@@ -216,7 +214,7 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 
 	// Router patterns (highest priority for routers)
 	routerPatterns := []string{
-		"router", "asr", "isr", "7200", "7300", "7400", "7500", "7600", 
+		"router", "asr", "isr", "7200", "7300", "7400", "7500", "7600",
 		"nexus", "mx", "ex", "qfx", "srx", "vmx", "vqfx", "routing",
 		"ospf", "bgp", "mpls", "cisco ios", "junos", "nx-os",
 		"ne8000", "ix3315", "crs-x", "7750", "7450", "vrp", "ios-xr",
@@ -233,20 +231,20 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 
 	// Firewall patterns
 	firewallPatterns := []string{
-		"firewall", "asa", "pix", "fortigate", "palo alto", "checkpoint", 
+		"firewall", "asa", "pix", "fortigate", "palo alto", "checkpoint",
 		"fortios", "pan-os", "security", "utm", "ngfw", "threat",
 		"15600", "gaia", "600e",
 	}
 
 	// Load balancer patterns
 	loadBalancerPatterns := []string{
-		"load balancer", "f5", "big-ip", "netscaler", "citrix", "a10", 
+		"load balancer", "f5", "big-ip", "netscaler", "citrix", "a10",
 		"loadbalancer", "application delivery", "adc",
 	}
 
 	// Access point patterns
 	accessPointPatterns := []string{
-		"access point", "wireless", "wifi", "ap", "wap", "aironet", 
+		"access point", "wireless", "wifi", "ap", "wap", "aironet",
 		"aruba", "ubiquiti", "unifi",
 		"flexradio", "flex radio", "radio",
 	}
@@ -276,7 +274,7 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 			return DEVICE_TYPE_ROUTER
 		}
 		if containsAnyPattern(sysDescrLower, switchPatterns) {
-			return DEVICE_TYPE_SWITCH  
+			return DEVICE_TYPE_SWITCH
 		}
 		if containsAnyPattern(sysDescrLower, firewallPatterns) {
 			return DEVICE_TYPE_FIREWALL
@@ -395,7 +393,7 @@ func inferDeviceTypeFromDescriptionPatterns(sysObjectID string) int32 {
 	}
 
 	switchPatterns := []string{
-		"7280", "catalyst", "nexus", "ex4300", "qfx", "switch", 
+		"7280", "catalyst", "nexus", "ex4300", "qfx", "switch",
 		"switching", "7280r3", "eos",
 		"d-link", "dgs", "des", "dxs", "dlink",
 		"extreme", "exos", "summit", "x440", "x460", "x480",
@@ -407,7 +405,7 @@ func inferDeviceTypeFromDescriptionPatterns(sysObjectID string) int32 {
 	}
 
 	serverPatterns := []string{
-		"poweredge", "proliant", "server", "idrac", "ilo", 
+		"poweredge", "proliant", "server", "idrac", "ilo",
 		"dl380", "r750", "blade",
 		"aix", "pseries", "zseries", "mainframe", "ibm",
 	}
@@ -455,11 +453,11 @@ func convertInterfaceToString(value interface{}) string {
 	if value == nil {
 		return ""
 	}
-	
+
 	// Handle byte array to string conversion
 	if byteArray, ok := value.([]uint8); ok {
 		return strings.TrimSpace(string(byteArray))
 	}
-	
+
 	return strings.TrimSpace(fmt.Sprintf("%v", value))
 }
