@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/types"
@@ -37,6 +39,10 @@ func newParser() *_Parser {
 }
 
 func (this *_Parser) Parse(job *types.CJob, any interface{}, resources ifs.IResources) error {
+	if job.Error != "" {
+		return errors.New(job.Error)
+	}
+
 	workSpace := make(map[string]interface{})
 	enc := object.NewDecode(job.Result, 0, resources.Registry())
 	data, err := enc.Get()
