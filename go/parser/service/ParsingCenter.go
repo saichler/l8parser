@@ -1,15 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"reflect"
-	"strings"
-	"time"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/types"
 	"github.com/saichler/l8types/go/ifs"
-	types2 "github.com/saichler/probler/go/types"
 )
 
 func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResources) {
@@ -38,19 +34,10 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 			resources.Logger().Error("No Vnic to notify inventory")
 			return
 		}
-		err = this.vnic.Proximity(job.IService.ServiceName, byte(job.IService.ServiceArea),
-			ifs.PATCH, elem)
+		err = this.vnic.Proximity(job.IService.ServiceName, byte(job.IService.ServiceArea), ifs.PATCH, elem)
 		if err != nil {
 			this.vnic.Resources().Logger().Error(err.Error())
 		} else {
-			name := jobFileName(job)
-			if strings.Contains(name, "ifTable") {
-				fmt.Println("*************************")
-				nd := elem.(*types2.NetworkDevice)
-				fmt.Println(nd)
-				fmt.Println("**********************")
-				time.Sleep(time.Second)
-			}
 			this.vnic.Resources().Logger().Info("Patch Job ", jobFileName(job))
 		}
 	}
