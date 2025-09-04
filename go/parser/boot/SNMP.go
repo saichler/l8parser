@@ -9,8 +9,19 @@ import (
 	"github.com/saichler/l8pollaris/go/types"
 )
 
-var DEFAULT_CADENCE int64 = 300
+var DEFAULT_CADENCE int64 = 900
+var EVERY_5_MINUTES int64 = 300
 var DEFAULT_TIMEOUT int64 = 30
+
+func CreatePreBootPolls() *types.Pollaris {
+	preBoot := &types.Pollaris{}
+	preBoot.Name = "pre"
+	preBoot.Groups = []string{common.PRE_BOOT_GROUP}
+	preBoot.Polling = make(map[string]*types.Poll)
+	createIpAddressPoll(preBoot)
+	createDeviceStatusPoll(preBoot)
+	return preBoot
+}
 
 // CreateSNMPBootPolls creates generic SNMP collection and parsing Pollaris model
 func CreateSNMPBootPolls() *types.Pollaris {
@@ -18,8 +29,6 @@ func CreateSNMPBootPolls() *types.Pollaris {
 	snmpPolaris.Name = "mib2"
 	snmpPolaris.Groups = []string{common.BOOT_GROUP}
 	snmpPolaris.Polling = make(map[string]*types.Poll)
-	createIpAddressPoll(snmpPolaris)
-	createDeviceStatusPoll(snmpPolaris)
 	createSystemMibPoll(snmpPolaris)
 	createIfTable(snmpPolaris)
 	createEntityMibPoll(snmpPolaris)
@@ -83,6 +92,12 @@ func GetPollarisByOid(sysOid string) *types.Pollaris {
 // GetAllPolarisModels returns a slice of all available Pollaris models
 func GetAllPolarisModels() []*types.Pollaris {
 	models := make([]*types.Pollaris, 0)
+
+	//Generic K8s
+	models = append(models, CreateK8sBootPolls())
+
+	// Generic Pre Boot
+	models = append(models, CreatePreBootPolls())
 
 	// Generic SNMP
 	models = append(models, CreateSNMPBootPolls())
@@ -227,6 +242,7 @@ func createSystemMibPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("systemMib")
 	poll.What = ".1.3.6.1.2.1.1"
 	poll.Operation = types.Operation_OMap
+	poll.Cadence = EVERY_5_MINUTES
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createVendor())            // networkdevice.equipmentinfo.vendor
 	poll.Attributes = append(poll.Attributes, createSysName())           // networkdevice.equipmentinfo.sys_name
@@ -264,6 +280,7 @@ func createIpAddressPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ipAddress")
 	poll.What = "ipaddress" // Static value instead of SNMP OID
 	poll.Operation = types.Operation_OMap
+	poll.Cadence = EVERY_5_MINUTES
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createIpAddress())
 	p.Polling[poll.Name] = poll
@@ -273,6 +290,7 @@ func createDeviceStatusPoll(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("deviceStatus")
 	poll.What = "devicestatus" // Static value instead of SNMP OID
 	poll.Operation = types.Operation_OMap
+	poll.Cadence = EVERY_5_MINUTES
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createDeviceStatus())
 	p.Polling[poll.Name] = poll
