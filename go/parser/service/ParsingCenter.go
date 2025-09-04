@@ -38,15 +38,11 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 			resources.Logger().Error("No Vnic to notify inventory")
 			return
 		}
-		/*
-			err := this.vnic.Proximity(job.IService.ServiceName, byte(job.IService.ServiceArea), ifs.PATCH, elem)
-			if err != nil {
-				this.vnic.Resources().Logger().Error(err.Error())
-			} else {
-				resources.Logger().Info("ParsingCenter.JobComplete: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " Patch Sent/Receive")
-			}*/
-		go func() {
-			this.vnic.ProximityRequest(job.IService.ServiceName, byte(job.IService.ServiceArea), ifs.PATCH, elem)
-		}()
+		err := this.vnic.Leader(job.IService.ServiceName, byte(job.IService.ServiceArea), ifs.PATCH, elem)
+		if err != nil {
+			this.vnic.Resources().Logger().Error(err.Error())
+		} else {
+			resources.Logger().Debug("ParsingCenter.JobComplete: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " Patch Sent/Receive")
+		}
 	}
 }
