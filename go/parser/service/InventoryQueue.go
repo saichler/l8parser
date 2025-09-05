@@ -28,6 +28,6 @@ func (this *InventoryQueue) items() []interface{} {
 
 func (this *InventoryQueue) flush(vnic ifs.IVNic) {
 	if len(this.queue) > 0 {
-		vnic.Proximity(this.serviceName, this.serviceArea, ifs.PATCH, this.items())
+		vnic.Leader(this.serviceName, this.serviceArea, ifs.PATCH, this.items())
 	}
 }
