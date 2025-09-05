@@ -1,7 +1,10 @@
 package service
 
 import (
+	"bytes"
 	"reflect"
+	"strconv"
+	"time"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/types"
@@ -38,11 +41,38 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 			resources.Logger().Error("No Vnic to notify inventory")
 			return
 		}
-		err := this.vnic.Leader(job.IService.ServiceName, byte(job.IService.ServiceArea), ifs.PATCH, elem)
-		if err != nil {
-			this.vnic.Resources().Logger().Error(err.Error())
-		} else {
-			resources.Logger().Debug("ParsingCenter.JobComplete: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " Patch Sent/Receive")
+		itemsQueueKey := this.itemsQueueKey(job)
+		this.itemsQueueMtx.Lock()
+		defer this.itemsQueueMtx.Unlock()
+		q, ok := this.itemsQueue[itemsQueueKey]
+		if !ok {
+			q = NewInventoryQueue(job.IService.ServiceName, byte(job.IService.ServiceArea))
+			this.itemsQueue[itemsQueueKey] = q
+		}
+		q.add(elem)
+	}
+}
+
+func (this *ParsingService) itemsQueueKey(job *types.CJob) string {
+	buff := bytes.Buffer{}
+	buff.WriteString(job.IService.ServiceName)
+	buff.WriteString(strconv.Itoa(int(job.IService.ServiceArea)))
+	return buff.String()
+}
+
+func (this *ParsingService) watchItemsQueue() {
+	for this.active {
+		this.flushItemQueue()
+		time.Sleep(time.Second * 5)
+	}
+}
+
+func (this *ParsingService) flushItemQueue() {
+	this.itemsQueueMtx.Lock()
+	defer this.itemsQueueMtx.Unlock()
+	if this.active {
+		for _, q := range this.itemsQueue {
+			q.flush(this.vnic)
 		}
 	}
 }
