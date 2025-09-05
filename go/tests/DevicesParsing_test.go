@@ -21,11 +21,14 @@ import (
 func TestFullDevicesParsing(t *testing.T) {
 
 	serviceArea := byte(0)
-	snmpPolls := boot.CreateSNMPBootPolls()
-	for _, poll := range snmpPolls.Polling {
-		poll.Cadence = 3
+	all := boot.GetAllPolarisModels()
+	for _, snmpPolls := range all {
+		for _, poll := range snmpPolls.Polling {
+			if poll.Cadence > 3 {
+				poll.Cadence = 3
+			}
+		}
 	}
-
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
@@ -41,10 +44,12 @@ func TestFullDevicesParsing(t *testing.T) {
 	vnic.Resources().Services().Activate(pollaris.ServiceType, pollaris.ServiceName, serviceArea, vnic.Resources(), vnic)
 
 	p := pollaris.Pollaris(vnic.Resources())
-	err := p.Add(snmpPolls, false)
-	if err != nil {
-		vnic.Resources().Logger().Fail(t, err.Error())
-		return
+	for _, snmpPolls := range all {
+		err := p.Add(snmpPolls, false)
+		if err != nil {
+			vnic.Resources().Logger().Fail(t, err.Error())
+			return
+		}
 	}
 
 	vnic.Resources().Registry().Register(devices.DeviceService{})
@@ -64,7 +69,7 @@ func TestFullDevicesParsing(t *testing.T) {
 
 	cl := topo.VnicByVnetNum(1, 1)
 	for _, device := range netDevices {
-		err = cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
+		err := cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
 		if err != nil {
 			panic(err)
 		}

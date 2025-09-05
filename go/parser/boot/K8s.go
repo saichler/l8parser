@@ -8,7 +8,7 @@ import (
 func CreateK8sBootPolls() *types.Pollaris {
 	k8sPollaris := &types.Pollaris{}
 	k8sPollaris.Name = "kubernetes"
-	k8sPollaris.Groups = []string{common.BOOT_GROUP}
+	k8sPollaris.Groups = []string{common.BOOT_STAGE_00}
 	k8sPollaris.Polling = make(map[string]*types.Poll)
 	createNodesPoll(k8sPollaris)
 	createPodsPoll(k8sPollaris)

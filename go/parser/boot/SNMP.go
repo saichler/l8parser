@@ -13,26 +13,34 @@ var DEFAULT_CADENCE int64 = 900
 var EVERY_5_MINUTES int64 = 300
 var DEFAULT_TIMEOUT int64 = 30
 
-func CreatePreBootPolls() *types.Pollaris {
-	preBoot := &types.Pollaris{}
-	preBoot.Name = "pre"
-	preBoot.Groups = []string{common.PRE_BOOT_GROUP}
-	preBoot.Polling = make(map[string]*types.Poll)
-	createIpAddressPoll(preBoot)
-	createDeviceStatusPoll(preBoot)
-	return preBoot
+func CreateBoot00() *types.Pollaris {
+	boot00 := &types.Pollaris{}
+	boot00.Name = "boot00"
+	boot00.Groups = []string{common.BOOT_STAGE_00}
+	boot00.Polling = make(map[string]*types.Poll)
+	createIpAddressPoll(boot00)
+	createDeviceStatusPoll(boot00)
+	return boot00
+}
+
+func CreateBoot01() *types.Pollaris {
+	boot01 := &types.Pollaris{}
+	boot01.Name = "boot01"
+	boot01.Groups = []string{common.BOOT_STAGE_01}
+	boot01.Polling = make(map[string]*types.Poll)
+	createSystemMibPoll(boot01)
+	return boot01
 }
 
 // CreateSNMPBootPolls creates generic SNMP collection and parsing Pollaris model
-func CreateSNMPBootPolls() *types.Pollaris {
-	snmpPolaris := &types.Pollaris{}
-	snmpPolaris.Name = "mib2"
-	snmpPolaris.Groups = []string{common.BOOT_GROUP}
-	snmpPolaris.Polling = make(map[string]*types.Poll)
-	createSystemMibPoll(snmpPolaris)
-	createIfTable(snmpPolaris)
-	createEntityMibPoll(snmpPolaris)
-	return snmpPolaris
+func CreateBoot02() *types.Pollaris {
+	boot02 := &types.Pollaris{}
+	boot02.Name = "boot02"
+	boot02.Groups = []string{common.BOOT_STAGE_02}
+	boot02.Polling = make(map[string]*types.Poll)
+	createIfTable(boot02)
+	createEntityMibPoll(boot02)
+	return boot02
 }
 
 // GetPollarisByOid returns the appropriate vendor-specific Pollaris model based on sysOID
@@ -86,7 +94,7 @@ func GetPollarisByOid(sysOid string) *types.Pollaris {
 	}
 
 	// Default to generic SNMP polling if no vendor match
-	return CreateSNMPBootPolls()
+	return CreateBoot02()
 }
 
 // GetAllPolarisModels returns a slice of all available Pollaris models
@@ -97,10 +105,11 @@ func GetAllPolarisModels() []*types.Pollaris {
 	models = append(models, CreateK8sBootPolls())
 
 	// Generic Pre Boot
-	models = append(models, CreatePreBootPolls())
+	models = append(models, CreateBoot00())
+	models = append(models, CreateBoot01())
 
 	// Generic SNMP
-	models = append(models, CreateSNMPBootPolls())
+	models = append(models, CreateBoot02())
 
 	// Cisco devices
 	models = append(models, CreateCiscoSwitchBootPolls())

@@ -24,9 +24,13 @@ func TestMain(m *testing.M) {
 
 func TestParser(t *testing.T) {
 	serviceArea := byte(0)
-	snmpPolls := boot.CreateSNMPBootPolls()
-	for _, poll := range snmpPolls.Polling {
-		poll.Cadence = 3
+	all := boot.GetAllPolarisModels()
+	for _, snmpPolls := range all {
+		for _, poll := range snmpPolls.Polling {
+			if poll.Cadence > 3 {
+				poll.Cadence = 3
+			}
+		}
 	}
 
 	//use opensim to simulate this device with this ip
@@ -39,12 +43,13 @@ func TestParser(t *testing.T) {
 	vnic.Resources().Services().Activate(pollaris.ServiceType, pollaris.ServiceName, serviceArea, vnic.Resources(), vnic)
 
 	p := pollaris.Pollaris(vnic.Resources())
-	err := p.Add(snmpPolls, false)
-	if err != nil {
-		vnic.Resources().Logger().Fail(t, err.Error())
-		return
+	for _, snmpPolls := range all {
+		err := p.Add(snmpPolls, false)
+		if err != nil {
+			vnic.Resources().Logger().Fail(t, err.Error())
+			return
+		}
 	}
-
 	vnic.Resources().Registry().Register(devices.DeviceService{})
 	vnic.Resources().Services().Activate(devices.ServiceType, devices.ServiceName, serviceArea, vnic.Resources(), vnic)
 	vnic.Resources().Registry().Register(service.CollectorService{})
@@ -61,7 +66,7 @@ func TestParser(t *testing.T) {
 	time.Sleep(time.Second)
 
 	cl := topo.VnicByVnetNum(1, 1)
-	err = cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
+	err := cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
 	if err != nil {
 		panic(err)
 	}
