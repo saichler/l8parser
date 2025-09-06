@@ -63,21 +63,23 @@ func (this *ParsingService) DeActivate() error {
 	return nil
 }
 
-func (this *ParsingService) Post(pb ifs.IElements, vnic ifs.IVNic) ifs.IElements {
-	job := pb.Element().(*types.CJob)
-	if this.persistJobs {
-		data, err := protojson.Marshal(job)
-		if err != nil {
-			vnic.Resources().Logger().Error("Failed to marshal job to JSON", "error", err)
-		} else {
-			err = os.WriteFile(jobFileName(job), data, 0777)
+func (this *ParsingService) Post(pbs ifs.IElements, vnic ifs.IVNic) ifs.IElements {
+	for _, pb := range pbs.Elements() {
+		job := pb.(*types.CJob)
+		if this.persistJobs {
+			data, err := protojson.Marshal(job)
 			if err != nil {
-				vnic.Resources().Logger().Error("Failed to save job to file", "error", err)
+				vnic.Resources().Logger().Error("Failed to marshal job to JSON", "error", err)
+			} else {
+				err = os.WriteFile(jobFileName(job), data, 0777)
+				if err != nil {
+					vnic.Resources().Logger().Error("Failed to save job to file", "error", err)
+				}
 			}
 		}
+		vnic.Resources().Logger().Info("Received Job ", job.DeviceId, " - ", job.HostId, " - ", job.PollarisName, " - ", job.JobName, " response")
+		this.JobComplete(job, this.resources)
 	}
-	vnic.Resources().Logger().Info("Received Job ", job.DeviceId, " - ", job.HostId, " - ", job.PollarisName, " - ", job.JobName, " response")
-	this.JobComplete(job, this.resources)
 	return nil
 }
 func (this *ParsingService) Put(pb ifs.IElements, vnic ifs.IVNic) ifs.IElements {
