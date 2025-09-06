@@ -100,7 +100,7 @@ func (this *ParsingService) GetCopy(pb ifs.IElements, vnic ifs.IVNic) ifs.IEleme
 func (this *ParsingService) Failed(pb ifs.IElements, vnic ifs.IVNic, msg *ifs.Message) ifs.IElements {
 	return nil
 }
-func (this *ParsingService) TransactionMethod() ifs.ITransactionMethod {
+func (this *ParsingService) TransactionConfig() ifs.ITransactionConfig {
 	return nil
 }
 func (this *ParsingService) WebService() ifs.IWebService {

@@ -28,6 +28,6 @@ func (this *InventoryQueue) items() []interface{} {
 
 func (this *InventoryQueue) flush(vnic ifs.IVNic) {
 	if len(this.queue) > 0 {
-		go vnic.LeaderRequest(this.serviceName, this.serviceArea, ifs.PATCH, this.items())
+		go vnic.LeaderRequest(this.serviceName, this.serviceArea, ifs.PATCH, this.items(), 30)
 	}
 }
