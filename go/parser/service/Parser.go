@@ -43,6 +43,11 @@ func (this *_Parser) Parse(job *types.CJob, any interface{}, resources ifs.IReso
 		return errors.New(job.Error)
 	}
 
+	if job.Result == nil || len(job.Result) < 4 {
+		return resources.Logger().Error("Invalid job result ", job.DeviceId, " - ", job.PollarisName,
+			" - ", job.JobName, " - ", string(job.Result))
+	}
+
 	workSpace := make(map[string]interface{})
 	enc := object.NewDecode(job.Result, 0, resources.Registry())
 	data, err := enc.Get()
