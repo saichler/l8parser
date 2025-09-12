@@ -66,7 +66,8 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	time.Sleep(time.Second)
 
 	inv := inventory.Inventory(vnic.Resources(), device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea))
-	elem := inv.ElementByKey("10.20.30.3")
+	filter := &types2.NetworkDevice{Id: "10.20.30.3"}
+	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)
 
 	fmt.Printf("DEBUG: NetworkDevice has %d physicals\n", len(networkDevice.Physicals))

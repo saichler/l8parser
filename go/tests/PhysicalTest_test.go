@@ -73,7 +73,8 @@ func TestPhysical(t *testing.T) {
 	time.Sleep(time.Second * 10)
 
 	inv := inventory.Inventory(vnic.Resources(), device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea))
-	elem := inv.ElementByKey(ip)
+	filter := &types2.NetworkDevice{Id: ip}
+	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)
 
 	marshalOptions := protojson.MarshalOptions{
