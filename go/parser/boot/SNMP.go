@@ -19,7 +19,6 @@ func CreateBoot00() *types.Pollaris {
 	boot00.Groups = []string{common.BOOT_STAGE_00}
 	boot00.Polling = make(map[string]*types.Poll)
 	createIpAddressPoll(boot00)
-	createDeviceStatusPoll(boot00)
 	return boot00
 }
 
@@ -32,15 +31,24 @@ func CreateBoot01() *types.Pollaris {
 	return boot01
 }
 
-// CreateSNMPBootPolls creates generic SNMP collection and parsing Pollaris model
 func CreateBoot02() *types.Pollaris {
 	boot02 := &types.Pollaris{}
 	boot02.Name = "boot02"
 	boot02.Groups = []string{common.BOOT_STAGE_02}
 	boot02.Polling = make(map[string]*types.Poll)
-	createIfTable(boot02)
-	createEntityMibPoll(boot02)
+	createDeviceStatusPoll(boot02)
 	return boot02
+}
+
+// CreateSNMPBootPolls creates generic SNMP collection and parsing Pollaris model
+func CreateBoot03() *types.Pollaris {
+	boot03 := &types.Pollaris{}
+	boot03.Name = "boot03"
+	boot03.Groups = []string{common.BOOT_STAGE_03}
+	boot03.Polling = make(map[string]*types.Poll)
+	createIfTable(boot03)
+	createEntityMibPoll(boot03)
+	return boot03
 }
 
 // GetPollarisByOid returns the appropriate vendor-specific Pollaris model based on sysOID
@@ -94,7 +102,7 @@ func GetPollarisByOid(sysOid string) *types.Pollaris {
 	}
 
 	// Default to generic SNMP polling if no vendor match
-	return CreateBoot02()
+	return CreateBoot03()
 }
 
 // GetAllPolarisModels returns a slice of all available Pollaris models
@@ -107,9 +115,10 @@ func GetAllPolarisModels() []*types.Pollaris {
 	// Generic Pre Boot
 	models = append(models, CreateBoot00())
 	models = append(models, CreateBoot01())
+	models = append(models, CreateBoot02())
 
 	// Generic SNMP
-	models = append(models, CreateBoot02())
+	models = append(models, CreateBoot03())
 
 	// Cisco devices
 	models = append(models, CreateCiscoSwitchBootPolls())
