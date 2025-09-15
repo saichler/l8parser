@@ -70,6 +70,7 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 		return errors.New("Input is not a CTable: " + fmt.Sprintf("%T", input))
 	}
 
+
 	// Get the NetworkDevice
 	networkDevice, ok := any.(*types2.NetworkDevice)
 	if !ok {
@@ -149,17 +150,21 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 		}
 	}
 
+
 	// Now process the collected entity data to create ports and interfaces
 	for entityIndex, columns := range entityData {
 		// Check if this entity is a port (entPhysicalClass = 10)
 		if classValue, exists := columns[5]; exists { // column 5 = entPhysicalClass
 			entityClassInt := 0
 			if classStr := fmt.Sprintf("%v", classValue); classStr != "" {
+				// Handle case where value comes as "INTEGER: 10" format
+				if strings.HasPrefix(classStr, "INTEGER: ") {
+					classStr = strings.TrimPrefix(classStr, "INTEGER: ")
+				}
 				if val, err := strconv.Atoi(classStr); err == nil {
 					entityClassInt = val
 				}
 			}
-
 			if entityClassInt == EntPhysicalClassPort {
 				// Create port with collected data
 				port := &types2.Port{
@@ -173,15 +178,32 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 
 				// Populate interface with Entity MIB data
 				if nameValue, exists := columns[7]; exists { // column 7 = entPhysicalName
-					// Entity MIB values typically come as []uint8, so use reflect.Slice
-					if name, err := convertToString(nameValue, reflect.Slice); err == nil {
-						iface.Name = strings.TrimSpace(name)
+					// Handle case where value comes as "STRING: value" format
+					nameStr := fmt.Sprintf("%v", nameValue)
+					if strings.HasPrefix(nameStr, "STRING: ") {
+						nameStr = strings.TrimPrefix(nameStr, "STRING: ")
+						nameStr = strings.Trim(nameStr, `"`) // Remove quotes if present
+						iface.Name = strings.TrimSpace(nameStr)
+					} else {
+						// Fallback to original conversion logic
+						if name, err := convertToString(nameValue, reflect.Slice); err == nil {
+							iface.Name = strings.TrimSpace(name)
+						}
 					}
 				}
 
 				if descrValue, exists := columns[2]; exists { // column 2 = entPhysicalDescr
-					if descr, err := convertToString(descrValue, reflect.Slice); err == nil {
-						iface.Description = strings.TrimSpace(descr)
+					// Handle case where value comes as "STRING: value" format
+					descrStr := fmt.Sprintf("%v", descrValue)
+					if strings.HasPrefix(descrStr, "STRING: ") {
+						descrStr = strings.TrimPrefix(descrStr, "STRING: ")
+						descrStr = strings.Trim(descrStr, `"`) // Remove quotes if present
+						iface.Description = strings.TrimSpace(descrStr)
+					} else {
+						// Fallback to original conversion logic
+						if descr, err := convertToString(descrValue, reflect.Slice); err == nil {
+							iface.Description = strings.TrimSpace(descr)
+						}
 					}
 				}
 
