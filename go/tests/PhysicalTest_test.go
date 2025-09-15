@@ -21,7 +21,7 @@ import (
 
 func TestPhysical(t *testing.T) {
 
-	ip := "10.20.30.3"
+	ip := "10.20.30.9"
 
 	serviceArea := byte(0)
 	allPolls := boot.GetAllPolarisModels()

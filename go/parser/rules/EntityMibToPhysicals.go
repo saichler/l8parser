@@ -71,6 +71,8 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 	}
 
 
+
+
 	// Get the NetworkDevice
 	networkDevice, ok := any.(*types2.NetworkDevice)
 	if !ok {
@@ -149,6 +151,7 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 			}
 		}
 	}
+
 
 
 	// Now process the collected entity data to create ports and interfaces
