@@ -65,7 +65,7 @@ func createBaseK8sPoll(name string) *types.Poll {
 func createLogs(p *types.Pollaris) {
 	poll := createBaseK8sPoll("logs")
 	poll.What = "logs -n $namespace $podname"
-	poll.Cadence = -1
+	poll.Cadence = DISABLED
 	poll.Operation = types.Operation_OGet
 	p.Polling[poll.Name] = poll
 }
@@ -73,7 +73,7 @@ func createLogs(p *types.Pollaris) {
 func createDetails(p *types.Pollaris) {
 	poll := createBaseK8sPoll("details")
 	poll.What = "get pods -o json -n $namespace $podname"
-	poll.Cadence = -1
+	poll.Cadence = DISABLED
 	poll.Operation = types.Operation_OGet
 	p.Polling[poll.Name] = poll
 }
