@@ -9,8 +9,9 @@ import (
 	"github.com/saichler/l8pollaris/go/types"
 )
 
-var DEFAULT_CADENCE int64 = 900
-var EVERY_5_MINUTES int64 = 300
+var DEFAULT_CADENCE = &types.CadencePlan{Cadences: []int64{900, 3600, 7200}, Enabled: true}
+var EVERY_5_MINUTES = &types.CadencePlan{Cadences: []int64{300, 3600, 7200}, Enabled: true}
+var DISABLED = &types.CadencePlan{Cadences: []int64{7200}, Enabled: false}
 var DEFAULT_TIMEOUT int64 = 30
 
 func CreateBoot00() *types.Pollaris {
@@ -279,7 +280,7 @@ func createIfTable(p *types.Pollaris) {
 	poll := createBaseSNMPPoll("ifTable")
 	poll.What = ".1.3.6.1.2.1.2.2"
 	poll.Operation = types.Operation_OTable
-	poll.Cadence = -1 // Disable ifTable polling
+	poll.Cadence = DISABLED // Disable ifTable polling
 	poll.Attributes = make([]*types.Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createIfTableRule())
 	p.Polling[poll.Name] = poll
