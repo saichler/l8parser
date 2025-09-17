@@ -27,8 +27,8 @@ func TestParser(t *testing.T) {
 	all := boot.GetAllPolarisModels()
 	for _, snmpPolls := range all {
 		for _, poll := range snmpPolls.Polling {
-			if poll.Cadence > 3 {
-				poll.Cadence = 3
+			if poll.Cadence.Enabled {
+				poll.Cadence.Cadences[0] = 3
 			}
 		}
 	}

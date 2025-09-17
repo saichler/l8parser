@@ -27,8 +27,8 @@ func TestPhysical(t *testing.T) {
 	allPolls := boot.GetAllPolarisModels()
 	for _, snmpPolls := range allPolls {
 		for _, poll := range snmpPolls.Polling {
-			if poll.Cadence > 3 {
-				poll.Cadence = 3
+			if poll.Cadence.Enabled {
+				poll.Cadence.Cadences[0] = 3
 			}
 		}
 	}
