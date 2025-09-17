@@ -25,6 +25,7 @@ func TestMain(m *testing.M) {
 func TestParser(t *testing.T) {
 	serviceArea := byte(0)
 	all := boot.GetAllPolarisModels()
+	common.SmoothFirstCollection = true
 	for _, snmpPolls := range all {
 		for _, poll := range snmpPolls.Polling {
 			if poll.Cadence.Enabled {

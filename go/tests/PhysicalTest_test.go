@@ -22,7 +22,7 @@ import (
 func TestPhysical(t *testing.T) {
 
 	ip := "10.20.30.9"
-
+	common.SmoothFirstCollection = true
 	serviceArea := byte(0)
 	allPolls := boot.GetAllPolarisModels()
 	for _, snmpPolls := range allPolls {
