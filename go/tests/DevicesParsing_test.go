@@ -54,7 +54,7 @@ func TestFullDevicesParsing(t *testing.T) {
 		}
 	}
 
-	vnic.Resources().Registry().Register(targets.DeviceService{})
+	vnic.Resources().Registry().Register(targets.TargetService{})
 	vnic.Resources().Services().Activate(targets.ServiceType, targets.ServiceName, serviceArea, vnic.Resources(), vnic)
 	vnic.Resources().Registry().Register(service.CollectorService{})
 	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)

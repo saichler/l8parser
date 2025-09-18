@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/saichler/l8parser/go/parser/boot"
-	
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 )
 import "google.golang.org/protobuf/encoding/protojson"
 

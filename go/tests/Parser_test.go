@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/saichler/l8collector/go/collector/common"
-	
+	"github.com/saichler/l8collector/go/collector/targets"
+
 	"github.com/saichler/l8collector/go/collector/service"
 	"github.com/saichler/l8collector/go/tests/utils_collector"
 	"github.com/saichler/l8inventory/go/tests/utils_inventory"
@@ -51,7 +52,7 @@ func TestParser(t *testing.T) {
 			return
 		}
 	}
-	vnic.Resources().Registry().Register(targets.DeviceService{})
+	vnic.Resources().Registry().Register(targets.TargetService{})
 	vnic.Resources().Services().Activate(targets.ServiceType, targets.ServiceName, serviceArea, vnic.Resources(), vnic)
 	vnic.Resources().Registry().Register(service.CollectorService{})
 	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)

@@ -10,7 +10,8 @@ import (
 	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
-	
+	"github.com/saichler/l8pollaris/go/types/l8poll"
+
 	"github.com/saichler/l8srlz/go/serialize/object"
 	types2 "github.com/saichler/probler/go/types"
 )
@@ -43,7 +44,7 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	vnic.Resources().Services().Activate(parsing.ServiceType, device.ParsingService.ServiceName, byte(device.ParsingService.ServiceArea),
 		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", true)
 
-	forwardInfo := &l8poll.L8C_TargetServiceInfo{}
+	forwardInfo := &l8poll.L8ServiceInfo{}
 	forwardInfo.ServiceName = "MockOrm"
 	forwardInfo.ServiceArea = 0
 
