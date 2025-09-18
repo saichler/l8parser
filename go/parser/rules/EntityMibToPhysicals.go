@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
@@ -57,7 +57,7 @@ const (
 	EntPhysicalClassCpu         = 12
 )
 
-func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
+func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
 	// Get the input CTable from workspace
 	input := workSpace[Input]
 	if input == nil {
@@ -65,13 +65,10 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 	}
 
 	// Try to get CTable from input
-	table, ok := input.(*types.CTable)
+	table, ok := input.(*l8poll.CTable)
 	if !ok {
 		return errors.New("Input is not a CTable: " + fmt.Sprintf("%T", input))
 	}
-
-
-
 
 	// Get the NetworkDevice
 	networkDevice, ok := any.(*types2.NetworkDevice)
@@ -151,8 +148,6 @@ func (this *EntityMibToPhysicals) Parse(resources ifs.IResources, workSpace map[
 			}
 		}
 	}
-
-
 
 	// Now process the collected entity data to create ports and interfaces
 	for entityIndex, columns := range entityData {

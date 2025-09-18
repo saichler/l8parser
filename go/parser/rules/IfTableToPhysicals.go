@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
@@ -21,7 +21,7 @@ func (this *IfTableToPhysicals) ParamNames() []string {
 	return []string{""}
 }
 
-func (this *IfTableToPhysicals) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
+func (this *IfTableToPhysicals) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
 	// Get the input CTable from workspace
 	input := workSpace[Input]
 	if input == nil {
@@ -29,11 +29,10 @@ func (this *IfTableToPhysicals) Parse(resources ifs.IResources, workSpace map[st
 	}
 
 	// Try to get CTable from input
-	table, ok := input.(*types.CTable)
+	table, ok := input.(*l8poll.CTable)
 	if !ok {
 		return errors.New("Input is not a CTable: " + fmt.Sprintf("%T", input))
 	}
-
 
 	// Get the NetworkDevice
 	networkDevice, ok := any.(*types2.NetworkDevice)
@@ -161,7 +160,7 @@ func (this *IfTableToPhysicals) Parse(resources ifs.IResources, workSpace map[st
 		// Initialize statistics if interface statistics columns are present
 		if hasStatistics(row.Data) {
 			iface.Statistics = &types2.InterfaceStatistics{}
-			
+
 			// Column 10: ifInOctets
 			if data, ok := row.Data[10]; ok {
 				if val := getIfTableValue(data, resources); val != nil {

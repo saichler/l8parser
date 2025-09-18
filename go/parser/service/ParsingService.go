@@ -4,7 +4,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/collect/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8utils/go/utils/strings"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -31,8 +32,8 @@ func (this *ParsingService) Activate(serviceName string, serviceArea byte,
 
 	this.resources = r
 	this.resources.Registry().Register(&types.CMap{})
-	this.resources.Registry().Register(&types.CTable{})
-	this.resources.Registry().Register(&types.CJob{})
+	this.resources.Registry().Register(&l8poll.CTable{})
+	this.resources.Registry().Register(&l8poll.CJob{})
 	this.elem = args[0]
 	this.primaryKey = args[1].(string)
 	this.persistJobs = args[2].(bool)
@@ -65,7 +66,7 @@ func (this *ParsingService) DeActivate() error {
 
 func (this *ParsingService) Post(pbs ifs.IElements, vnic ifs.IVNic) ifs.IElements {
 	for _, pb := range pbs.Elements() {
-		job := pb.(*types.CJob)
+		job := pb.(*l8poll.CJob)
 		if this.persistJobs {
 			data, err := protojson.Marshal(job)
 			if err != nil {
@@ -107,17 +108,17 @@ func (this *ParsingService) WebService() ifs.IWebService {
 	return nil
 }
 
-func jobFileName(job *types.CJob) string {
+func jobFileName(job *l8poll.CJob) string {
 	return strings.New(JobFileLocation, job.PollarisName, ".", job.JobName, ".", job.DeviceId, ".", job.HostId).String()
 }
 
-func LoadJob(pollarisName, jobName, deviceId, hostId string) (*types.CJob, error) {
+func LoadJob(pollarisName, jobName, deviceId, hostId string) (*l8poll.CJob, error) {
 	filename := strings.New(JobFileLocation, pollarisName, ".", jobName, ".", deviceId, ".", hostId).String()
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	job := &types.CJob{}
+	job := &l8poll.CJob{}
 	err = protojson.Unmarshal(data, job)
 	return job, err
 }

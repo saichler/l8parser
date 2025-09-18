@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/saichler/l8collector/go/collector/common"
-	"github.com/saichler/l8collector/go/collector/devices"
+	
 	"github.com/saichler/l8collector/go/collector/service"
 	"github.com/saichler/l8collector/go/tests/utils_collector"
 	"github.com/saichler/l8inventory/go/tests/utils_inventory"
@@ -51,8 +51,8 @@ func TestParser(t *testing.T) {
 			return
 		}
 	}
-	vnic.Resources().Registry().Register(devices.DeviceService{})
-	vnic.Resources().Services().Activate(devices.ServiceType, devices.ServiceName, serviceArea, vnic.Resources(), vnic)
+	vnic.Resources().Registry().Register(targets.DeviceService{})
+	vnic.Resources().Services().Activate(targets.ServiceType, targets.ServiceName, serviceArea, vnic.Resources(), vnic)
 	vnic.Resources().Registry().Register(service.CollectorService{})
 	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
 
@@ -67,7 +67,7 @@ func TestParser(t *testing.T) {
 	time.Sleep(time.Second)
 
 	cl := topo.VnicByVnetNum(1, 1)
-	err := cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
+	err := cl.Multicast(targets.ServiceName, serviceArea, ifs.POST, device)
 	if err != nil {
 		panic(err)
 	}

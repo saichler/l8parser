@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
 )
@@ -32,7 +32,7 @@ const (
 	DEVICE_TYPE_GATEWAY       = 8
 )
 
-func (this *InferDeviceType) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
+func (this *InferDeviceType) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
 	// Get the NetworkDevice
 	networkDevice, ok := any.(*types2.NetworkDevice)
 	if !ok {
@@ -65,7 +65,7 @@ func (this *InferDeviceType) Parse(resources ifs.IResources, workSpace map[strin
 	// Infer device type based on sysObjectID patterns
 	deviceType := inferDeviceTypeFromOID(sysObjectID)
 	networkDevice.Equipmentinfo.DeviceType = types2.DeviceType(deviceType)
-	
+
 	return nil
 }
 
@@ -220,7 +220,7 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 		"ne8000", "ix3315", "crs-x", "7750", "7450", "vrp", "ios-xr",
 	}
 
-	// Switch patterns  
+	// Switch patterns
 	switchPatterns := []string{
 		"switch", "catalyst", "3750", "3560", "2960", "4500", "6500",
 		"switching", "vlan", "spanning-tree", "stp", "ethernet switch",
@@ -301,7 +301,7 @@ func inferDeviceTypeFromData(sysDescr string, sysObjectID string) int32 {
 		return DEVICE_TYPE_SERVER
 	}
 
-	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.232") { // HP/HPE  
+	if strings.Contains(sysObjectIDLower, "1.3.6.1.4.1.232") { // HP/HPE
 		return DEVICE_TYPE_SERVER
 	}
 

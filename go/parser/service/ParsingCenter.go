@@ -7,18 +7,19 @@ import (
 	"time"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
+
 	"github.com/saichler/l8types/go/ifs"
 )
 
-func (this *ParsingService) createElementInstance(job *types.CJob) interface{} {
+func (this *ParsingService) createElementInstance(job *l8poll.CJob) interface{} {
 	newElem := reflect.New(reflect.ValueOf(this.elem).Elem().Type())
 	field := newElem.Elem().FieldByName(this.primaryKey)
 	field.Set(reflect.ValueOf(job.DeviceId))
 	return newElem.Interface()
 }
 
-func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResources) {
+func (this *ParsingService) JobComplete(job *l8poll.CJob, resources ifs.IResources) {
 	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
 	if err != nil {
 		resources.Logger().Error("ParsingCenter:" + err.Error())
@@ -53,7 +54,7 @@ func (this *ParsingService) JobComplete(job *types.CJob, resources ifs.IResource
 	}
 }
 
-func (this *ParsingService) itemsQueueKey(job *types.CJob) string {
+func (this *ParsingService) itemsQueueKey(job *l8poll.CJob) string {
 	buff := bytes.Buffer{}
 	buff.WriteString(job.IService.ServiceName)
 	buff.WriteString(strconv.Itoa(int(job.IService.ServiceArea)))

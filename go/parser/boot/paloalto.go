@@ -1,15 +1,15 @@
 package boot
 
 import (
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 )
 
 // CreatePaloAltoFirewallBootPolls creates collection and parsing Pollaris model for Palo Alto firewalls
-func CreatePaloAltoFirewallBootPolls() *types.Pollaris {
-	polaris := &types.Pollaris{}
+func CreatePaloAltoFirewallBootPolls() *l8poll.L8Pollaris {
+	polaris := &l8poll.L8Pollaris{}
 	polaris.Name = "paloalto-firewall"
 	polaris.Groups = []string{"paloalto", "paloalto-firewall"}
-	polaris.Polling = make(map[string]*types.Poll)
+	polaris.Polling = make(map[string]*l8poll.L8Poll)
 	createPaloAltoSystemPoll(polaris)
 	createPaloAltoMibSystemPoll(polaris)
 	createPaloAltoSessionsPoll(polaris)
@@ -18,79 +18,79 @@ func CreatePaloAltoFirewallBootPolls() *types.Pollaris {
 }
 
 // Palo Alto Networks device-specific polling functions
-func createPaloAltoSystemPoll(p *types.Pollaris) {
+func createPaloAltoSystemPoll(p *l8poll.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoSystem")
 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1"
-	poll.Operation = types.Operation_OMap
-	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Operation = l8poll.L8C_Operation_L8C_Map
+	poll.Attributes = make([]*l8poll.L8P_Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoVersion())
 	p.Polling[poll.Name] = poll
 }
 
-func createPaloAltoMibSystemPoll(p *types.Pollaris) {
+func createPaloAltoMibSystemPoll(p *l8poll.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoMibSystem")
 	poll.What = ".1.3.6.1.2.1.1"
-	poll.Operation = types.Operation_OMap
-	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Operation = l8poll.L8C_Operation_L8C_Map
+	poll.Attributes = make([]*l8poll.L8P_Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
 	p.Polling[poll.Name] = poll
 }
 
-func createPaloAltoInterfacesPoll(p *types.Pollaris) {
+func createPaloAltoInterfacesPoll(p *l8poll.L8Pollaris) {
 	poll := createBaseSNMPPoll("ifTable")
 	poll.What = ".1.3.6.1.2.1.2.2"
-	poll.Operation = types.Operation_OTable
-	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Operation = l8poll.L8C_Operation_L8C_Table
+	poll.Attributes = make([]*l8poll.L8P_Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoIfTableRule())
 	p.Polling[poll.Name] = poll
 }
 
-func createPaloAltoSessionsPoll(p *types.Pollaris) {
+func createPaloAltoSessionsPoll(p *l8poll.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoSessions")
 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3"
-	poll.Operation = types.Operation_OMap
-	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Operation = l8poll.L8C_Operation_L8C_Map
+	poll.Attributes = make([]*l8poll.L8P_Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createActiveSessions())
 	p.Polling[poll.Name] = poll
 }
 
-func createPaloAltoThreatsPoll(p *types.Pollaris) {
+func createPaloAltoThreatsPoll(p *l8poll.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoThreats")
 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2"
-	poll.Operation = types.Operation_OMap
-	poll.Attributes = make([]*types.Attribute, 0)
+	poll.Operation = l8poll.L8C_Operation_L8C_Map
+	poll.Attributes = make([]*l8poll.L8P_Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createThreatCount())
 	p.Polling[poll.Name] = poll
 }
 
-func createPaloAltoIfTableRule() *types.Attribute {
-	attr := &types.Attribute{}
+func createPaloAltoIfTableRule() *l8poll.L8P_Attribute {
+	attr := &l8poll.L8P_Attribute{}
 	attr.PropertyId = "networkdevice.physicals"
-	attr.Rules = make([]*types.Rule, 0)
-	
+	attr.Rules = make([]*l8poll.L8P_Rule, 0)
+
 	// Use custom rule to translate ifTable CTable to NetworkDevice.physicals
-	rule := &types.Rule{}
+	rule := &l8poll.L8P_Rule{}
 	rule.Name = "IfTableToPhysicals"
-	rule.Params = make(map[string]*types.Parameter)
+	rule.Params = make(map[string]*l8poll.L8P_Parameter)
 	attr.Rules = append(attr.Rules, rule)
-	
+
 	return attr
 }
 
 // Palo Alto-specific attribute creation functions
-func createPaloAltoVendor() *types.Attribute {
-	attr := &types.Attribute{}
+func createPaloAltoVendor() *l8poll.L8P_Attribute {
+	attr := &l8poll.L8P_Attribute{}
 	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
-	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = make([]*l8poll.L8P_Rule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("paloalto", ".1.3.6.1.2.1.1.1.0", "Palo Alto Networks"))
 	return attr
 }
 
-func createPaloAltoVersion() *types.Attribute {
-	attr := &types.Attribute{}
+func createPaloAltoVersion() *l8poll.L8P_Attribute {
+	attr := &l8poll.L8P_Attribute{}
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
-	attr.Rules = make([]*types.Rule, 0)
+	attr.Rules = make([]*l8poll.L8P_Rule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.1.1.0"))
 	return attr
 }

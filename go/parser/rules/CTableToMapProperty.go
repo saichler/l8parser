@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
@@ -22,8 +22,8 @@ func (this *CTableToMapProperty) ParamNames() []string {
 	return []string{""}
 }
 
-func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
-	table, ok := workSpace[Output].(*types.CTable)
+func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
+	table, ok := workSpace[Output].(*l8poll.CTable)
 	if !ok {
 		return errors.New("Workspace had an invalid output object")
 	}

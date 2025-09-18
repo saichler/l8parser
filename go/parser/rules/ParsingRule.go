@@ -5,7 +5,8 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/collect/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 )
@@ -13,7 +14,7 @@ import (
 type ParsingRule interface {
 	Name() string
 	ParamNames() []string
-	Parse(ifs.IResources, map[string]interface{}, map[string]*types.Parameter, interface{}, string) error
+	Parse(ifs.IResources, map[string]interface{}, map[string]*l8poll.L8P_Parameter, interface{}, string) error
 }
 
 func convertToString(value interface{}, kind reflect.Kind) (string, error) {
@@ -39,7 +40,7 @@ func convertToString(value interface{}, kind reflect.Kind) (string, error) {
 }
 
 // GetValueInput extracts any value type from input data and returns the value, its reflect.Kind, and any error
-func GetValueInput(resources ifs.IResources, input interface{}, params map[string]*types.Parameter, pollWhat string) (interface{}, reflect.Kind, error) {
+func GetValueInput(resources ifs.IResources, input interface{}, params map[string]*l8poll.L8P_Parameter, pollWhat string) (interface{}, reflect.Kind, error) {
 	m, ok := input.(*types.CMap)
 	if ok {
 		if len(m.Data) == 0 {

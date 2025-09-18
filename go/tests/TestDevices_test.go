@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/saichler/l8parser/go/parser/boot"
-	"github.com/saichler/l8pollaris/go/types"
+	
 )
 import "google.golang.org/protobuf/encoding/protojson"
 
@@ -46,7 +46,7 @@ func CheckPollaris() map[string]string {
 	return result
 }
 
-func checkPollaris(p *types.Pollaris, invalid map[string]string) {
+func checkPollaris(p *l8poll.L8Pollaris, invalid map[string]string) {
 	for _, poll := range p.Polling {
 		for _, attr := range poll.Attributes {
 			for _, rule := range attr.Rules {

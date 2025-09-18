@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/reflect/go/reflect/properties"
 )
@@ -19,7 +19,7 @@ func (this *Set) ParamNames() []string {
 	return []string{}
 }
 
-func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
+func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
 	input := workSpace[Input]
 	_propertyId := workSpace[PropertyId]
 	propertyId := _propertyId.(string)
@@ -109,6 +109,6 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 	}
 
 	modifiedId := strings.Join(result, ".")
-	
+
 	return modifiedId
 }

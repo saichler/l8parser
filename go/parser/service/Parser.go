@@ -5,7 +5,8 @@ import (
 
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/pollaris"
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
+
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 )
@@ -38,7 +39,7 @@ func newParser() *_Parser {
 	return p
 }
 
-func (this *_Parser) Parse(job *types.CJob, any interface{}, resources ifs.IResources) error {
+func (this *_Parser) Parse(job *l8poll.CJob, any interface{}, resources ifs.IResources) error {
 	if job.Error != "" {
 		return errors.New(job.Error)
 	}

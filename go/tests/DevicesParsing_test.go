@@ -6,14 +6,14 @@ import (
 	"time"
 
 	"github.com/saichler/l8collector/go/collector/common"
-	"github.com/saichler/l8collector/go/collector/devices"
+	
 	"github.com/saichler/l8collector/go/collector/service"
 	"github.com/saichler/l8collector/go/tests/utils_collector"
 	"github.com/saichler/l8inventory/go/tests/utils_inventory"
 	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
-	"github.com/saichler/l8pollaris/go/types"
+	
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
 )
@@ -52,8 +52,8 @@ func TestFullDevicesParsing(t *testing.T) {
 		}
 	}
 
-	vnic.Resources().Registry().Register(devices.DeviceService{})
-	vnic.Resources().Services().Activate(devices.ServiceType, devices.ServiceName, serviceArea, vnic.Resources(), vnic)
+	vnic.Resources().Registry().Register(targets.DeviceService{})
+	vnic.Resources().Services().Activate(targets.ServiceType, targets.ServiceName, serviceArea, vnic.Resources(), vnic)
 	vnic.Resources().Registry().Register(service.CollectorService{})
 	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
 
@@ -69,7 +69,7 @@ func TestFullDevicesParsing(t *testing.T) {
 
 	cl := topo.VnicByVnetNum(1, 1)
 	for _, device := range netDevices {
-		err := cl.Multicast(devices.ServiceName, serviceArea, ifs.POST, device)
+		err := cl.Multicast(targets.ServiceName, serviceArea, ifs.POST, device)
 		if err != nil {
 			panic(err)
 		}

@@ -3,7 +3,8 @@ package rules
 import (
 	"strings"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/collect/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
@@ -19,7 +20,7 @@ func (this *StringToCTable) ParamNames() []string {
 	return []string{"columns", "keycolumn"}
 }
 
-func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
+func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
 	input, ok := workSpace[Input].(string)
 	if !ok {
 		return nil
@@ -30,8 +31,8 @@ func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string
 	}
 
 	lines := strings.Split(input, "\n")
-	table := &types.CTable{}
-	table.Rows = make(map[int32]*types.CRow)
+	table := &l8poll.CTable{}
+	table.Rows = make(map[int32]*l8poll.CRow)
 	for i, line := range lines {
 		if table.Columns == nil {
 			table.Columns = getColumns(line, colmns)

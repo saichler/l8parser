@@ -3,7 +3,7 @@ package rules
 import (
 	"strings"
 
-	"github.com/saichler/l8pollaris/go/types"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/reflect/go/reflect/properties"
 )
@@ -18,7 +18,7 @@ func (this *Contains) ParamNames() []string {
 	return []string{"what"}
 }
 
-func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*types.Parameter, any interface{}, pollWhat string) error {
+func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
 	input := workSpace[Input]
 	what := params[What]
 	output := params[Output]
