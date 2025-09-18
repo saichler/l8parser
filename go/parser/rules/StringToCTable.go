@@ -3,7 +3,6 @@ package rules
 import (
 	"strings"
 
-	"github.com/saichler/collect/go/types"
 	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
@@ -41,7 +40,7 @@ func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string
 			}
 			continue
 		}
-		row := &types.CRow{}
+		row := &l8poll.CRow{}
 		row.Data = getValues(line, table.Columns)
 		table.Rows[int32(i)] = row
 	}

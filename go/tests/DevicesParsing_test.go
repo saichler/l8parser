@@ -6,14 +6,16 @@ import (
 	"time"
 
 	"github.com/saichler/l8collector/go/collector/common"
-	
+	"github.com/saichler/l8collector/go/collector/targets"
+	"github.com/saichler/l8pollaris/go/types/l8poll"
+
 	"github.com/saichler/l8collector/go/collector/service"
 	"github.com/saichler/l8collector/go/tests/utils_collector"
 	"github.com/saichler/l8inventory/go/tests/utils_inventory"
 	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
-	
+
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
 )
@@ -32,7 +34,7 @@ func TestFullDevicesParsing(t *testing.T) {
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	netDevices := make([]*types.Device, 0)
+	netDevices := make([]*l8poll.L8C_Target, 0)
 	for i := 1; i <= 19; i++ {
 		ii := strconv.Itoa(i)
 		device := utils_collector.CreateDevice("10.20.30."+ii, serviceArea)

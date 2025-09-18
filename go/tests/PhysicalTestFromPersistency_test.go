@@ -43,7 +43,7 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	vnic.Resources().Services().Activate(parsing.ServiceType, device.ParsingService.ServiceName, byte(device.ParsingService.ServiceArea),
 		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", true)
 
-	forwardInfo := &types.DeviceServiceInfo{}
+	forwardInfo := &l8poll.L8C_TargetServiceInfo{}
 	forwardInfo.ServiceName = "MockOrm"
 	forwardInfo.ServiceArea = 0
 
