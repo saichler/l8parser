@@ -31,7 +31,7 @@ func (this *ParsingService) Activate(serviceName string, serviceArea byte,
 	r ifs.IResources, l ifs.IServiceCacheListener, args ...interface{}) error {
 
 	this.resources = r
-	this.resources.Registry().Register(&types.CMap{})
+	this.resources.Registry().Register(&l8poll.CMap{})
 	this.resources.Registry().Register(&l8poll.CTable{})
 	this.resources.Registry().Register(&l8poll.CJob{})
 	this.elem = args[0]
