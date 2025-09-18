@@ -78,7 +78,7 @@ func (this *ParsingService) Post(pbs ifs.IElements, vnic ifs.IVNic) ifs.IElement
 				}
 			}
 		}
-		vnic.Resources().Logger().Info("Received Job ", job.DeviceId, " - ", job.HostId, " - ", job.PollarisName, " - ", job.JobName, " response")
+		vnic.Resources().Logger().Info("Received Job ", job.TargetId, " - ", job.HostId, " - ", job.PollarisName, " - ", job.JobName, " response")
 		this.JobComplete(job, this.resources)
 	}
 	return nil
@@ -109,7 +109,7 @@ func (this *ParsingService) WebService() ifs.IWebService {
 }
 
 func jobFileName(job *l8poll.CJob) string {
-	return strings.New(JobFileLocation, job.PollarisName, ".", job.JobName, ".", job.DeviceId, ".", job.HostId).String()
+	return strings.New(JobFileLocation, job.PollarisName, ".", job.JobName, ".", job.TargetId, ".", job.HostId).String()
 }
 
 func LoadJob(pollarisName, jobName, deviceId, hostId string) (*l8poll.CJob, error) {

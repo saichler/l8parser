@@ -45,7 +45,7 @@ func (this *_Parser) Parse(job *l8poll.CJob, any interface{}, resources ifs.IRes
 	}
 
 	if job.Result == nil || len(job.Result) < 4 {
-		return resources.Logger().Error("Invalid job result ", job.DeviceId, " - ", job.PollarisName,
+		return resources.Logger().Error("Invalid job result ", job.TargetId, " - ", job.PollarisName,
 			" - ", job.JobName, " - ", string(job.Result))
 	}
 

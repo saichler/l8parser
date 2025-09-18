@@ -15,7 +15,7 @@ import (
 func (this *ParsingService) createElementInstance(job *l8poll.CJob) interface{} {
 	newElem := reflect.New(reflect.ValueOf(this.elem).Elem().Type())
 	field := newElem.Elem().FieldByName(this.primaryKey)
-	field.Set(reflect.ValueOf(job.DeviceId))
+	field.Set(reflect.ValueOf(job.TargetId))
 	return newElem.Interface()
 }
 
@@ -35,7 +35,7 @@ func (this *ParsingService) JobComplete(job *l8poll.CJob, resources ifs.IResourc
 		elem := this.createElementInstance(job)
 		err = Parser.Parse(job, elem, resources)
 		if err != nil {
-			resources.Logger().Error("ParsingCenter.JobComplete: ", job.DeviceId, " - ", job.PollarisName, " - ", job.JobName, " - ", err.Error())
+			resources.Logger().Error("ParsingCenter.JobComplete: ", job.TargetId, " - ", job.PollarisName, " - ", job.JobName, " - ", err.Error())
 			return
 		}
 		if this.vnic == nil {

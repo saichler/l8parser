@@ -641,11 +641,11 @@ func createSysOidAttribute() *l8poll.L8P_Attribute {
 	return attr
 }
 
-func createDeviceIdAttribute() *l8poll.L8P_Attribute {
+func createTargetIdAttribute() *l8poll.L8P_Attribute {
 	attr := &l8poll.L8P_Attribute{}
 	attr.PropertyId = "networkdevice.equipmentinfo.deviceid"
 	attr.Rules = make([]*l8poll.L8P_Rule, 0)
-	// NOTE: DeviceId typically derived from inventory system, not directly available via SNMP
+	// NOTE: TargetId typically derived from inventory system, not directly available via SNMP
 	// Could be mapped from sysName or other identifier
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.5.0")) // Use sysName as fallback
 	return attr

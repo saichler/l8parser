@@ -80,7 +80,7 @@ func createDetails(p *l8poll.L8Pollaris) {
 
 func LogsJob(cluster, context, namespace, podname string) *l8poll.CJob {
 	job := &l8poll.CJob{}
-	job.DeviceId = cluster
+	job.TargetId = cluster
 	job.HostId = context
 	job.PollarisName = "kubernetes"
 	job.JobName = "logs"
@@ -90,7 +90,7 @@ func LogsJob(cluster, context, namespace, podname string) *l8poll.CJob {
 
 func DetailsJob(cluster, context, namespace, podname string) *l8poll.CJob {
 	job := &l8poll.CJob{}
-	job.DeviceId = cluster
+	job.TargetId = cluster
 	job.HostId = context
 	job.PollarisName = "kubernetes"
 	job.JobName = "details"
