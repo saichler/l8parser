@@ -6,7 +6,7 @@ import (
 
 	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/reflect/go/reflect/properties"
+	"github.com/saichler/l8reflect/go/reflect/properties"
 )
 
 type Set struct{}

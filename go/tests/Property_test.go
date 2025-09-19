@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/saichler/probler/go/types"
-	"github.com/saichler/reflect/go/reflect/cloning"
-	"github.com/saichler/reflect/go/reflect/updating"
+	"github.com/saichler/l8reflect/go/reflect/cloning"
+	"github.com/saichler/l8reflect/go/reflect/updating"
 )
 
 func TestProperty(t *testing.T) {
