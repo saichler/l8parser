@@ -10,7 +10,7 @@ import (
 	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8types/go/types/l8services"
 
 	"github.com/saichler/l8srlz/go/serialize/object"
 	types2 "github.com/saichler/probler/go/types"
@@ -41,15 +41,15 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	}
 
 	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, device.ParsingService.ServiceName, byte(device.ParsingService.ServiceArea),
+	vnic.Resources().Services().Activate(parsing.ServiceType, device.LinkP.ZsideServiceName, byte(device.LinkP.ZsideServiceArea),
 		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", true)
 
-	forwardInfo := &l8poll.L8ServiceInfo{}
-	forwardInfo.ServiceName = "MockOrm"
-	forwardInfo.ServiceArea = 0
+	forwardInfo := &l8services.L8ServiceLink{}
+	forwardInfo.ZsideServiceName = "MockOrm"
+	forwardInfo.ZsideServiceArea = 0
 
 	vnic.Resources().Registry().Register(&inventory.InventoryService{})
-	vnic.Resources().Services().Activate(inventory.ServiceType, device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea),
+	vnic.Resources().Services().Activate(inventory.ServiceType, device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea),
 		vnic.Resources(), vnic, "Id", &types2.NetworkDevice{}, forwardInfo)
 
 	time.Sleep(time.Second)
@@ -59,14 +59,14 @@ func TestPhysicalFromPersistency(t *testing.T) {
 		vnic.Resources().Logger().Fail(t, err.Error())
 		return
 	}
-	ps, _ := vnic.Resources().Services().ServiceHandler(device.ParsingService.ServiceName, byte(device.ParsingService.ServiceArea))
+	ps, _ := vnic.Resources().Services().ServiceHandler(device.LinkP.ZsideServiceName, byte(device.LinkP.ZsideServiceArea))
 	parserService := ps.(*parsing.ParsingService)
 	jobElem := object.New(nil, job)
 	parserService.Post(jobElem, vnic)
 
 	time.Sleep(time.Second)
 
-	inv := inventory.Inventory(vnic.Resources(), device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea))
+	inv := inventory.Inventory(vnic.Resources(), device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea))
 	filter := &types2.NetworkDevice{Id: "10.20.30.3"}
 	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)

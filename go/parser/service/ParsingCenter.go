@@ -1,10 +1,7 @@
 package service
 
 import (
-	"bytes"
 	"reflect"
-	"strconv"
-	"time"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/types/l8poll"
@@ -42,38 +39,8 @@ func (this *ParsingService) JobComplete(job *l8poll.CJob, resources ifs.IResourc
 			resources.Logger().Error("No Vnic to notify inventory")
 			return
 		}
-		itemsQueueKey := this.itemsQueueKey(job)
-		this.itemsQueueMtx.Lock()
-		defer this.itemsQueueMtx.Unlock()
-		q, ok := this.itemsQueue[itemsQueueKey]
-		if !ok {
-			q = NewInventoryQueue(job.IService.ServiceName, byte(job.IService.ServiceArea))
-			this.itemsQueue[itemsQueueKey] = q
-		}
-		q.add(elem)
-	}
-}
 
-func (this *ParsingService) itemsQueueKey(job *l8poll.CJob) string {
-	buff := bytes.Buffer{}
-	buff.WriteString(job.IService.ServiceName)
-	buff.WriteString(strconv.Itoa(int(job.IService.ServiceArea)))
-	return buff.String()
-}
-
-func (this *ParsingService) watchItemsQueue() {
-	for this.active {
-		this.flushItemQueue()
-		time.Sleep(time.Second * 5)
-	}
-}
-
-func (this *ParsingService) flushItemQueue() {
-	this.itemsQueueMtx.Lock()
-	defer this.itemsQueueMtx.Unlock()
-	if this.active {
-		for _, q := range this.itemsQueue {
-			q.flush(this.vnic)
-		}
+		this.vnic.RegisterServiceLink(job.LinkD)
+		this.vnic.Leader(job.LinkD.ZsideServiceName, byte(job.LinkD.ZsideServiceArea), ifs.PATCH, elem)
 	}
 }

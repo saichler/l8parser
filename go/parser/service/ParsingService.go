@@ -2,7 +2,6 @@ package service
 
 import (
 	"os"
-	"sync"
 
 	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8types/go/ifs"
@@ -16,14 +15,14 @@ const (
 )
 
 type ParsingService struct {
-	resources     ifs.IResources
-	elem          interface{}
-	primaryKey    string
-	vnic          ifs.IVNic
-	persistJobs   bool
-	itemsQueue    map[string]*InventoryQueue
-	itemsQueueMtx *sync.Mutex
-	active        bool
+	resources   ifs.IResources
+	elem        interface{}
+	primaryKey  string
+	vnic        ifs.IVNic
+	persistJobs bool
+	//itemsQueue    map[string]*InventoryQueue
+	//itemsQueueMtx *sync.Mutex
+	active bool
 }
 
 func (this *ParsingService) Activate(serviceName string, serviceArea byte,
@@ -36,8 +35,8 @@ func (this *ParsingService) Activate(serviceName string, serviceArea byte,
 	this.elem = args[0]
 	this.primaryKey = args[1].(string)
 	this.persistJobs = args[2].(bool)
-	this.itemsQueueMtx = &sync.Mutex{}
-	this.itemsQueue = make(map[string]*InventoryQueue)
+	//this.itemsQueueMtx = &sync.Mutex{}
+	//this.itemsQueue = make(map[string]*InventoryQueue)
 	this.active = true
 
 	vnic, ok := l.(ifs.IVNic)
@@ -48,18 +47,18 @@ func (this *ParsingService) Activate(serviceName string, serviceArea byte,
 	if this.persistJobs {
 		os.Mkdir(JobFileLocation, 0777)
 	}
-	go this.watchItemsQueue()
+	//go this.watchItemsQueue()
 	return nil
 }
 
 func (this *ParsingService) DeActivate() error {
-	this.itemsQueueMtx.Lock()
-	defer this.itemsQueueMtx.Unlock()
+	//this.itemsQueueMtx.Lock()
+	//defer this.itemsQueueMtx.Unlock()
 	this.active = false
 	this.vnic = nil
 	this.resources = nil
 	this.elem = nil
-	this.itemsQueue = nil
+	//this.itemsQueue = nil
 	return nil
 }
 

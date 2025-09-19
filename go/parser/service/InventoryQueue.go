@@ -1,5 +1,6 @@
 package service
 
+/*
 import "github.com/saichler/l8types/go/ifs"
 
 type InventoryQueue struct {
@@ -31,3 +32,4 @@ func (this *InventoryQueue) flush(vnic ifs.IVNic) {
 		vnic.Leader(this.serviceName, this.serviceArea, ifs.PATCH, this.items())
 	}
 }
+*/

@@ -58,11 +58,11 @@ func TestPhysical(t *testing.T) {
 	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
 
 	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, device.ParsingService.ServiceName, byte(device.ParsingService.ServiceArea),
+	vnic.Resources().Services().Activate(parsing.ServiceType, device.LinkP.ZsideServiceName, byte(device.LinkP.ZsideServiceArea),
 		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", true)
 
 	vnic.Resources().Registry().Register(&inventory.InventoryService{})
-	vnic.Resources().Services().Activate(inventory.ServiceType, device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea),
+	vnic.Resources().Services().Activate(inventory.ServiceType, device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea),
 		vnic.Resources(), vnic, "Id", &types2.NetworkDevice{})
 
 	time.Sleep(time.Second)
@@ -72,7 +72,7 @@ func TestPhysical(t *testing.T) {
 
 	time.Sleep(time.Second * 10)
 
-	inv := inventory.Inventory(vnic.Resources(), device.InventoryService.ServiceName, byte(device.InventoryService.ServiceArea))
+	inv := inventory.Inventory(vnic.Resources(), device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea))
 	filter := &types2.NetworkDevice{Id: ip}
 	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)
