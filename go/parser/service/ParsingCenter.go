@@ -1,10 +1,13 @@
 package service
 
 import (
+	"bytes"
 	"reflect"
+	"strconv"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8types/go/types/l8services"
 
 	"github.com/saichler/l8types/go/ifs"
 )
@@ -40,7 +43,22 @@ func (this *ParsingService) JobComplete(job *l8poll.CJob, resources ifs.IResourc
 			return
 		}
 
-		this.vnic.RegisterServiceLink(job.LinkD)
+		key := linkKey(job.LinkD)
+		_, ok := this.registeredLinks.Load(key)
+		if !ok {
+			job.LinkD.Mode = int32(ifs.M_Leader)
+			job.LinkD.Interval = 5
+			this.vnic.RegisterServiceLink(job.LinkD)
+			this.registeredLinks.Store(key, true)
+		}
+
 		this.vnic.Leader(job.LinkD.ZsideServiceName, byte(job.LinkD.ZsideServiceArea), ifs.PATCH, elem)
 	}
+}
+
+func linkKey(link *l8services.L8ServiceLink) string {
+	buff := bytes.Buffer{}
+	buff.WriteString(link.ZsideServiceName)
+	buff.WriteString(strconv.Itoa(int(link.ZsideServiceArea)))
+	return buff.String()
 }

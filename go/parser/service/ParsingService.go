@@ -2,6 +2,7 @@ package service
 
 import (
 	"os"
+	"sync"
 
 	"github.com/saichler/l8pollaris/go/types/l8poll"
 	"github.com/saichler/l8types/go/ifs"
@@ -22,12 +23,13 @@ type ParsingService struct {
 	persistJobs bool
 	//itemsQueue    map[string]*InventoryQueue
 	//itemsQueueMtx *sync.Mutex
-	active bool
+	active          bool
+	registeredLinks *sync.Map
 }
 
 func (this *ParsingService) Activate(serviceName string, serviceArea byte,
 	r ifs.IResources, l ifs.IServiceCacheListener, args ...interface{}) error {
-
+	this.registeredLinks = &sync.Map{}
 	this.resources = r
 	this.resources.Registry().Register(&l8poll.CMap{})
 	this.resources.Registry().Register(&l8poll.CTable{})
