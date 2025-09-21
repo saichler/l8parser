@@ -11,6 +11,7 @@ import (
 
 var DEFAULT_CADENCE = &l8poll.L8C_CadencePlan{Cadences: []int64{900, 3600, 7200}, Enabled: true}
 var EVERY_5_MINUTES = &l8poll.L8C_CadencePlan{Cadences: []int64{300, 3600, 7200}, Enabled: true}
+var EVERY_5_MINUTES_ALWAYS = &l8poll.L8C_CadencePlan{Cadences: []int64{300}, Enabled: true}
 var DISABLED = &l8poll.L8C_CadencePlan{Cadences: []int64{7200}, Enabled: false}
 var DEFAULT_TIMEOUT int64 = 30
 
@@ -309,7 +310,7 @@ func createDeviceStatusPoll(p *l8poll.L8Pollaris) {
 	poll := createBaseSNMPPoll("deviceStatus")
 	poll.What = "devicestatus" // Static value instead of SNMP OID
 	poll.Operation = l8poll.L8C_Operation_L8C_Map
-	poll.Cadence = EVERY_5_MINUTES
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8poll.L8P_Attribute, 0)
 	poll.Attributes = append(poll.Attributes, createDeviceStatus())
 	p.Polling[poll.Name] = poll
