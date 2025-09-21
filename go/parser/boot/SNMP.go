@@ -13,7 +13,7 @@ var DEFAULT_CADENCE = &l8poll.L8C_CadencePlan{Cadences: []int64{900, 3600, 7200}
 var EVERY_5_MINUTES = &l8poll.L8C_CadencePlan{Cadences: []int64{300, 3600, 7200}, Enabled: true}
 var EVERY_5_MINUTES_ALWAYS = &l8poll.L8C_CadencePlan{Cadences: []int64{300}, Enabled: true}
 var DISABLED = &l8poll.L8C_CadencePlan{Cadences: []int64{7200}, Enabled: false}
-var DEFAULT_TIMEOUT int64 = 30
+var DEFAULT_TIMEOUT int64 = 60
 
 func CreateBoot00() *l8poll.L8Pollaris {
 	boot00 := &l8poll.L8Pollaris{}
