@@ -57,7 +57,7 @@ func createBaseK8sPoll(name string) *l8poll.L8Poll {
 	poll := &l8poll.L8Poll{}
 	poll.Name = name
 	poll.Timeout = DEFAULT_TIMEOUT
-	poll.Cadence = DEFAULT_CADENCE
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Protocol = l8poll.L8C_Protocol_L8P_Kubectl
 	return poll
 }
