@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L8Parser - Network Data Parsing Service</title>
+    <title>Layer 8 Model Agnostic Parsing - Advanced Network Data Processing</title>
     <style>
         :root {
             --primary-bg: linear-gradient(135deg, #f7f3e9 0%, #e8ddd4 100%);
             --accent-gradient: linear-gradient(135deg, #a08873 0%, #8b745f 100%);
-            --highlight-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --highlight-gradient: linear-gradient(135deg, #2d5a87 0%, #1e3a52 100%);
             --text-primary: #4a4a4a;
             --text-secondary: #6b5b4a;
             --text-accent: #8b745f;
@@ -40,11 +40,15 @@
         header {
             background: var(--highlight-gradient);
             color: white;
-            padding: 3rem 0;
+            padding: 0;
             text-align: center;
             box-shadow: var(--shadow-soft);
             position: relative;
             overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         header::before {
@@ -54,8 +58,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.3;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit" width="100" height="100" patternUnits="userSpaceOnUse"><g fill="rgba(255,255,255,0.1)"><circle cx="20" cy="20" r="1"/><circle cx="80" cy="20" r="1"/><circle cx="50" cy="50" r="1.5"/><circle cx="20" cy="80" r="1"/><circle cx="80" cy="80" r="1"/><path d="M20,20 L50,50 L80,20 M20,80 L50,50 L80,80" stroke="rgba(255,255,255,0.05)" stroke-width="0.5" fill="none"/></g></pattern></defs><rect width="100" height="100" fill="url(%23circuit)"/></svg>');
+            opacity: 0.4;
         }
 
         header .container {
@@ -64,19 +68,22 @@
         }
 
         header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 400;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+            opacity: 0;
+            animation: fadeInUp 1.5s ease-out 0.5s forwards;
         }
 
         header p {
-            font-size: 1.3rem;
-            opacity: 0.95;
-            max-width: 700px;
+            font-size: 1.5rem;
+            opacity: 0;
+            max-width: 800px;
             margin: 0 auto;
             font-style: italic;
+            animation: fadeInUp 1.5s ease-out 1s forwards;
         }
 
         nav {
@@ -319,9 +326,123 @@
             opacity: 0.95;
         }
 
+        /* Parallax and Animation Styles */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .parallax-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parallax-element {
+            position: absolute;
+            will-change: transform;
+        }
+
+        .floating-illustration {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .illustration-1 {
+            top: 20%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #2d5a87, #4a7ba7);
+            border-radius: 50%;
+            animation-delay: 0s;
+        }
+
+        .illustration-2 {
+            top: 60%;
+            left: 5%;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #1e3a52, #2d5a87);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            animation-delay: 2s;
+        }
+
+        .illustration-3 {
+            top: 40%;
+            right: 20%;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #4a7ba7, #5d8fb8);
+            transform: rotate(45deg);
+            animation-delay: 4s;
+        }
+
+        .custom-svg-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .circuit-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><pattern id="networkPattern" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="%23ffffff" opacity="0.1"/><path d="M0,25 L50,25 M25,0 L25,50" stroke="%23ffffff" stroke-width="0.5" opacity="0.05"/></pattern></defs><rect width="200" height="200" fill="url(%23networkPattern)"/></svg>');
+            opacity: 0.3;
+        }
+
+        /* Enhanced section transitions */
+        section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
         @media (max-width: 768px) {
             header h1 {
-                font-size: 2.5rem;
+                font-size: 3rem;
+            }
+
+            header p {
+                font-size: 1.2rem;
             }
 
             nav ul {
@@ -349,14 +470,26 @@
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
+
+            .floating-illustration {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
+    <header class="parallax-container">
+        <div class="circuit-pattern"></div>
+        <div class="floating-illustration illustration-1"></div>
+        <div class="floating-illustration illustration-2"></div>
+        <div class="floating-illustration illustration-3"></div>
         <div class="container">
-            <h1>L8Parser</h1>
-            <p>A powerful, rule-based parsing service for processing network data in the Layer8 ecosystem</p>
+            <h1>Layer 8 Model Agnostic Parsing</h1>
+            <p>Advanced network data processing with intelligent rule-based parsing and multi-vendor support</p>
+            <div class="scroll-indicator">
+                <div style="font-size: 1.5rem;">⇩</div>
+                <div style="font-size: 0.9rem; margin-top: 5px;">Scroll to explore</div>
+            </div>
         </div>
     </header>
 
@@ -378,7 +511,7 @@
         <div class="container">
             <section id="overview">
                 <h2>Overview</h2>
-                <p>L8Parser serves as the intelligent data transformation layer within the Layer8 network management ecosystem. It processes raw data collected by l8collector, applying sophisticated parsing rules to extract meaningful information for inventory management. With support for multiple protocols and vendors, L8Parser ensures data consistency and reliability across diverse network infrastructures.</p>
+                <p>Layer 8 Model Agnostic Parsing (L8Parser) serves as the intelligent data transformation layer within the Layer8 network management ecosystem. This powerful model-agnostic parsing service processes raw data collected by l8collector, applying sophisticated rule-based parsing framework with advanced PropertyId injection and protocol buffer integration. With support for multiple protocols and vendors, L8Parser ensures data consistency and reliability across diverse network infrastructures.</p>
                 
                 <div class="stats">
                     <div class="stat-item">
@@ -394,8 +527,8 @@
                         <span>Rule Types</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">Real-time</span>
-                        <span>Processing</span>
+                        <span class="stat-number">Go 1.24.7</span>
+                        <span>Toolchain</span>
                     </div>
                 </div>
 
@@ -434,28 +567,28 @@
             </section>
 
             <section id="recent-updates">
-                <h2>Recent Updates</h2>
+                <h2>Recent Updates (September 2025)</h2>
                 <div class="highlight-box">
                     <h4>🚀 Latest Enhancements</h4>
-                    <p>Recent improvements include PropertyId injection functionality, enhanced field name mappings, and comprehensive protobuf integration fixes.</p>
+                    <p>Recent improvements include Kubernetes integration enhancements, performance optimizations with enlarged timeout settings, comprehensive test framework improvements, and Go 1.24.7 toolchain updates for enhanced performance and security.</p>
                 </div>
                 
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>PropertyId Path Enhancement</h4>
-                        <p>Implemented intelligent PropertyId injection with slice indices and map keys using format <code>&lt;{reflect.Kind}value&gt;</code> for complex data structures like interfaces, modules, and power supplies.</p>
+                        <h4>Kubernetes Integration</h4>
+                        <p>Enhanced k8s interval configuration for cloud-native deployments with improved container orchestration and scaling capabilities.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Field Name Mapping Optimization</h4>
-                        <p>Refined field name mappings to correctly handle protobuf field names, removing incorrect underscore transformations while preserving necessary collection mappings.</p>
+                        <h4>Performance Optimizations</h4>
+                        <p>Enlarged timeout settings and improved status cadence handling for better reliability and performance in high-load environments.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Rule Engine Improvements</h4>
-                        <p>Updated Set rule to handle different data types directly without string conversion, improved error handling, and enhanced property resolution for better reliability.</p>
+                        <h4>Test Framework Enhancement</h4>
+                        <p>Comprehensive testing improvements with better physical device testing, enhanced coverage analysis, and improved integration testing.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>SNMP Configuration Fixes</h4>
-                        <p>Corrected SNMP OID relationships ensuring poll.What represents walk OIDs and attr.Params["from"] contains specific leaf OIDs for accurate data collection.</p>
+                        <h4>Go Toolchain Update</h4>
+                        <p>Updated to Go 1.24.7 toolchain providing enhanced performance, security improvements, and better memory management.</p>
                     </div>
                 </div>
 
@@ -784,11 +917,38 @@ go test ./tests -run TestPropertyInjection -v</code>
             });
         });
 
-        // Enhanced navigation with smooth transitions
-        window.addEventListener('scroll', () => {
+        // Parallax scrolling effect
+        function parallaxScroll() {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.floating-illustration');
+
+            parallaxElements.forEach((element, index) => {
+                const speed = 0.5 + (index * 0.2);
+                const yPos = -(scrolled * speed);
+                element.style.transform = `translateY(${yPos}px)`;
+            });
+
+            // Circuit pattern parallax
+            const circuitPattern = document.querySelector('.circuit-pattern');
+            if (circuitPattern) {
+                circuitPattern.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+
+            // Header content parallax
+            const headerContent = document.querySelector('header .container');
+            if (headerContent && scrolled < window.innerHeight) {
+                headerContent.style.transform = `translateY(${scrolled * 0.5}px)`;
+                headerContent.style.opacity = 1 - (scrolled / window.innerHeight);
+            }
+        }
+
+        // Enhanced navigation with smooth transitions and parallax
+        function handleScroll() {
+            parallaxScroll();
+
             const sections = document.querySelectorAll('section[id]');
             const navLinks = document.querySelectorAll('nav a[href^="#"]');
-            
+
             let current = '';
             sections.forEach(section => {
                 const sectionTop = section.offsetTop - 120;
@@ -807,15 +967,43 @@ go test ./tests -run TestPropertyInjection -v</code>
                     link.style.transform = 'translateY(-2px)';
                 }
             });
+
+            // Hide scroll indicator when scrolled
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            if (scrollIndicator) {
+                if (window.scrollY > 100) {
+                    scrollIndicator.style.opacity = '0';
+                } else {
+                    scrollIndicator.style.opacity = '1';
+                }
+            }
+        }
+
+        // Throttled scroll event
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(handleScroll);
+                ticking = true;
+                requestAnimationFrame(() => { ticking = false; });
+            }
         });
 
-        // Add subtle animations on scroll
+        // Section reveal animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
         };
 
-        const observer = new IntersectionObserver((entries) => {
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        const cardObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.style.opacity = '1';
@@ -824,11 +1012,23 @@ go test ./tests -run TestPropertyInjection -v</code>
             });
         }, observerOptions);
 
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Observe sections for reveal animations
+            document.querySelectorAll('section').forEach(section => {
+                sectionObserver.observe(section);
+            });
+
+            // Observe feature cards for staggered animations
+            document.querySelectorAll('.feature-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                cardObserver.observe(card);
+            });
+
+            // Add initial parallax state
+            handleScroll();
         });
     </script>
 </body>

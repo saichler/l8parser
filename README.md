@@ -1,6 +1,6 @@
-# L8Parser
+# Layer 8 Model Agnostic Parsing (L8Parser)
 
-A powerful parsing service for processing l8collector payloads in the Layer8 ecosystem. L8Parser provides a rule-based parsing framework that processes collected data from network devices and transforms it into structured objects.
+A powerful model-agnostic parsing service for processing l8collector payloads in the Layer8 ecosystem. L8Parser provides a sophisticated rule-based parsing framework that processes collected data from network devices and transforms it into structured objects with advanced PropertyId injection and protocol buffer integration.
 
 ## Overview
 
@@ -36,8 +36,9 @@ The parser supports multiple rule types:
 
 ### Prerequisites
 
-- Go 1.23.8 or higher
+- Go 1.24.0 or higher (current: Go 1.24.7 toolchain)
 - Access to Layer8 ecosystem modules
+- Protocol Buffer support for enhanced data structures
 
 ### Dependencies
 
@@ -124,6 +125,16 @@ poll := &types.Poll{
 2. **Rule Application**: Applies configured parsing rules based on Pollaris configuration
 3. **Data Transformation**: Transforms raw data into structured objects
 4. **Inventory Update**: Sends parsed objects to inventory service via PATCH operations
+
+## Recent Updates (September 2025)
+
+### Latest Enhancements
+
+- **Kubernetes Integration**: Enhanced k8s interval configuration for cloud-native deployments
+- **Performance Optimizations**: Enlarged timeout settings and improved status cadence handling
+- **Test Framework Improvements**: Comprehensive testing enhancements with better physical device testing
+- **Repository Restructuring**: Updated repository organization and dependency management
+- **Go Toolchain Update**: Updated to Go 1.24.7 toolchain for enhanced performance and security
 
 ## SNMP Support
 
