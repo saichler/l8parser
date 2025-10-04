@@ -18,8 +18,18 @@ func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
 	createServicesPoll(k8sPollaris)
 	createNamespacesPoll(k8sPollaris)
 	createNetworkPoliciesPoll(k8sPollaris)
+
 	createLogs(k8sPollaris)
-	createDetails(k8sPollaris)
+
+	createNodeDetails(k8sPollaris)
+	createPodDetails(k8sPollaris)
+	createDeploymentDetails(k8sPollaris)
+	createStatefulsetDetails(k8sPollaris)
+	createDaemonsetDetails(k8sPollaris)
+	createServiceDetails(k8sPollaris)
+	createNamespaceDetails(k8sPollaris)
+	createNetworkPolicyDetails(k8sPollaris)
+
 	return k8sPollaris
 }
 
@@ -184,9 +194,65 @@ func createLogs(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
-func createDetails(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("details")
+func createNodeDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("nodedetails")
+	poll.What = "get node $name -o json"
+	poll.Cadence = DISABLED
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	p.Polling[poll.Name] = poll
+}
+
+func createPodDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("poddetails")
 	poll.What = "get pods -o json -n $namespace $podname"
+	poll.Cadence = DISABLED
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	p.Polling[poll.Name] = poll
+}
+
+func createDeploymentDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("deploymentdetails")
+	poll.What = "get deployment -o json -n $namespace $deploymentname"
+	poll.Cadence = DISABLED
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	p.Polling[poll.Name] = poll
+}
+
+func createStatefulsetDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("statefulsetdetails")
+	poll.What = "get statefulset -o json -n $namespace $statefulsetname"
+	poll.Cadence = DISABLED
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	p.Polling[poll.Name] = poll
+}
+
+func createDaemonsetDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("daemonsetdetails")
+	poll.What = "get daemonset -o json -n $namespace $daemonsetname"
+	poll.Cadence = DISABLED
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	p.Polling[poll.Name] = poll
+}
+
+func createServiceDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("servicedetails")
+	poll.What = "get service -o json -n $namespace $servicename"
+	poll.Cadence = DISABLED
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	p.Polling[poll.Name] = poll
+}
+
+func createNamespaceDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("namespacedetails")
+	poll.What = "get namespace $namespace -o json"
+	poll.Cadence = DISABLED
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	p.Polling[poll.Name] = poll
+}
+
+func createNetworkPolicyDetails(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sPoll("networkpolicydetails")
+	poll.What = "get netpol -o json -n $namespace $networkpolicyname"
 	poll.Cadence = DISABLED
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	p.Polling[poll.Name] = poll
