@@ -313,6 +313,7 @@ func createDeviceStatusPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDeviceStatus())
+	poll.Always = true
 	p.Polling[poll.Name] = poll
 }
 
