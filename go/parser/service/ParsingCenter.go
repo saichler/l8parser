@@ -12,14 +12,14 @@ import (
 	"github.com/saichler/l8types/go/ifs"
 )
 
-func (this *ParsingService) createElementInstance(job *l8poll.CJob) interface{} {
+func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interface{} {
 	newElem := reflect.New(reflect.ValueOf(this.elem).Elem().Type())
 	field := newElem.Elem().FieldByName(this.primaryKey)
 	field.Set(reflect.ValueOf(job.TargetId))
 	return newElem.Interface()
 }
 
-func (this *ParsingService) JobComplete(job *l8poll.CJob, resources ifs.IResources) {
+func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IResources) {
 	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
 	if err != nil {
 		resources.Logger().Error("ParsingCenter:" + err.Error())
@@ -43,16 +43,16 @@ func (this *ParsingService) JobComplete(job *l8poll.CJob, resources ifs.IResourc
 			return
 		}
 
-		key := linkKey(job.LinkD)
+		key := linkKey(job.LinkData)
 		_, ok := this.registeredLinks.Load(key)
 		if !ok {
-			job.LinkD.Mode = int32(ifs.M_Leader)
-			job.LinkD.Interval = 5
-			this.vnic.RegisterServiceLink(job.LinkD)
+			job.LinkData.Mode = int32(ifs.M_Leader)
+			job.LinkData.Interval = 5
+			this.vnic.RegisterServiceLink(job.LinkData)
 			this.registeredLinks.Store(key, true)
 		}
 
-		this.vnic.Leader(job.LinkD.ZsideServiceName, byte(job.LinkD.ZsideServiceArea), ifs.PATCH, elem)
+		this.vnic.Leader(job.LinkData.ZsideServiceName, byte(job.LinkData.ZsideServiceArea), ifs.PATCH, elem)
 	}
 }
 

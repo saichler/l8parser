@@ -32,7 +32,7 @@ const (
 	DEVICE_TYPE_GATEWAY       = 8
 )
 
-func (this *InferDeviceType) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
+func (this *InferDeviceType) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8P_Parameter, any interface{}, pollWhat string) error {
 	// Get the NetworkDevice
 	networkDevice, ok := any.(*types2.NetworkDevice)
 	if !ok {

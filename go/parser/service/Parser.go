@@ -39,7 +39,7 @@ func newParser() *_Parser {
 	return p
 }
 
-func (this *_Parser) Parse(job *l8poll.CJob, any interface{}, resources ifs.IResources) error {
+func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs.IResources) error {
 	if job.Error != "" {
 		return errors.New(job.Error)
 	}

@@ -34,7 +34,7 @@ func TestFullDevicesParsing(t *testing.T) {
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	netDevices := make([]*l8poll.L8C_Target, 0)
+	netDevices := make([]*l8tpollaris.L8PTarget, 0)
 	for i := 1; i <= 19; i++ {
 		ii := strconv.Itoa(i)
 		device := utils_collector.CreateDevice("10.20.30."+ii, serviceArea)
@@ -60,11 +60,11 @@ func TestFullDevicesParsing(t *testing.T) {
 	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
 
 	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, netDevices[0].LinkP.ZsideServiceName, byte(netDevices[0].LinkP.ZsideServiceArea),
+	vnic.Resources().Services().Activate(parsing.ServiceType, netDevices[0].LinkParser.ZsideServiceName, byte(netDevices[0].LinkParser.ZsideServiceArea),
 		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", false)
 
 	vnic.Resources().Registry().Register(&utils_inventory.MockOrmService{})
-	vnic.Resources().Services().Activate(utils_inventory.ServiceType, netDevices[0].LinkD.ZsideServiceName, byte(netDevices[0].LinkD.ZsideServiceArea),
+	vnic.Resources().Services().Activate(utils_inventory.ServiceType, netDevices[0].LinkData.ZsideServiceName, byte(netDevices[0].LinkData.ZsideServiceArea),
 		vnic.Resources(), vnic)
 
 	time.Sleep(time.Second)

@@ -58,11 +58,11 @@ func TestParser(t *testing.T) {
 	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
 
 	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, device.LinkP.ZsideServiceName, byte(device.LinkP.ZsideServiceArea),
+	vnic.Resources().Services().Activate(parsing.ServiceType, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea),
 		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id")
 
 	vnic.Resources().Registry().Register(&utils_inventory.MockOrmService{})
-	vnic.Resources().Services().Activate(utils_inventory.ServiceType, device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea),
+	vnic.Resources().Services().Activate(utils_inventory.ServiceType, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea),
 		vnic.Resources(), vnic)
 
 	time.Sleep(time.Second)
@@ -75,7 +75,7 @@ func TestParser(t *testing.T) {
 
 	time.Sleep(time.Second)
 
-	m, ok := vnic.Resources().Services().ServiceHandler(device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea))
+	m, ok := vnic.Resources().Services().ServiceHandler(device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea))
 	if !ok {
 		vnic.Resources().Logger().Fail(t, "Cannot find mock service")
 		return

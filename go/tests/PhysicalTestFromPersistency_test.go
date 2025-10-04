@@ -41,7 +41,7 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	}
 
 	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, device.LinkP.ZsideServiceName, byte(device.LinkP.ZsideServiceArea),
+	vnic.Resources().Services().Activate(parsing.ServiceType, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea),
 		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", true)
 
 	forwardInfo := &l8services.L8ServiceLink{}
@@ -49,7 +49,7 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	forwardInfo.ZsideServiceArea = 0
 
 	vnic.Resources().Registry().Register(&inventory.InventoryService{})
-	vnic.Resources().Services().Activate(inventory.ServiceType, device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea),
+	vnic.Resources().Services().Activate(inventory.ServiceType, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea),
 		vnic.Resources(), vnic, "Id", &types2.NetworkDevice{}, forwardInfo)
 
 	time.Sleep(time.Second)
@@ -59,14 +59,14 @@ func TestPhysicalFromPersistency(t *testing.T) {
 		vnic.Resources().Logger().Fail(t, err.Error())
 		return
 	}
-	ps, _ := vnic.Resources().Services().ServiceHandler(device.LinkP.ZsideServiceName, byte(device.LinkP.ZsideServiceArea))
+	ps, _ := vnic.Resources().Services().ServiceHandler(device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea))
 	parserService := ps.(*parsing.ParsingService)
 	jobElem := object.New(nil, job)
 	parserService.Post(jobElem, vnic)
 
 	time.Sleep(time.Second)
 
-	inv := inventory.Inventory(vnic.Resources(), device.LinkD.ZsideServiceName, byte(device.LinkD.ZsideServiceArea))
+	inv := inventory.Inventory(vnic.Resources(), device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea))
 	filter := &types2.NetworkDevice{Id: "10.20.30.3"}
 	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)

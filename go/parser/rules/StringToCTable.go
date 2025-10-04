@@ -19,7 +19,7 @@ func (this *StringToCTable) ParamNames() []string {
 	return []string{"columns", "keycolumn"}
 }
 
-func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
+func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8P_Parameter, any interface{}, pollWhat string) error {
 	input, ok := workSpace[Input].(string)
 	if !ok {
 		return nil
@@ -30,8 +30,8 @@ func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string
 	}
 
 	lines := strings.Split(input, "\n")
-	table := &l8poll.CTable{}
-	table.Rows = make(map[int32]*l8poll.CRow)
+	table := &l8tpollaris.CTable{}
+	table.Rows = make(map[int32]*l8tpollaris.CRow)
 	for i, line := range lines {
 		if table.Columns == nil {
 			table.Columns = getColumns(line, colmns)
@@ -40,7 +40,7 @@ func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string
 			}
 			continue
 		}
-		row := &l8poll.CRow{}
+		row := &l8tpollaris.CRow{}
 		row.Data = getValues(line, table.Columns)
 		table.Rows[int32(i)] = row
 	}

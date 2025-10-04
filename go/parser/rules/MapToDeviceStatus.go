@@ -19,7 +19,7 @@ func (this *MapToDeviceStatus) ParamNames() []string {
 	return []string{From}
 }
 
-func (this *MapToDeviceStatus) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
+func (this *MapToDeviceStatus) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8P_Parameter, any interface{}, pollWhat string) error {
 	input := workSpace[Input]
 	_propertyId := workSpace[PropertyId]
 	propertyId := _propertyId.(string)

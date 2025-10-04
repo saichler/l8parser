@@ -19,7 +19,7 @@ func (this *Set) ParamNames() []string {
 	return []string{}
 }
 
-func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8poll.L8P_Parameter, any interface{}, pollWhat string) error {
+func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8P_Parameter, any interface{}, pollWhat string) error {
 	input := workSpace[Input]
 	_propertyId := workSpace[PropertyId]
 	propertyId := _propertyId.(string)

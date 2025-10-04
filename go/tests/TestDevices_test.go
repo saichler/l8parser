@@ -46,7 +46,7 @@ func CheckPollaris() map[string]string {
 	return result
 }
 
-func checkPollaris(p *l8poll.L8Pollaris, invalid map[string]string) {
+func checkPollaris(p *l8tpollaris.L8Pollaris, invalid map[string]string) {
 	for _, poll := range p.Polling {
 		for _, attr := range poll.Attributes {
 			for _, rule := range attr.Rules {
