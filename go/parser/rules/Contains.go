@@ -18,7 +18,7 @@ func (this *Contains) ParamNames() []string {
 	return []string{"what"}
 }
 
-func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8P_Parameter, any interface{}, pollWhat string) error {
+func (this *Contains) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 	input := workSpace[Input]
 	what := params[What]
 	output := params[Output]

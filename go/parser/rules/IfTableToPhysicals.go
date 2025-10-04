@@ -21,7 +21,7 @@ func (this *IfTableToPhysicals) ParamNames() []string {
 	return []string{""}
 }
 
-func (this *IfTableToPhysicals) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8P_Parameter, any interface{}, pollWhat string) error {
+func (this *IfTableToPhysicals) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 	// Get the input CTable from workspace
 	input := workSpace[Input]
 	if input == nil {

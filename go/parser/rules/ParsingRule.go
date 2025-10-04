@@ -13,7 +13,7 @@ import (
 type ParsingRule interface {
 	Name() string
 	ParamNames() []string
-	Parse(ifs.IResources, map[string]interface{}, map[string]*l8tpollaris.L8P_Parameter, interface{}, string) error
+	Parse(ifs.IResources, map[string]interface{}, map[string]*l8tpollaris.L8PParameter, interface{}, string) error
 }
 
 func convertToString(value interface{}, kind reflect.Kind) (string, error) {
@@ -39,7 +39,7 @@ func convertToString(value interface{}, kind reflect.Kind) (string, error) {
 }
 
 // GetValueInput extracts any value type from input data and returns the value, its reflect.Kind, and any error
-func GetValueInput(resources ifs.IResources, input interface{}, params map[string]*l8tpollaris.L8P_Parameter, pollWhat string) (interface{}, reflect.Kind, error) {
+func GetValueInput(resources ifs.IResources, input interface{}, params map[string]*l8tpollaris.L8PParameter, pollWhat string) (interface{}, reflect.Kind, error) {
 	m, ok := input.(*l8tpollaris.CMap)
 	if ok {
 		if len(m.Data) == 0 {

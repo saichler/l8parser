@@ -21,7 +21,7 @@ func createNodesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sPoll("nodes")
 	poll.What = "get nodes -o wide"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8P_Attribute, 0)
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNodesTable())
 	p.Polling[poll.Name] = poll
 }
@@ -30,24 +30,24 @@ func createPodsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sPoll("pods")
 	poll.What = "get pods -A -o wide"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8P_Attribute, 0)
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createPodsTable())
 	p.Polling[poll.Name] = poll
 }
 
-func createNodesTable() *l8tpollaris.L8P_Attribute {
-	attr := &l8tpollaris.L8P_Attribute{}
+func createNodesTable() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.nodes"
-	attr.Rules = make([]*l8tpollaris.L8P_Rule, 0)
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(10, 0))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
 
-func createPodsTable() *l8tpollaris.L8P_Attribute {
-	attr := &l8tpollaris.L8P_Attribute{}
+func createPodsTable() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.pods"
-	attr.Rules = make([]*l8tpollaris.L8P_Rule, 0)
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(10, 6))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
