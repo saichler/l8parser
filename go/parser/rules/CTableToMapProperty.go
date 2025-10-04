@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
+	"github.com/saichler/l8reflect/go/reflect/properties"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
-	"github.com/saichler/l8reflect/go/reflect/properties"
 )
 
 type CTableToMapProperty struct{}
@@ -76,6 +76,8 @@ func getAttributeNameFromColumn(value interface{}) string {
 	colName = strings.ToLower(colName)
 	colName = removeChar(colName, "-")
 	colName = removeChar(colName, " ")
+	colName = removeChar(colName, "(")
+	colName = removeChar(colName, ")")
 	return colName
 }
 
@@ -84,7 +86,8 @@ func removeChar(colName, c string) string {
 	if index == -1 {
 		return colName
 	}
-	return strings2.New(colName[0:index], colName[index+1:]).String()
+	result := strings2.New(colName[0:index], colName[index+1:]).String()
+	return removeChar(result, c)
 }
 
 func getValue(data []byte, resources ifs.IResources) interface{} {

@@ -15,6 +15,9 @@ import (
 func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interface{} {
 	newElem := reflect.New(reflect.ValueOf(this.elem).Elem().Type())
 	field := newElem.Elem().FieldByName(this.primaryKey)
+	if !field.CanSet() {
+		panic("cannot set field " + this.primaryKey)
+	}
 	field.Set(reflect.ValueOf(job.TargetId))
 	return newElem.Interface()
 }

@@ -88,7 +88,7 @@ func createNamespacesPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sPoll("networkpolicies")
-	poll.What = "get networkpolicies -A -o wide"
+	poll.What = "get netpol -A -o wide"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNetworkPoliciesTable())
@@ -162,7 +162,7 @@ func createNetworkPoliciesTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.networkpolicies"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(3, 0))
+	attr.Rules = append(attr.Rules, createToTable(4, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
