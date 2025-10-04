@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -15,6 +15,7 @@ import (
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func TestCluster(t *testing.T) {
@@ -59,5 +60,9 @@ func TestCluster(t *testing.T) {
 	filter := &types2.K8SCluster{Name: "lab"}
 	elem := inv.ElementByElement(filter)
 	k8sCluster := elem.(*types2.K8SCluster)
-	fmt.Println(k8sCluster)
+	list := &types2.K8SClusterList{List: []*types2.K8SCluster{k8sCluster}}
+
+	jsn, _ := protojson.Marshal(list)
+	os.WriteFile("./clusters.json", jsn, 0777)
+
 }

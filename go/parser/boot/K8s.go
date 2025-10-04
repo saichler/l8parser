@@ -196,7 +196,7 @@ func createLogs(p *l8tpollaris.L8Pollaris) {
 
 func createNodeDetails(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sPoll("nodedetails")
-	poll.What = "get node $name -o json"
+	poll.What = "get node $nodename -o json"
 	poll.Cadence = DISABLED
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	p.Polling[poll.Name] = poll
@@ -268,12 +268,82 @@ func LogsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
 	return job
 }
 
-func DetailsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
+func NodeDetailsJob(cluster, context, nodename string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
 	job.HostId = context
 	job.PollarisName = "kubernetes"
-	job.JobName = "details"
+	job.JobName = "nodedetails"
+	job.Arguments = map[string]string{"nodename": nodename}
+	return job
+}
+
+func PodDetailsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
+	job := &l8tpollaris.CJob{}
+	job.TargetId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "poddetails"
 	job.Arguments = map[string]string{"namespace": namespace, "podname": podname}
+	return job
+}
+
+func DeploymentDetailsJob(cluster, context, namespace, deploymentname string) *l8tpollaris.CJob {
+	job := &l8tpollaris.CJob{}
+	job.TargetId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "deploymentdetails"
+	job.Arguments = map[string]string{"namespace": namespace, "deploymentname": deploymentname}
+	return job
+}
+
+func StatefulsetDetailsJob(cluster, context, namespace, statefulsetname string) *l8tpollaris.CJob {
+	job := &l8tpollaris.CJob{}
+	job.TargetId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "statefulsetdetails"
+	job.Arguments = map[string]string{"namespace": namespace, "statefulsetname": statefulsetname}
+	return job
+}
+
+func DaemonsetDetailsJob(cluster, context, namespace, daemonsetname string) *l8tpollaris.CJob {
+	job := &l8tpollaris.CJob{}
+	job.TargetId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "daemonsetdetails"
+	job.Arguments = map[string]string{"namespace": namespace, "daemonsetname": daemonsetname}
+	return job
+}
+
+func ServiceDetailsJob(cluster, context, namespace, servicename string) *l8tpollaris.CJob {
+	job := &l8tpollaris.CJob{}
+	job.TargetId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "servicedetails"
+	job.Arguments = map[string]string{"namespace": namespace, "servicename": servicename}
+	return job
+}
+
+func NamespaceDetailsJob(cluster, context, namespace string) *l8tpollaris.CJob {
+	job := &l8tpollaris.CJob{}
+	job.TargetId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "namespacedetails"
+	job.Arguments = map[string]string{"namespace": namespace}
+	return job
+}
+
+func NetworkPolicyDetailsJob(cluster, context, namespace, networkpolicyname string) *l8tpollaris.CJob {
+	job := &l8tpollaris.CJob{}
+	job.TargetId = cluster
+	job.HostId = context
+	job.PollarisName = "kubernetes"
+	job.JobName = "networkpolicydetails"
+	job.Arguments = map[string]string{"namespace": namespace, "networkpolicyname": networkpolicyname}
 	return job
 }
