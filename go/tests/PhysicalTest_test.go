@@ -45,7 +45,7 @@ func TestPhysical(t *testing.T) {
 
 	p := pollaris.Pollaris(vnic.Resources())
 	for _, snmpPolls := range allPolls {
-		err := p.Add(snmpPolls, false)
+		err := p.Post(snmpPolls, false)
 		if err != nil {
 			vnic.Resources().Logger().Fail(t, err.Error())
 			return
@@ -70,7 +70,7 @@ func TestPhysical(t *testing.T) {
 	cl := topo.VnicByVnetNum(1, 1)
 	cl.Multicast(targets.ServiceName, serviceArea, ifs.POST, device)
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 20)
 
 	inv := inventory.Inventory(vnic.Resources(), device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea))
 	filter := &types2.NetworkDevice{Id: ip}

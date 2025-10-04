@@ -46,7 +46,7 @@ func TestParser(t *testing.T) {
 
 	p := pollaris.Pollaris(vnic.Resources())
 	for _, snmpPolls := range all {
-		err := p.Add(snmpPolls, false)
+		err := p.Post(snmpPolls, false)
 		if err != nil {
 			vnic.Resources().Logger().Fail(t, err.Error())
 			return
