@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	types2 "github.com/saichler/probler/go/types"

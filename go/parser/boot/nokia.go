@@ -1,7 +1,7 @@
 package boot
 
 import (
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
 
 // CreateNokiaRouterBootPolls creates collection and parsing Pollaris model for Nokia routers

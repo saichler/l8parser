@@ -2,7 +2,7 @@ package boot
 
 import (
 	"github.com/saichler/l8collector/go/collector/common"
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
 
 func CreateK8sBootPolls() *l8poll.L8Pollaris {

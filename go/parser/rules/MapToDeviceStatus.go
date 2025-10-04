@@ -3,7 +3,7 @@ package rules
 import (
 	"reflect"
 
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8types/go/ifs"
 	problerTypes "github.com/saichler/probler/go/types"
 	"github.com/saichler/l8reflect/go/reflect/properties"

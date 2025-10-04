@@ -1,7 +1,7 @@
 package boot
 
 import (
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
 
 // CreateHuaweiRouterBootPolls creates collection and parsing Pollaris model for Huawei routers

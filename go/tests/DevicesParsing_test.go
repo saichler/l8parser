@@ -7,7 +7,7 @@ import (
 
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8collector/go/collector/targets"
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 
 	"github.com/saichler/l8collector/go/collector/service"
 	"github.com/saichler/l8collector/go/tests/utils_collector"

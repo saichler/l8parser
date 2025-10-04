@@ -6,7 +6,7 @@ import (
 
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8parser/go/parser/rules"
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
 
 var DEFAULT_CADENCE = &l8poll.L8C_CadencePlan{Cadences: []int64{900, 3600, 7200}, Enabled: true}

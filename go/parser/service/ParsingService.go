@@ -4,7 +4,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/saichler/l8pollaris/go/types/l8poll"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8utils/go/utils/strings"
 	"google.golang.org/protobuf/encoding/protojson"
