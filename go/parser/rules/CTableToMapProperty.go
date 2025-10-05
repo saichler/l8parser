@@ -28,7 +28,7 @@ func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[s
 		return errors.New("Workspace had an invalid output object")
 	}
 
-	keyColumn, e := getIntInput(workSpace, KeyColumn)
+	keyColumns, e := getIntArrInput(workSpace, KeyColumn)
 	if e != nil {
 		return e
 	}
@@ -39,22 +39,28 @@ func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[s
 
 	for _, row := range table.Rows {
 		pid := strings2.New(propertyId)
+		recOK := true
 		for i := 0; i < len(table.Columns); i++ {
 			if i == 0 {
-				val := getValue(row.Data[int32(keyColumn)], resources)
-				if val == nil {
+				pid.Add("<")
+				for _, j := range keyColumns {
+					val := getValue(row.Data[int32(j)], resources)
+					if val == nil {
+						recOK = false
+					}
+					pid.Add(toString.ToString(reflect.ValueOf(val)))
+				}
+				pid.Add(">.")
+				if !recOK {
 					break
 				}
-				pid.Add("<")
-				pid.Add(toString.ToString(reflect.ValueOf(val)))
-				pid.Add(">.")
 			}
 
 			key := strings2.New(pid.String())
 			attrName := getAttributeNameFromColumn(table.Columns[int32(i)])
 			key.Add(attrName)
-
-			prop, err := properties.PropertyOf(key.String(), resources)
+			keyString := key.String()
+			prop, err := properties.PropertyOf(keyString, resources)
 			if err != nil {
 				resources.Logger().Error(err.Error())
 				continue

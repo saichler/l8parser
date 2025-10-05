@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -61,6 +62,8 @@ func TestCluster(t *testing.T) {
 	elem := inv.ElementByElement(filter)
 	k8sCluster := elem.(*types2.K8SCluster)
 	list := &types2.K8SClusterList{List: []*types2.K8SCluster{k8sCluster}}
+
+	fmt.Println(len(k8sCluster.Pods))
 
 	jsn, _ := protojson.Marshal(list)
 	os.WriteFile("./clusters.json", jsn, 0777)

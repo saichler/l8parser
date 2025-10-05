@@ -118,7 +118,7 @@ func createPodsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.pods"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(10, 6))
+	attr.Rules = append(attr.Rules, createToTable(10, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
@@ -127,7 +127,7 @@ func createDeplymentsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.deployments"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(9, 1))
+	attr.Rules = append(attr.Rules, createToTable(9, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
@@ -136,7 +136,7 @@ func createStatefulsetsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.statefulsets"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(6, 1))
+	attr.Rules = append(attr.Rules, createToTable(6, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
@@ -145,7 +145,7 @@ func createDaemonsetsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.daemonsets"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(12, 1))
+	attr.Rules = append(attr.Rules, createToTable(12, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
@@ -154,7 +154,7 @@ func createServicesTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.services"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(8, 1))
+	attr.Rules = append(attr.Rules, createToTable(8, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
@@ -172,7 +172,7 @@ func createNetworkPoliciesTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "k8scluster.networkpolicies"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(4, 1))
+	attr.Rules = append(attr.Rules, createToTable(4, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }

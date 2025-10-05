@@ -1,12 +1,14 @@
 package boot
 
 import (
+	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
+	strings2 "github.com/saichler/l8utils/go/utils/strings"
 )
 
 var DEFAULT_CADENCE = &l8tpollaris.L8PCadencePlan{Cadences: []int64{900, 3600, 7200}, Enabled: true}
@@ -14,6 +16,8 @@ var EVERY_5_MINUTES = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 3600, 7
 var EVERY_5_MINUTES_ALWAYS = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300}, Enabled: true}
 var DISABLED = &l8tpollaris.L8PCadencePlan{Cadences: []int64{7200}, Enabled: false}
 var DEFAULT_TIMEOUT int64 = 60
+
+var stringConvert = &strings2.String{TypesPrefix: true}
 
 func CreateBoot00() *l8tpollaris.L8Pollaris {
 	boot00 := &l8tpollaris.L8Pollaris{}
@@ -397,12 +401,13 @@ func createContainsRule(what, from, output string) *l8tpollaris.L8PRule {
 	return rule
 }
 
-func createToTable(columns, keycolumn int) *l8tpollaris.L8PRule {
+func createToTable(columns int, keycolumn ...int) *l8tpollaris.L8PRule {
 	rule := &l8tpollaris.L8PRule{}
 	rule.Name = "StringToCTable"
 	rule.Params = make(map[string]*l8tpollaris.L8PParameter)
 	rule.Params[rules.Columns] = &l8tpollaris.L8PParameter{Name: rules.Columns, Value: strconv.Itoa(columns)}
-	rule.Params[rules.KeyColumn] = &l8tpollaris.L8PParameter{Name: rules.KeyColumn, Value: strconv.Itoa(keycolumn)}
+	keyStr := stringConvert.ToString(reflect.ValueOf(keycolumn))
+	rule.Params[rules.KeyColumn] = &l8tpollaris.L8PParameter{Name: rules.KeyColumn, Value: keyStr}
 	return rule
 }
 

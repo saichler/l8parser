@@ -8,6 +8,7 @@ import (
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8utils/go/utils/strings"
 )
 
 type ParsingRule interface {
@@ -87,4 +88,16 @@ func getIntInput(workSpace map[string]interface{}, paramName string) (int, error
 		return -1, e
 	}
 	return i, nil
+}
+
+func getIntArrInput(workSpace map[string]interface{}, paramName string) ([]int, error) {
+	v, ok := workSpace[paramName].(string)
+	if !ok {
+		return []int{}, errors.New("'" + paramName + "' does not exist")
+	}
+	arr, e := strings.FromString(v, nil)
+	if e != nil {
+		return []int{}, e
+	}
+	return arr.Interface().([]int), nil
 }
