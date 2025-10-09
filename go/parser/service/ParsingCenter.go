@@ -55,7 +55,7 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 			this.registeredLinks.Store(key, true)
 		}
 
-		this.vnic.Proximity(job.LinkData.ZsideServiceName, byte(job.LinkData.ZsideServiceArea), ifs.PATCH, elem)
+		this.vnic.Leader(job.LinkData.ZsideServiceName, byte(job.LinkData.ZsideServiceArea), ifs.PATCH, elem)
 	}
 }
 
