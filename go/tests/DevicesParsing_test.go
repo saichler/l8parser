@@ -63,7 +63,8 @@ func TestFullDevicesParsing(t *testing.T) {
 	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, netDevices[0].LinkParser.ZsideServiceName,
 		byte(netDevices[0].LinkParser.ZsideServiceArea), true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
-	sla.SetPrimaryKeys([]string{"Id"})
+	sla.SetPrimaryKeys("Id")
+	sla.SetArgs(false)
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, netDevices[0].LinkData.ZsideServiceName,

@@ -60,14 +60,14 @@ func TestPhysical(t *testing.T) {
 
 	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea), true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
-	sla.SetPrimaryKeys([]string{"Id"})
+	sla.SetPrimaryKeys("Id")
 	sla.SetArgs(false)
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	sla = ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
 	sla.SetServiceItemList(&types2.NetworkDeviceList{})
-	sla.SetPrimaryKeys([]string{"Id"})
+	sla.SetPrimaryKeys("Id")
 	//sla.SetArgs(forwardInfo)
 	vnic.Resources().Services().Activate(sla, vnic)
 

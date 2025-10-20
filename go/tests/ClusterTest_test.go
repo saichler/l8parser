@@ -31,6 +31,7 @@ func TestCluster(t *testing.T) {
 	vnic := topo.VnicByVnetNum(2, 2)
 
 	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	sla.SetInitItems([]interface{}{k8sPolls})
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
@@ -40,24 +41,23 @@ func TestCluster(t *testing.T) {
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, cluster.LinkParser.ZsideServiceName, byte(cluster.LinkParser.ZsideServiceArea), true, nil)
-	sla.SetServiceItem(&types2.NetworkDevice{})
-	sla.SetPrimaryKeys([]string{"Id"})
+	sla.SetServiceItem(&types2.K8SCluster{})
+	sla.SetPrimaryKeys("Name")
+	sla.SetArgs(false)
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	sla = ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, cluster.LinkData.ZsideServiceName, byte(cluster.LinkData.ZsideServiceArea), true, nil)
-	sla.SetServiceItem(&types2.NetworkDevice{})
-	sla.SetServiceItemList(&types2.NetworkDeviceList{})
-	sla.SetPrimaryKeys([]string{"Id"})
-
-	p := pollaris.Pollaris(vnic.Resources())
-	p.Post(k8sPolls, false)
+	sla.SetServiceItem(&types2.K8SCluster{})
+	sla.SetServiceItemList(&types2.K8SClusterList{})
+	sla.SetPrimaryKeys("Name")
+	vnic.Resources().Services().Activate(sla, vnic)
 
 	time.Sleep(time.Second)
 
 	cl := topo.VnicByVnetNum(1, 1)
 	cl.Multicast(targets.ServiceName, serviceArea, ifs.POST, cluster)
 
-	time.Sleep(time.Second * 20)
+	time.Sleep(time.Second * 10)
 
 	inv := inventory.Inventory(vnic.Resources(), cluster.LinkData.ZsideServiceName, byte(cluster.LinkData.ZsideServiceArea))
 

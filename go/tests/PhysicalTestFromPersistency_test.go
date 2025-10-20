@@ -50,7 +50,7 @@ func TestPhysicalFromPersistency(t *testing.T) {
 
 	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea), true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
-	sla.SetPrimaryKeys([]string{"Id"})
+	sla.SetPrimaryKeys("Id")
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), true, nil)

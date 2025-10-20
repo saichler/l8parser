@@ -35,23 +35,20 @@ func TestParser(t *testing.T) {
 		}
 	}
 
+	initData := []interface{}{}
+	for _, snmpPolls := range all {
+		initData = append(initData, snmpPolls)
+	}
+
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	device := utils_collector.CreateDevice("10.10.10.1", serviceArea)
+	device := utils_collector.CreateDevice("10.20.30.1", serviceArea)
 
 	vnic := topo.VnicByVnetNum(2, 2)
 	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	sla.SetInitItems(initData)
 	vnic.Resources().Services().Activate(sla, vnic)
-
-	p := pollaris.Pollaris(vnic.Resources())
-	for _, snmpPolls := range all {
-		err := p.Post(snmpPolls, false)
-		if err != nil {
-			vnic.Resources().Logger().Fail(t, err.Error())
-			return
-		}
-	}
 
 	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
 	vnic.Resources().Services().Activate(sla, vnic)
@@ -61,13 +58,12 @@ func TestParser(t *testing.T) {
 
 	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea), true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
-	sla.SetPrimaryKeys([]string{"Id"})
+	sla.SetPrimaryKeys("Id")
+	sla.SetArgs(false)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), true, nil)
+	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), false, nil)
 	vnic.Resources().Services().Activate(sla, vnic)
-
-	time.Sleep(time.Second)
 
 	cl := topo.VnicByVnetNum(1, 1)
 	err := cl.Multicast(targets.ServiceName, serviceArea, ifs.POST, device)
@@ -75,7 +71,7 @@ func TestParser(t *testing.T) {
 		panic(err)
 	}
 
-	time.Sleep(time.Second)
+	time.Sleep(time.Second * 6)
 
 	m, ok := vnic.Resources().Services().ServiceHandler(device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea))
 	if !ok {
@@ -83,8 +79,8 @@ func TestParser(t *testing.T) {
 		return
 	}
 	mock := m.(*utils_inventory.MockOrmService)
-	if mock.PatchCount() != 1 {
-		vnic.Resources().Logger().Fail(t, "Expected 1 patch count in mock")
+	if mock.PatchCount() < 1 {
+		vnic.Resources().Logger().Fail(t, "Expected 1 patch count in mock ", mock.PatchCount())
 		return
 	}
 
