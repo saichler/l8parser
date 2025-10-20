@@ -9,10 +9,14 @@ L8Parser is part of the Layer8 network management ecosystem and serves as the da
 ## Features
 
 - **Rule-Based Parsing**: Flexible parsing engine with pluggable rules
-- **SNMP Support**: Built-in support for SNMP data parsing with MIB-2 compatibility
+- **SNMP Support**: Built-in support for SNMP data parsing with MIB-2 compatibility and multi-vendor device support
+- **Kubernetes Integration**: Complete K8s cluster monitoring with pods, nodes, deployments, and services
+- **Protocol Buffer Support**: Enhanced data serialization with protobuf definitions for inventory structures
 - **Protocol Agnostic**: Extensible architecture supporting multiple collection protocols
 - **Real-time Processing**: Event-driven processing of collector jobs
 - **Service Integration**: Seamless integration with Layer8 service architecture
+- **Comprehensive Testing**: Extensive test suite with physical device simulations and persistent test data
+- **Documentation**: Complete vendor limitation documentation and polling configuration guides
 
 ## Architecture
 
@@ -22,6 +26,33 @@ L8Parser is part of the Layer8 network management ecosystem and serves as the da
 - **Parsing Service** (`go/parser/service/ParsingService.go`): Service wrapper implementing Layer8 service interface
 - **Parsing Center** (`go/parser/service/ParsingCenter.go`): Job completion handler and inventory integration
 - **Rule Engine** (`go/parser/rules/`): Collection of parsing rules for data transformation
+
+### Project Structure
+
+```
+l8parser/
+├── go/                           # Go module root
+│   ├── parser/
+│   │   ├── boot/                 # Boot configuration and vendor-specific parsers
+│   │   │   ├── K8s.go           # Kubernetes resource monitoring
+│   │   │   ├── SNMP.go          # Common SNMP utilities
+│   │   │   ├── cisco.go         # Cisco device configurations
+│   │   │   ├── juniper.go       # Juniper device configurations
+│   │   │   └── ...              # Other vendor configurations
+│   │   ├── service/             # Core parsing services
+│   │   └── rules/               # Parsing rule implementations
+│   ├── tests/                   # Comprehensive test suite
+│   │   ├── jobsPersistency/     # Persistent test data
+│   │   ├── clusters.json        # Cluster test configurations
+│   │   └── *.go                 # Test files
+│   ├── go.mod                   # Go module definition
+│   └── test.sh                  # Test execution script
+├── proto/                       # Protocol buffer definitions
+│   └── inventory.proto          # Device inventory structures
+├── web.html                     # Web interface
+├── notsupported.md             # Vendor limitation documentation
+└── README.md                    # This file
+```
 
 ### Parsing Rules
 
@@ -36,9 +67,10 @@ The parser supports multiple rule types:
 
 ### Prerequisites
 
-- Go 1.24.0 or higher (current: Go 1.24.7 toolchain)
+- Go 1.24.0 or higher (current: Go 1.24.9 toolchain)
 - Access to Layer8 ecosystem modules
 - Protocol Buffer support for enhanced data structures
+- Kubernetes API access for K8s monitoring features
 
 ### Dependencies
 
@@ -126,15 +158,23 @@ poll := &types.Poll{
 3. **Data Transformation**: Transforms raw data into structured objects
 4. **Inventory Update**: Sends parsed objects to inventory service via PATCH operations
 
-## Recent Updates (September 2025)
+## Recent Updates (October 2025)
 
 ### Latest Enhancements
+
+- **Full Kubernetes Support**: Complete K8s resource monitoring with pods, nodes, deployments, and services
+- **Protocol Buffer Integration**: Added inventory.proto for enhanced data serialization and type safety
+- **Extended Testing Framework**: New test files for GetStringInput, GetValueInput, and cluster testing
+- **Documentation Improvements**: Added comprehensive documentation for unsupported attributes by vendor
+- **Dependency Updates**: Updated all Layer8 dependencies to latest versions (October 2025)
+- **Go Toolchain Update**: Updated to Go 1.24.9 toolchain for enhanced performance and security
+
+### September 2025 Updates
 
 - **Kubernetes Integration**: Enhanced k8s interval configuration for cloud-native deployments
 - **Performance Optimizations**: Enlarged timeout settings and improved status cadence handling
 - **Test Framework Improvements**: Comprehensive testing enhancements with better physical device testing
 - **Repository Restructuring**: Updated repository organization and dependency management
-- **Go Toolchain Update**: Updated to Go 1.24.7 toolchain for enhanced performance and security
 
 ## SNMP Support
 
@@ -216,6 +256,87 @@ func CreateCiscoSwitchBootPolls() *types.Pollaris {
 }
 ```
 
+## Kubernetes Integration
+
+### Overview
+
+L8Parser now includes comprehensive Kubernetes cluster monitoring and parsing capabilities through the new K8s module. This integration enables real-time monitoring of Kubernetes resources and workloads.
+
+### Supported Kubernetes Resources
+
+The parser can collect and process data from the following Kubernetes resources:
+
+- **Nodes**: Cluster node information, status, and specifications
+- **Pods**: Pod details, status, containers, and resource usage
+- **Deployments**: Deployment configurations and rollout status
+- **StatefulSets**: StatefulSet specifications and pod management
+- **DaemonSets**: DaemonSet deployments across cluster nodes
+- **Services**: Service endpoints, ports, and load balancing
+- **Namespaces**: Namespace isolation and resource organization
+- **Network Policies**: Network security rules and traffic control
+
+### Kubernetes Polling Configuration
+
+```go
+func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
+    k8sPollaris := &l8tpollaris.L8Pollaris{
+        Name:   "kubernetes",
+        Groups: []string{common.BOOT_STAGE_00},
+        Polling: map[string]*l8tpollaris.L8Poll{
+            // Node monitoring
+            "nodes": {
+                What:      "get nodes -o wide",
+                Operation: l8tpollaris.L8C_Operation_L8C_Table,
+            },
+            // Pod monitoring
+            "pods": {
+                What:      "get pods -A -o wide",
+                Operation: l8tpollaris.L8C_Operation_L8C_Table,
+            },
+        },
+    }
+    return k8sPollaris
+}
+```
+
+### Features
+
+- **Real-time Monitoring**: Continuous polling of Kubernetes resources
+- **Log Collection**: Automated log retrieval from pods and containers
+- **Resource Details**: Deep inspection of resource configurations
+- **Multi-cluster Support**: Monitoring across multiple Kubernetes clusters
+- **kubectl Integration**: Native kubectl command execution and parsing
+
+### Configuration
+
+The Kubernetes module is configured through the boot stage initialization and supports various polling intervals and detail levels for different resource types.
+
+## Protocol Buffer Integration
+
+### Enhanced Data Structures
+
+The project now includes Protocol Buffer definitions for improved data serialization and type safety:
+
+- **inventory.proto**: Defines comprehensive network device inventory structures
+- **NetworkDevice**: Core device representation with equipment info, physical components, and logical interfaces
+- **EquipmentInfo**: Detailed device metadata including vendor, model, firmware, and location
+- **DeviceType**: Enumerated device classifications (routers, switches, firewalls, servers)
+- **NetworkTopology**: Topology discovery and network relationship mapping
+
+### Proto Structure Example
+
+```protobuf
+message NetworkDevice {
+  string id = 1;
+  EquipmentInfo equipmentinfo = 2;
+  map<string, Physical> physicals = 3;
+  map<string, Logical> logicals = 4;
+  NetworkTopology topology = 5;
+  repeated NetworkLink network_links = 6;
+  NetworkHealth network_health = 7;
+}
+```
+
 ## Testing
 
 ### Unit Tests
@@ -241,6 +362,17 @@ The test suite includes integration tests that:
 - Simulate SNMP device responses
 - Test end-to-end parsing workflows
 - Validate inventory integration
+- Physical device testing with persistent job data
+- Cluster configuration testing with clusters.json
+- Lab environment simulation with .kubeadm-lab and lab.conf
+
+### New Test Components
+
+- **GetStringInput_test.go**: Comprehensive string parsing validation
+- **GetValueInput_test.go**: Value extraction and type conversion testing
+- **ClusterTest_test.go**: Kubernetes cluster configuration testing
+- **PhysicalTestFromPersistency_test.go**: Testing with real device data from jobsPersistency directory
+- **DevicesParsing_test.go**: Vendor-specific device parsing validation
 
 ## Configuration
 
@@ -277,6 +409,30 @@ L8Parser implements comprehensive error handling:
 - **Metrics**: Processing time and throughput metrics
 - **Logging**: Detailed operation logging
 - **Health Checks**: Service health monitoring
+
+## Documentation
+
+### Unsupported Attributes Documentation
+
+The project includes comprehensive documentation of vendor-specific limitations in `notsupported.md`:
+
+- **Vendor-Specific Limitations**: Detailed list of attributes not available via SNMP/SSH for each vendor
+- **Protocol Limitations**: SNMP protocol constraints and version dependencies
+- **Alternative Collection Methods**: NETCONF and REST API options for extended data collection
+- **Workarounds**: Practical solutions for gathering unsupported metrics
+
+Key unsupported areas include:
+- Real-time network health metrics requiring continuous monitoring
+- Hardware-specific details not exposed via SNMP (CPU architecture, memory frequency)
+- Topology discovery requiring network-wide visibility
+- Historical performance data requiring time-series collection
+
+### Available Documentation
+
+- **README.md**: Project overview and usage instructions
+- **notsupported.md**: Comprehensive list of vendor-specific limitations
+- **COMPREHENSIVE_POLLING_DOCUMENTATION.md**: Detailed polling configuration guide
+- **web.html**: Interactive web interface for parsing service visualization
 
 ## Contributing
 

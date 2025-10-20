@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Layer 8 Model Agnostic Parsing - Advanced Network Data Processing</title>
+    <title>L8Parser - Kubernetes & Protocol Buffer Enhanced Network Data Processing | October 2025</title>
+    <link rel="icon" type="image/gif" href="Layer8Logo.gif">
     <style>
         :root {
             --primary-bg: linear-gradient(135deg, #f7f3e9 0%, #e8ddd4 100%);
-            --accent-gradient: linear-gradient(135deg, #a08873 0%, #8b745f 100%);
-            --highlight-gradient: linear-gradient(135deg, #2d5a87 0%, #1e3a52 100%);
+            --accent-gradient: linear-gradient(135deg, #d4af37 0%, #b8960f 100%);
+            --highlight-gradient: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
             --text-primary: #4a4a4a;
             --text-secondary: #6b5b4a;
-            --text-accent: #8b745f;
+            --text-accent: #d4af37;
             --card-bg: rgba(255, 255, 255, 0.9);
             --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
             --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
@@ -484,8 +485,9 @@
         <div class="floating-illustration illustration-2"></div>
         <div class="floating-illustration illustration-3"></div>
         <div class="container">
+            <img src="Layer8Logo.gif" alt="Layer 8 Logo" style="width: 75px; height: 75px; margin-bottom: 2rem; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
             <h1>Layer 8 Model Agnostic Parsing</h1>
-            <p>Advanced network data processing with intelligent rule-based parsing and multi-vendor support</p>
+            <p>Advanced network data processing with Kubernetes integration, Protocol Buffer support, and comprehensive multi-vendor SNMP parsing</p>
             <div class="scroll-indicator">
                 <div style="font-size: 1.5rem;">⇩</div>
                 <div style="font-size: 0.9rem; margin-top: 5px;">Scroll to explore</div>
@@ -499,10 +501,12 @@
                 <li><a href="#overview">Overview</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#architecture">Architecture</a></li>
-                <li><a href="#recent-updates">Recent Updates</a></li>
+                <li><a href="#kubernetes">Kubernetes</a></li>
+                <li><a href="#recent-updates">Updates</a></li>
                 <li><a href="#installation">Installation</a></li>
                 <li><a href="#usage">Usage</a></li>
                 <li><a href="#testing">Testing</a></li>
+                <li><a href="#documentation">Docs</a></li>
             </ul>
         </div>
     </nav>
@@ -515,19 +519,19 @@
                 
                 <div class="stats">
                     <div class="stat-item">
-                        <span class="stat-number">9</span>
+                        <span class="stat-number">9+</span>
                         <span>Vendor Support</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">11</span>
-                        <span>Device Models</span>
+                        <span class="stat-number">K8s</span>
+                        <span>Kubernetes Ready</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">4</span>
-                        <span>Rule Types</span>
+                        <span class="stat-number">Proto</span>
+                        <span>Buffer Support</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">Go 1.24.7</span>
+                        <span class="stat-number">Go 1.24.9</span>
                         <span>Toolchain</span>
                     </div>
                 </div>
@@ -540,42 +544,62 @@
                 <h2>Features</h2>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>Advanced Rule-Based Parsing</h4>
-                        <p>Sophisticated parsing engine with pluggable rules including Contains, Set, StringToCTable, and CTableToMapProperty for comprehensive data transformation scenarios.</p>
+                        <h4>Kubernetes Integration</h4>
+                        <p>Complete K8s cluster monitoring with support for pods, nodes, deployments, statefulsets, daemonsets, services, namespaces, and network policies with kubectl integration.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>PropertyId Path Injection</h4>
-                        <p>Intelligent property path resolution with automatic slice index and map key injection using reflect.Kind values for complex nested data structures.</p>
+                        <h4>Protocol Buffer Support</h4>
+                        <p>Enhanced data serialization with inventory.proto definitions, providing type-safe structures for NetworkDevice, EquipmentInfo, and comprehensive device metadata.</p>
                     </div>
                     <div class="feature-card">
                         <h4>Multi-Vendor SNMP Support</h4>
                         <p>Comprehensive SNMP support for 9 major vendors with automatic OID-based device detection and vendor-specific configurations optimized for hardware monitoring.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Protocol Buffer Integration</h4>
-                        <p>Seamless protobuf integration with field name mapping and type-safe data structure handling for consistent inventory representation.</p>
+                        <h4>Advanced Rule-Based Parsing</h4>
+                        <p>Sophisticated parsing engine with pluggable rules including Contains, Set, ToTable, and TableToMap for comprehensive data transformation scenarios.</p>
                     </div>
                     <div class="feature-card">
                         <h4>Real-time Processing</h4>
                         <p>Event-driven processing of collector jobs with concurrent rule execution and optimized memory management for high-performance data transformation.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Enhanced Error Handling</h4>
-                        <p>Comprehensive error handling with property resolution validation, parsing error recovery, and graceful degradation for robust operation.</p>
+                        <h4>Comprehensive Documentation</h4>
+                        <p>Complete vendor limitation documentation (notsupported.md), polling configuration guides, and extensive test coverage with physical device simulations.</p>
                     </div>
                 </div>
             </section>
 
             <section id="recent-updates">
-                <h2>Recent Updates (September 2025)</h2>
+                <h2>Recent Updates (October 2025)</h2>
                 <div class="highlight-box">
                     <h4>🚀 Latest Enhancements</h4>
-                    <p>Recent improvements include Kubernetes integration enhancements, performance optimizations with enlarged timeout settings, comprehensive test framework improvements, and Go 1.24.7 toolchain updates for enhanced performance and security.</p>
+                    <p>Major updates include complete Kubernetes support with K8s resource monitoring, Protocol Buffer integration for enhanced data serialization, extended testing framework with GetStringInput and GetValueInput tests, comprehensive vendor limitation documentation, and Go 1.24.9 toolchain update.</p>
                 </div>
-                
+
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>Kubernetes Integration</h4>
+                        <h4>Full Kubernetes Support</h4>
+                        <p>Complete K8s resource monitoring including pods, nodes, deployments, statefulsets, daemonsets, services, namespaces, and network policies with kubectl command integration.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Protocol Buffer Integration</h4>
+                        <p>Added inventory.proto with comprehensive device structures, NetworkDevice models, EquipmentInfo metadata, and type-safe data serialization for inventory management.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Extended Testing Framework</h4>
+                        <p>New test components including GetStringInput_test.go, GetValueInput_test.go, ClusterTest_test.go, and PhysicalTestFromPersistency with jobsPersistency data.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Documentation Improvements</h4>
+                        <p>Added notsupported.md documenting vendor-specific SNMP/SSH limitations, protocol constraints, and alternative collection methods for comprehensive device monitoring.</p>
+                    </div>
+                </div>
+
+                <h3>September 2025 Updates</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Initial Kubernetes Config</h4>
                         <p>Enhanced k8s interval configuration for cloud-native deployments with improved container orchestration and scaling capabilities.</p>
                     </div>
                     <div class="feature-card">
@@ -583,12 +607,12 @@
                         <p>Enlarged timeout settings and improved status cadence handling for better reliability and performance in high-load environments.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Test Framework Enhancement</h4>
+                        <h4>Test Framework Foundation</h4>
                         <p>Comprehensive testing improvements with better physical device testing, enhanced coverage analysis, and improved integration testing.</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Go Toolchain Update</h4>
-                        <p>Updated to Go 1.24.7 toolchain providing enhanced performance, security improvements, and better memory management.</p>
+                        <h4>Dependency Updates</h4>
+                        <p>Updated all Layer8 dependencies to latest versions ensuring compatibility and enhanced features across the ecosystem.</p>
                     </div>
                 </div>
 
@@ -685,13 +709,124 @@
                 </ul>
             </section>
 
+            <section id="kubernetes">
+                <h2>Kubernetes Integration</h2>
+                <div class="highlight-box">
+                    <h4>Complete K8s Cluster Monitoring</h4>
+                    <p>L8Parser now includes comprehensive Kubernetes integration through the new K8s module (go/parser/boot/K8s.go), enabling real-time monitoring and parsing of Kubernetes resources across multiple clusters.</p>
+                </div>
+
+                <h3>Supported Kubernetes Resources</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Compute Resources</h4>
+                        <p><strong>Nodes:</strong> Cluster node information, status, and specifications<br>
+                        <strong>Pods:</strong> Pod details, status, containers, and resource usage<br>
+                        <strong>Containers:</strong> Container logs, status, and resource metrics</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Workload Management</h4>
+                        <p><strong>Deployments:</strong> Deployment configurations and rollout status<br>
+                        <strong>StatefulSets:</strong> Stateful application pod management<br>
+                        <strong>DaemonSets:</strong> System-wide daemon deployments</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Networking</h4>
+                        <p><strong>Services:</strong> Service endpoints, ports, and load balancing<br>
+                        <strong>Network Policies:</strong> Network security rules and traffic control<br>
+                        <strong>Ingress:</strong> External access configuration</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Organization</h4>
+                        <p><strong>Namespaces:</strong> Resource isolation and organization<br>
+                        <strong>ConfigMaps:</strong> Configuration data management<br>
+                        <strong>Secrets:</strong> Sensitive data handling</p>
+                    </div>
+                </div>
+
+                <h3>Kubernetes Polling Configuration</h3>
+                <div class="code-block">
+<code>// K8s resource monitoring with kubectl integration
+func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
+    k8sPollaris := &l8tpollaris.L8Pollaris{
+        Name:   "kubernetes",
+        Groups: []string{common.BOOT_STAGE_00},
+        Polling: map[string]*l8tpollaris.L8Poll{
+            "nodes": {
+                What:      "get nodes -o wide",
+                Operation: l8tpollaris.L8C_Operation_L8C_Table,
+            },
+            "pods": {
+                What:      "get pods -A -o wide",
+                Operation: l8tpollaris.L8C_Operation_L8C_Table,
+            },
+            "deployments": {
+                What:      "get deployments -A -o wide",
+                Operation: l8tpollaris.L8C_Operation_L8C_Table,
+            },
+        },
+    }
+    return k8sPollaris
+}</code>
+                </div>
+
+                <h3>Features</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Real-time Monitoring</h4>
+                        <p>Continuous polling of Kubernetes resources with configurable intervals and automatic status updates.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Log Collection</h4>
+                        <p>Automated log retrieval from pods and containers with filtering and aggregation capabilities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Resource Details</h4>
+                        <p>Deep inspection of resource configurations, specifications, and runtime states.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Multi-cluster Support</h4>
+                        <p>Monitor and manage resources across multiple Kubernetes clusters from a single interface.</p>
+                    </div>
+                </div>
+
+                <h3>Protocol Buffer Integration</h3>
+                <div class="highlight-box">
+                    <h4>Enhanced Data Structures</h4>
+                    <p>The project now includes Protocol Buffer definitions (proto/inventory.proto) for improved data serialization and type safety, providing comprehensive structures for network devices, equipment information, and topology data.</p>
+                </div>
+
+                <div class="code-block">
+<code>// Protocol Buffer structure for NetworkDevice
+message NetworkDevice {
+    string id = 1;
+    EquipmentInfo equipmentinfo = 2;
+    map&lt;string, Physical&gt; physicals = 3;
+    map&lt;string, Logical&gt; logicals = 4;
+    NetworkTopology topology = 5;
+    repeated NetworkLink network_links = 6;
+    NetworkHealth network_health = 7;
+}
+
+message EquipmentInfo {
+    string vendor = 1;
+    string model = 9;
+    string serial_number = 10;
+    string firmware_version = 11;
+    DeviceType device_type = 13;
+    // ... additional fields
+}</code>
+                </div>
+            </section>
+
             <section id="installation">
                 <h2>Installation</h2>
                 <h3>Prerequisites</h3>
                 <ul style="margin-left: 2rem; color: var(--text-secondary);">
-                    <li>Go 1.23.8 or higher</li>
+                    <li>Go 1.24.0 or higher (current: Go 1.24.9 toolchain)</li>
                     <li>Access to Layer8 ecosystem modules</li>
                     <li>Protocol Buffer compiler (for development)</li>
+                    <li>Kubernetes API access (for K8s monitoring features)</li>
                 </ul>
 
                 <h3>Dependencies</h3>
@@ -833,20 +968,20 @@ go test ./tests -run TestPropertyInjection -v</code>
                 <h3>Enhanced Test Coverage</h3>
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h4>PropertyId Injection Testing</h4>
-                        <p>Comprehensive tests for slice index and map key injection with various data structures</p>
+                        <h4>String & Value Parsing</h4>
+                        <p>GetStringInput_test.go and GetValueInput_test.go provide comprehensive validation of string parsing and value extraction capabilities</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Field Name Mapping Validation</h4>
-                        <p>Verification of correct field name transformations and protobuf compatibility</p>
+                        <h4>Cluster Testing</h4>
+                        <p>ClusterTest_test.go validates Kubernetes cluster configurations with clusters.json and .kubeadm-lab test data</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Rule Engine Testing</h4>
-                        <p>Enhanced rule execution tests including type safety and error handling scenarios</p>
+                        <h4>Physical Device Testing</h4>
+                        <p>PhysicalTestFromPersistency_test.go uses real device data from jobsPersistency directory for integration testing</p>
                     </div>
                     <div class="feature-card">
-                        <h4>Integration Testing</h4>
-                        <p>End-to-end testing with simulated SNMP responses and inventory integration validation</p>
+                        <h4>Device Parsing Validation</h4>
+                        <p>DevicesParsing_test.go ensures vendor-specific parsing rules work correctly across all supported device types</p>
                     </div>
                 </div>
 
@@ -867,6 +1002,68 @@ go test ./tests -run TestPropertyInjection -v</code>
                     <div class="feature-card">
                         <h4>Enhanced Monitoring</h4>
                         <p>Detailed metrics for PropertyId resolution, parsing times, and error tracking</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="documentation">
+                <h2>Documentation</h2>
+                <div class="highlight-box">
+                    <h4>Comprehensive Documentation Suite</h4>
+                    <p>L8Parser includes extensive documentation covering vendor limitations, polling configurations, and architectural details to help users maximize the parser's capabilities.</p>
+                </div>
+
+                <h3>Available Documentation</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>README.md</h4>
+                        <p>Complete project overview with installation instructions, usage examples, and comprehensive feature documentation</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>notsupported.md</h4>
+                        <p>Detailed documentation of vendor-specific SNMP/SSH limitations, protocol constraints, and workarounds for unsupported attributes</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>COMPREHENSIVE_POLLING_DOCUMENTATION.md</h4>
+                        <p>In-depth guide to polling configurations, SNMP OID mappings, and vendor-specific polling strategies</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>web.html</h4>
+                        <p>This interactive web interface providing visual representation of the parsing service architecture and features</p>
+                    </div>
+                </div>
+
+                <h3>Vendor Limitation Documentation</h3>
+                <div class="highlight-box">
+                    <h4>Understanding Device Limitations</h4>
+                    <p>The notsupported.md file provides crucial information about attributes that cannot be collected via SNMP/SSH for specific vendors and device types.</p>
+                </div>
+
+                <ul style="margin-left: 2rem; color: var(--text-secondary);">
+                    <li><strong>Network Vendors:</strong> Cisco, Juniper, Arista, Nokia, Huawei - routing tables, environmental data limitations</li>
+                    <li><strong>Security Vendors:</strong> Palo Alto, Fortinet - session monitoring, threat detection constraints</li>
+                    <li><strong>Server Vendors:</strong> Dell, HPE, IBM - hardware monitoring, IPMI integration limits</li>
+                    <li><strong>Protocol Limitations:</strong> SNMP v1/v2c/v3 constraints, MIB availability issues</li>
+                    <li><strong>Alternative Methods:</strong> NETCONF, REST APIs, Telemetry streaming options</li>
+                </ul>
+
+                <h3>Key Unsupported Areas</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Real-time Metrics</h4>
+                        <p>Network health metrics requiring continuous monitoring such as jitter, packet loss percentage, and availability scores</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Hardware Details</h4>
+                        <p>CPU architecture, memory frequency, and other hardware specifics not exposed via standard SNMP MIBs</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Topology Discovery</h4>
+                        <p>Network-wide topology mapping requiring visibility across multiple devices simultaneously</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Historical Data</h4>
+                        <p>Performance trends and historical metrics requiring time-series data collection and storage</p>
                     </div>
                 </div>
             </section>
@@ -897,8 +1094,9 @@ go test ./tests -run TestPropertyInjection -v</code>
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 L8Parser. Licensed under the Apache License, Version 2.0.</p>
+            <p>&copy; 2025 L8Parser - Last Updated: October 2025. Licensed under the Apache License, Version 2.0.</p>
             <p>For issues, questions, or contributions, visit the <a href="https://github.com/saichler/l8parser" style="color: #a08873;">GitHub repository</a>.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">Version: Go 1.24.9 | Kubernetes Ready | Protocol Buffer Enhanced</p>
         </div>
     </footer>
 
