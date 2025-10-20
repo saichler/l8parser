@@ -42,8 +42,8 @@ func TestFullDevicesParsing(t *testing.T) {
 	}
 
 	vnic := topo.VnicByVnetNum(2, 2)
-	vnic.Resources().Registry().Register(pollaris.PollarisService{})
-	vnic.Resources().Services().Activate(pollaris.ServiceType, pollaris.ServiceName, serviceArea, vnic.Resources(), vnic)
+	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
 
 	p := pollaris.Pollaris(vnic.Resources())
 	for _, snmpPolls := range all {
@@ -54,18 +54,21 @@ func TestFullDevicesParsing(t *testing.T) {
 		}
 	}
 
-	vnic.Resources().Registry().Register(targets.TargetService{})
-	vnic.Resources().Services().Activate(targets.ServiceType, targets.ServiceName, serviceArea, vnic.Resources(), vnic)
-	vnic.Resources().Registry().Register(service.CollectorService{})
-	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
+	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
 
-	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, netDevices[0].LinkParser.ZsideServiceName, byte(netDevices[0].LinkParser.ZsideServiceArea),
-		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", false)
+	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, common.CollectorService, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
 
-	vnic.Resources().Registry().Register(&utils_inventory.MockOrmService{})
-	vnic.Resources().Services().Activate(utils_inventory.ServiceType, netDevices[0].LinkData.ZsideServiceName, byte(netDevices[0].LinkData.ZsideServiceArea),
-		vnic.Resources(), vnic)
+	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, netDevices[0].LinkParser.ZsideServiceName,
+		byte(netDevices[0].LinkParser.ZsideServiceArea), true, nil)
+	sla.SetServiceItem(&types2.NetworkDevice{})
+	sla.SetPrimaryKeys([]string{"Id"})
+	vnic.Resources().Services().Activate(sla, vnic)
+
+	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, netDevices[0].LinkData.ZsideServiceName,
+		byte(netDevices[0].LinkData.ZsideServiceArea), true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
 
 	time.Sleep(time.Second)
 

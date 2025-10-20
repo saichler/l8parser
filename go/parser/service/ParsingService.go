@@ -27,24 +27,20 @@ type ParsingService struct {
 	registeredLinks *sync.Map
 }
 
-func (this *ParsingService) Activate(serviceName string, serviceArea byte,
-	r ifs.IResources, l ifs.IServiceCacheListener, args ...interface{}) error {
+func (this *ParsingService) Activate(sla *ifs.ServiceLevelAgreement, vnic ifs.IVNic) error {
+	this.vnic = vnic
 	this.registeredLinks = &sync.Map{}
-	this.resources = r
+	this.resources = vnic.Resources()
 	this.resources.Registry().Register(&l8tpollaris.CMap{})
 	this.resources.Registry().Register(&l8tpollaris.CTable{})
 	this.resources.Registry().Register(&l8tpollaris.CJob{})
-	this.elem = args[0]
-	this.primaryKey = args[1].(string)
-	this.persistJobs = args[2].(bool)
+	this.elem = sla.ServiceItem()
+	this.primaryKey = sla.PrimaryKeys()[0]
+	this.persistJobs = sla.Args()[0].(bool)
 	//this.itemsQueueMtx = &sync.Mutex{}
 	//this.itemsQueue = make(map[string]*InventoryQueue)
 	this.active = true
 
-	vnic, ok := l.(ifs.IVNic)
-	if ok {
-		this.vnic = vnic
-	}
 	this.resources.Introspector().Inspect(this.elem)
 	if this.persistJobs {
 		os.Mkdir(JobFileLocation, 0777)

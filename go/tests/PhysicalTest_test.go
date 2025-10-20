@@ -39,9 +39,9 @@ func TestPhysical(t *testing.T) {
 	device := utils_collector.CreateDevice(ip, serviceArea)
 
 	vnic := topo.VnicByVnetNum(2, 2)
-	vnic.Resources().Registry().Register(pollaris.PollarisService{})
-	vnic.Resources().Services().Activate(pollaris.ServiceType, pollaris.ServiceName, serviceArea, vnic.Resources(), vnic)
-	vnic.Resources().Registry().Register(&types2.NetworkDeviceList{})
+
+	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
 
 	p := pollaris.Pollaris(vnic.Resources())
 	for _, snmpPolls := range allPolls {
@@ -52,18 +52,24 @@ func TestPhysical(t *testing.T) {
 		}
 	}
 
-	vnic.Resources().Registry().Register(&targets.TargetService{})
-	vnic.Resources().Services().Activate(targets.ServiceType, targets.ServiceName, serviceArea, vnic.Resources(), vnic)
-	vnic.Resources().Registry().Register(service.CollectorService{})
-	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
+	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
 
-	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea),
-		vnic.Resources(), vnic, &types2.NetworkDevice{}, "Id", true)
+	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, common.CollectorService, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
 
-	vnic.Resources().Registry().Register(&inventory.InventoryService{})
-	vnic.Resources().Services().Activate(inventory.ServiceType, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea),
-		vnic.Resources(), vnic, "Id", &types2.NetworkDevice{})
+	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea), true, nil)
+	sla.SetServiceItem(&types2.NetworkDevice{})
+	sla.SetPrimaryKeys([]string{"Id"})
+	sla.SetArgs(false)
+	vnic.Resources().Services().Activate(sla, vnic)
+
+	sla = ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), true, nil)
+	sla.SetServiceItem(&types2.NetworkDevice{})
+	sla.SetServiceItemList(&types2.NetworkDeviceList{})
+	sla.SetPrimaryKeys([]string{"Id"})
+	//sla.SetArgs(forwardInfo)
+	vnic.Resources().Services().Activate(sla, vnic)
 
 	time.Sleep(time.Second)
 

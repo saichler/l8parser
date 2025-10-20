@@ -29,25 +29,28 @@ func TestCluster(t *testing.T) {
 	cluster := utils_collector.CreateCluster("./lab.conf", "lab", int32(serviceArea))
 
 	vnic := topo.VnicByVnetNum(2, 2)
-	vnic.Resources().Registry().Register(pollaris.PollarisService{})
-	vnic.Resources().Services().Activate(pollaris.ServiceType, pollaris.ServiceName, serviceArea, vnic.Resources(), vnic)
-	vnic.Resources().Registry().Register(&types2.K8SClusterList{})
+
+	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
+
+	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
+
+	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, common.CollectorService, serviceArea, true, nil)
+	vnic.Resources().Services().Activate(sla, vnic)
+
+	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, cluster.LinkParser.ZsideServiceName, byte(cluster.LinkParser.ZsideServiceArea), true, nil)
+	sla.SetServiceItem(&types2.NetworkDevice{})
+	sla.SetPrimaryKeys([]string{"Id"})
+	vnic.Resources().Services().Activate(sla, vnic)
+
+	sla = ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, cluster.LinkData.ZsideServiceName, byte(cluster.LinkData.ZsideServiceArea), true, nil)
+	sla.SetServiceItem(&types2.NetworkDevice{})
+	sla.SetServiceItemList(&types2.NetworkDeviceList{})
+	sla.SetPrimaryKeys([]string{"Id"})
 
 	p := pollaris.Pollaris(vnic.Resources())
 	p.Post(k8sPolls, false)
-
-	vnic.Resources().Registry().Register(&targets.TargetService{})
-	vnic.Resources().Services().Activate(targets.ServiceType, targets.ServiceName, serviceArea, vnic.Resources(), vnic)
-	vnic.Resources().Registry().Register(service.CollectorService{})
-	vnic.Resources().Services().Activate(service.ServiceType, common.CollectorService, serviceArea, vnic.Resources(), vnic)
-
-	vnic.Resources().Registry().Register(&parsing.ParsingService{})
-	vnic.Resources().Services().Activate(parsing.ServiceType, cluster.LinkParser.ZsideServiceName, byte(cluster.LinkParser.ZsideServiceArea),
-		vnic.Resources(), vnic, &types2.K8SCluster{}, "Name", true)
-
-	vnic.Resources().Registry().Register(&inventory.InventoryService{})
-	vnic.Resources().Services().Activate(inventory.ServiceType, cluster.LinkData.ZsideServiceName, byte(cluster.LinkData.ZsideServiceArea),
-		vnic.Resources(), vnic, "Name", &types2.K8SCluster{})
 
 	time.Sleep(time.Second)
 
