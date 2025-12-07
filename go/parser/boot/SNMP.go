@@ -11,7 +11,7 @@ import (
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
 )
 
-var DEFAULT_CADENCE = &l8tpollaris.L8PCadencePlan{Cadences: []int64{900, 3600, 7200}, Enabled: true}
+var DEFAULT_CADENCE = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 900, 3600, 7200}, Enabled: true}
 var EVERY_5_MINUTES = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 3600, 7200}, Enabled: true}
 var EVERY_5_MINUTES_ALWAYS = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300}, Enabled: true}
 var DISABLED = &l8tpollaris.L8PCadencePlan{Cadences: []int64{7200}, Enabled: false}
