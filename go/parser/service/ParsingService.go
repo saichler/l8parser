@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"os"
 	"sync"
 
@@ -11,7 +12,6 @@ import (
 )
 
 const (
-	ServiceType     = "ParsingService"
 	JobFileLocation = "./jobsPersistency/"
 )
 
@@ -27,6 +27,15 @@ type ParsingService struct {
 	registeredLinks *sync.Map
 }
 
+func Activate(linksID string, serviceItem interface{}, persist bool, vnic ifs.IVNic, primaryKeys ...string) {
+	parserServiceName, parserServiceArea := targets.Links.Parser(linksID)
+	sla := ifs.NewServiceLevelAgreement(&ParsingService{}, parserServiceName, parserServiceArea, true, nil)
+	sla.SetServiceItem(serviceItem)
+	sla.SetPrimaryKeys(primaryKeys...)
+	sla.SetArgs(persist)
+	vnic.Resources().Services().Activate(sla, vnic)
+}
+
 func (this *ParsingService) Activate(sla *ifs.ServiceLevelAgreement, vnic ifs.IVNic) error {
 	this.vnic = vnic
 	this.registeredLinks = &sync.Map{}
@@ -37,6 +46,7 @@ func (this *ParsingService) Activate(sla *ifs.ServiceLevelAgreement, vnic ifs.IV
 	this.elem = sla.ServiceItem()
 	this.primaryKey = sla.PrimaryKeys()[0]
 	this.persistJobs = sla.Args()[0].(bool)
+	vnic.Resources().Introspector().Decorators().AddPrimaryKeyDecorator(this.elem, sla.PrimaryKeys()...)
 	//this.itemsQueueMtx = &sync.Mutex{}
 	//this.itemsQueue = make(map[string]*InventoryQueue)
 	this.active = true
