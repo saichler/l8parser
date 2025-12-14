@@ -2,16 +2,18 @@ package tests
 
 import (
 	"fmt"
+	"github.com/saichler/l8pollaris/go/pollaris/targets"
+	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
+	common2 "github.com/saichler/probler/go/prob/common"
+	"github.com/saichler/probler/go/prob/common/creates"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8collector/go/collector/service"
-	"github.com/saichler/l8collector/go/collector/targets"
 	"github.com/saichler/l8collector/go/tests/utils_collector"
 	inventory "github.com/saichler/l8inventory/go/inv/service"
-	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8types/go/ifs"
@@ -20,51 +22,38 @@ import (
 )
 
 func TestPhysical(t *testing.T) {
-
+	linksId := common2.NetworkDevice_Links_ID
 	ip := "10.20.30.9"
 	common.SmoothFirstCollection = true
-	serviceArea := byte(0)
-	allPolls := boot.GetAllPolarisModels()
-	for _, snmpPolls := range allPolls {
-		for _, poll := range snmpPolls.Polling {
-			if poll.Cadence.Enabled {
-				poll.Cadence.Cadences[0] = 3
-			}
-		}
-	}
 
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	device := utils_collector.CreateDevice(ip, serviceArea)
+	device := creates.CreateDevice(ip, linksId, "sim")
+	device.State = l8tpollaris.L8PTargetState_Up
 
 	vnic := topo.VnicByVnetNum(2, 2)
 
-	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, pollaris.ServiceArea, true, nil)
+	utils_collector.SetPolls(sla)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	p := pollaris.Pollaris(vnic.Resources())
-	for _, snmpPolls := range allPolls {
-		err := p.Post(snmpPolls, false)
-		if err != nil {
-			vnic.Resources().Logger().Fail(t, err.Error())
-			return
-		}
-	}
+	targets.Activate("postgres", "probler", vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
+	collSN, collSA := targets.Links.Collector(linksId)
+	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, collSN, collSA, true, nil)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, common.CollectorService, serviceArea, true, nil)
-	vnic.Resources().Services().Activate(sla, vnic)
-
-	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea), true, nil)
+	parSN, parSA := targets.Links.Parser(linksId)
+	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, parSN, parSA, true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
 	sla.SetPrimaryKeys("Id")
 	sla.SetArgs(false)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), true, nil)
+	boxSN, boxSA := targets.Links.Cache(linksId)
+	fmt.Println(boxSN, boxSA)
+	sla = ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, boxSN, boxSA, true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
 	sla.SetServiceItemList(&types2.NetworkDeviceList{})
 	sla.SetPrimaryKeys("Id")
@@ -74,12 +63,12 @@ func TestPhysical(t *testing.T) {
 	time.Sleep(time.Second)
 
 	cl := topo.VnicByVnetNum(1, 1)
-	cl.Multicast(targets.ServiceName, serviceArea, ifs.POST, device)
+	cl.Multicast(targets.ServiceName, targets.ServiceArea, ifs.POST, device)
 
 	time.Sleep(time.Second * 20)
 
-	inv := inventory.Inventory(vnic.Resources(), device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea))
-	filter := &types2.NetworkDevice{Id: ip}
+	inv := inventory.Inventory(vnic.Resources(), boxSN, boxSA)
+	filter := &types2.NetworkDevice{Id: device.TargetId}
 	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)
 

@@ -1,15 +1,12 @@
 package service
 
 import (
-	"bytes"
-	"reflect"
-	"strconv"
-
+	"fmt"
 	"github.com/saichler/l8pollaris/go/pollaris"
+	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
-	"github.com/saichler/l8types/go/types/l8services"
-
 	"github.com/saichler/l8types/go/ifs"
+	"reflect"
 )
 
 func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interface{} {
@@ -18,6 +15,7 @@ func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interfa
 	if !field.CanSet() {
 		panic("cannot set field " + this.primaryKey)
 	}
+	fmt.Println(job.TargetId)
 	field.Set(reflect.ValueOf(job.TargetId))
 	return newElem.Interface()
 }
@@ -46,22 +44,8 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 			return
 		}
 
-		key := linkKey(job.LinkData)
-		_, ok := this.registeredLinks.Load(key)
-		if !ok {
-			job.LinkData.Mode = int32(ifs.M_Leader)
-			job.LinkData.Interval = 5
-			this.vnic.RegisterServiceLink(job.LinkData)
-			this.registeredLinks.Store(key, true)
-		}
-
-		this.vnic.Leader(job.LinkData.ZsideServiceName, byte(job.LinkData.ZsideServiceArea), ifs.PATCH, elem)
+		cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
+		fmt.Println(cacheServiceName, ":", cacheServiceArea, ":", elem)
+		this.vnic.Leader(cacheServiceName, cacheServiceArea, ifs.PATCH, elem)
 	}
-}
-
-func linkKey(link *l8services.L8ServiceLink) string {
-	buff := bytes.Buffer{}
-	buff.WriteString(link.ZsideServiceName)
-	buff.WriteString(strconv.Itoa(int(link.ZsideServiceArea)))
-	return buff.String()
 }

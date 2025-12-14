@@ -1,14 +1,15 @@
 package tests
 
 import (
+	"github.com/saichler/l8pollaris/go/pollaris/targets"
+	common2 "github.com/saichler/probler/go/prob/common"
+	"github.com/saichler/probler/go/prob/common/creates"
 	"testing"
 	"time"
 
 	"github.com/saichler/l8collector/go/collector/common"
-	"github.com/saichler/l8collector/go/collector/targets"
 
 	"github.com/saichler/l8collector/go/collector/service"
-	"github.com/saichler/l8collector/go/tests/utils_collector"
 	"github.com/saichler/l8inventory/go/tests/utils_inventory"
 	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
@@ -24,7 +25,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestParser(t *testing.T) {
-	serviceArea := byte(0)
+
+	linksId := common2.NetworkDevice_Links_ID
+
 	all := boot.GetAllPolarisModels()
 	common.SmoothFirstCollection = true
 	for _, snmpPolls := range all {
@@ -43,37 +46,39 @@ func TestParser(t *testing.T) {
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	device := utils_collector.CreateDevice("10.20.30.1", serviceArea)
+	device := creates.CreateDevice("10.20.30.1", linksId, "sim")
 
 	vnic := topo.VnicByVnetNum(2, 2)
-	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, pollaris.ServiceArea, true, nil)
 	sla.SetInitItems(initData)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
+	targets.Activate("postgres", "probler", vnic)
+
+	collSN, collSA := targets.Links.Collector(linksId)
+	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, collSN, collSA, true, nil)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, common.CollectorService, serviceArea, true, nil)
-	vnic.Resources().Services().Activate(sla, vnic)
-
-	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea), true, nil)
+	parSN, parSA := targets.Links.Parser(linksId)
+	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, parSN, parSA, true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
 	sla.SetPrimaryKeys("Id")
 	sla.SetArgs(false)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), false, nil)
+	boxSN, boxSA := targets.Links.Cache(linksId)
+	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, boxSN, boxSA, false, nil)
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	cl := topo.VnicByVnetNum(1, 1)
-	err := cl.Multicast(targets.ServiceName, serviceArea, ifs.POST, device)
+	err := cl.Multicast(targets.ServiceName, targets.ServiceArea, ifs.POST, device)
 	if err != nil {
 		panic(err)
 	}
 
 	time.Sleep(time.Second * 6)
 
-	m, ok := vnic.Resources().Services().ServiceHandler(device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea))
+	m, ok := vnic.Resources().Services().ServiceHandler(boxSN, boxSA)
 	if !ok {
 		vnic.Resources().Logger().Fail(t, "Cannot find mock service")
 		return

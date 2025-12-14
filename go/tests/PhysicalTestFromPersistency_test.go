@@ -2,16 +2,15 @@ package tests
 
 import (
 	"fmt"
+	"github.com/saichler/l8collector/go/tests/utils_collector"
+	"github.com/saichler/l8pollaris/go/pollaris/targets"
+	common2 "github.com/saichler/probler/go/prob/common"
 	"testing"
 	"time"
 
-	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8collector/go/collector/service"
-	"github.com/saichler/l8collector/go/collector/targets"
-	"github.com/saichler/l8collector/go/tests/utils_collector"
 	inventory "github.com/saichler/l8inventory/go/inv/service"
 	"github.com/saichler/l8inventory/go/tests/utils_inventory"
-	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8srlz/go/serialize/object"
@@ -21,39 +20,33 @@ import (
 
 func TestPhysicalFromPersistency(t *testing.T) {
 
-	serviceArea := byte(0)
-	allPolls := boot.GetAllPolarisModels()
+	linksId := common2.NetworkDevice_Links_ID
 
 	//use opensim to simulate this device with this ip
 	//https://github.com/saichler/opensim
 	//curl -X POST http://localhost:8080/api/v1/devices -H "Content-Type: application/json" -d '{"start_ip":"10.10.10.1","device_count":3,"netmask":"24"}'
-	device := utils_collector.CreateDevice("10.20.30.3", serviceArea)
+	//device := creates.CreateDevice("10.20.30.3", linksId, "sim")
 
 	vnic := topo.VnicByVnetNum(2, 2)
-	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, serviceArea, true, nil)
+	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, pollaris.ServiceArea, true, nil)
+	utils_collector.SetPolls(sla)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	p := pollaris.Pollaris(vnic.Resources())
-	for _, snmpPolls := range allPolls {
-		err := p.Post(snmpPolls, false)
-		if err != nil {
-			vnic.Resources().Logger().Fail(t, err.Error())
-			return
-		}
-	}
+	targets.Activate("postgres", "probler", vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&targets.TargetService{}, targets.ServiceName, serviceArea, true, nil)
+	collSN, collSA := targets.Links.Collector(linksId)
+	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, collSN, collSA, true, nil)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, common.CollectorService, serviceArea, true, nil)
-	vnic.Resources().Services().Activate(sla, vnic)
-
-	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea), true, nil)
+	parSN, parSA := targets.Links.Parser(linksId)
+	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, parSN, parSA, true, nil)
 	sla.SetServiceItem(&types2.NetworkDevice{})
 	sla.SetPrimaryKeys("Id")
+	sla.SetArgs(false)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea), true, nil)
+	boxSN, boxSA := targets.Links.Cache(linksId)
+	sla = ifs.NewServiceLevelAgreement(&utils_inventory.MockOrmService{}, boxSN, boxSA, true, nil)
 	vnic.Resources().Services().Activate(sla, vnic)
 
 	time.Sleep(time.Second)
@@ -62,15 +55,16 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	if err != nil {
 		vnic.Resources().Logger().Fail(t, err.Error())
 		return
+
 	}
-	ps, _ := vnic.Resources().Services().ServiceHandler(device.LinkParser.ZsideServiceName, byte(device.LinkParser.ZsideServiceArea))
+	ps, _ := vnic.Resources().Services().ServiceHandler(parSN, parSA)
 	parserService := ps.(*parsing.ParsingService)
 	jobElem := object.New(nil, job)
 	parserService.Post(jobElem, vnic)
 
 	time.Sleep(time.Second)
 
-	inv := inventory.Inventory(vnic.Resources(), device.LinkData.ZsideServiceName, byte(device.LinkData.ZsideServiceArea))
+	inv := inventory.Inventory(vnic.Resources(), boxSN, boxSA)
 	filter := &types2.NetworkDevice{Id: "10.20.30.3"}
 	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)
