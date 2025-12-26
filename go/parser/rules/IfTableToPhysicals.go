@@ -1,3 +1,18 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package rules
 
 import (
@@ -11,16 +26,22 @@ import (
 	types2 "github.com/saichler/probler/go/types"
 )
 
+// IfTableToPhysicals is a parsing rule that transforms SNMP IF-MIB interface table data
+// into NetworkDevice physical port/interface structures. It creates interface objects
+// with properties like name, description, type, speed, and operational status.
 type IfTableToPhysicals struct{}
 
+// Name returns the rule identifier "IfTableToPhysicals".
 func (this *IfTableToPhysicals) Name() string {
 	return "IfTableToPhysicals"
 }
 
+// ParamNames returns the required parameter names for this rule.
 func (this *IfTableToPhysicals) ParamNames() []string {
 	return []string{""}
 }
 
+// Parse executes the IfTableToPhysicals rule, converting IF-MIB data to physical structures.
 func (this *IfTableToPhysicals) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 	// Get the input CTable from workspace
 	input := workSpace[Input]

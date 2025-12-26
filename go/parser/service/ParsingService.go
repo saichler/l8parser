@@ -1,3 +1,18 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package service
 
 import (
@@ -11,10 +26,15 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
+// JobFileLocation is the directory path where job results are persisted when persistence is enabled.
 const (
 	JobFileLocation = "./jobsPersistency/"
 )
 
+// ParsingService is the main service that processes collection job results.
+// It implements the L8 service interface and handles parsing of collected data
+// into structured inventory objects. It supports job persistence for debugging
+// and replay purposes.
 type ParsingService struct {
 	resources   ifs.IResources
 	elem        interface{}
@@ -27,8 +47,12 @@ type ParsingService struct {
 	registeredLinks *sync.Map
 }
 
+// Activate initializes and registers the parsing service with the L8 ecosystem.
+// Parameters: linksID (the links identifier), serviceItem (prototype instance for parsing),
+// persist (whether to save jobs to disk), vnic (virtual NIC for communication), primaryKeys (keys for the service item).
 func Activate(linksID string, serviceItem interface{}, persist bool, vnic ifs.IVNic, primaryKeys ...string) {
 	parserServiceName, parserServiceArea := targets.Links.Parser(linksID)
+	vnic.Resources().Logger().Info("Activating parser service ", parserServiceName, " area ", parserServiceArea, " with ", linksID)
 	sla := ifs.NewServiceLevelAgreement(&ParsingService{}, parserServiceName, parserServiceArea, true, nil)
 	sla.SetServiceItem(serviceItem)
 	sla.SetPrimaryKeys(primaryKeys...)
@@ -36,6 +60,8 @@ func Activate(linksID string, serviceItem interface{}, persist bool, vnic ifs.IV
 	vnic.Resources().Services().Activate(sla, vnic)
 }
 
+// Activate is called when the service is activated. It initializes the service state,
+// registers required types with the registry, and sets up job persistence if enabled.
 func (this *ParsingService) Activate(sla *ifs.ServiceLevelAgreement, vnic ifs.IVNic) error {
 	this.vnic = vnic
 	this.registeredLinks = &sync.Map{}
@@ -59,6 +85,7 @@ func (this *ParsingService) Activate(sla *ifs.ServiceLevelAgreement, vnic ifs.IV
 	return nil
 }
 
+// DeActivate is called when the service is deactivated. It cleans up service resources.
 func (this *ParsingService) DeActivate() error {
 	//this.itemsQueueMtx.Lock()
 	//defer this.itemsQueueMtx.Unlock()
@@ -70,6 +97,8 @@ func (this *ParsingService) DeActivate() error {
 	return nil
 }
 
+// Post handles incoming collection job results. It optionally persists jobs to disk
+// and triggers the JobComplete handler for each received job.
 func (this *ParsingService) Post(pbs ifs.IElements, vnic ifs.IVNic) ifs.IElements {
 	for _, pb := range pbs.Elements() {
 		job := pb.(*l8tpollaris.CJob)
@@ -118,6 +147,8 @@ func jobFileName(job *l8tpollaris.CJob) string {
 	return strings.New(JobFileLocation, job.PollarisName, ".", job.JobName, ".", job.TargetId, ".", job.HostId).String()
 }
 
+// LoadJob loads a persisted job from disk for replay or debugging purposes.
+// Parameters: pollarisName, jobName, deviceId, hostId to identify the job file.
 func LoadJob(pollarisName, jobName, deviceId, hostId string) (*l8tpollaris.CJob, error) {
 	filename := strings.New(JobFileLocation, pollarisName, ".", jobName, ".", deviceId, ".", hostId).String()
 	data, err := os.ReadFile(filename)

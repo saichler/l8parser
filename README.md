@@ -158,18 +158,19 @@ poll := &types.Poll{
 3. **Data Transformation**: Transforms raw data into structured objects
 4. **Inventory Update**: Sends parsed objects to inventory service via PATCH operations
 
-## Recent Updates (October 2025)
+## Recent Updates (December 2025)
 
 ### Latest Enhancements
 
+- **Apache License 2.0**: Project now fully licensed under Apache License 2.0 with comprehensive copyright headers
 - **Full Kubernetes Support**: Complete K8s resource monitoring with pods, nodes, deployments, and services
 - **Protocol Buffer Integration**: Added inventory.proto for enhanced data serialization and type safety
 - **Extended Testing Framework**: New test files for GetStringInput, GetValueInput, and cluster testing
 - **Documentation Improvements**: Added comprehensive documentation for unsupported attributes by vendor
-- **Dependency Updates**: Updated all Layer8 dependencies to latest versions (October 2025)
+- **Dependency Updates**: Updated all Layer8 dependencies to latest versions (December 2025)
 - **Go Toolchain Update**: Updated to Go 1.24.9 toolchain for enhanced performance and security
 
-### September 2025 Updates
+### October 2025 Updates
 
 - **Kubernetes Integration**: Enhanced k8s interval configuration for cloud-native deployments
 - **Performance Optimizations**: Enlarged timeout settings and improved status cadence handling
@@ -452,7 +453,18 @@ Key unsupported areas include:
 
 ## License
 
-Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 ## Related Projects
 

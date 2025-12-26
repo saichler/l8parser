@@ -1,3 +1,22 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+// Package rules provides the parsing rule engine for L8Parser.
+// It defines the ParsingRule interface and implements various rule types
+// for data transformation including Contains, Set, StringToCTable, CTableToMapProperty,
+// EntityMibToPhysicals, IfTableToPhysicals, InferDeviceType, and MapToDeviceStatus.
 package rules
 
 import (
@@ -11,9 +30,17 @@ import (
 	"github.com/saichler/l8utils/go/utils/strings"
 )
 
+// ParsingRule defines the interface for all parsing rules in the L8Parser.
+// Each rule must provide a name, parameter names, and a Parse method that
+// transforms input data according to the rule's logic.
 type ParsingRule interface {
+	// Name returns the unique identifier for this rule type.
 	Name() string
+	// ParamNames returns the list of parameter names this rule expects.
 	ParamNames() []string
+	// Parse executes the rule logic, transforming input data and storing results in the workspace.
+	// Parameters: resources (system resources), workspace (rule workspace), params (rule parameters),
+	// input (data to parse), pollWhat (the poll identifier).
 	Parse(ifs.IResources, map[string]interface{}, map[string]*l8tpollaris.L8PParameter, interface{}, string) error
 }
 

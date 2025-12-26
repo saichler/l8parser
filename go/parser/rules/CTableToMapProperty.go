@@ -1,3 +1,18 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package rules
 
 import (
@@ -12,16 +27,22 @@ import (
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
 )
 
+// CTableToMapProperty is a parsing rule that transforms a CTable structure into property values
+// on a target object. It iterates through table rows, using key columns to generate PropertyId
+// paths and setting column values to corresponding object properties.
 type CTableToMapProperty struct{}
 
+// Name returns the rule identifier "CTableToMapProperty".
 func (this *CTableToMapProperty) Name() string {
 	return "CTableToMapProperty"
 }
 
+// ParamNames returns the required parameter names for this rule.
 func (this *CTableToMapProperty) ParamNames() []string {
 	return []string{""}
 }
 
+// Parse executes the CTableToMapProperty rule, mapping table data to object properties.
 func (this *CTableToMapProperty) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 	table, ok := workSpace[Output].(*l8tpollaris.CTable)
 	if !ok {

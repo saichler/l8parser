@@ -1,3 +1,18 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package rules
 
 import (
@@ -9,16 +24,22 @@ import (
 	"github.com/saichler/l8reflect/go/reflect/properties"
 )
 
+// Set is a parsing rule that directly sets a value from input to a target property.
+// It supports PropertyId path injection for nested collections and handles type-safe value assignment.
+// Parameters: "from" (source field in the input data).
 type Set struct{}
 
+// Name returns the rule identifier "Set".
 func (this *Set) Name() string {
 	return "Set"
 }
 
+// ParamNames returns the required parameter names for this rule.
 func (this *Set) ParamNames() []string {
 	return []string{}
 }
 
+// Parse executes the Set rule logic, extracting a value and setting it to the target property.
 func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 	input := workSpace[Input]
 	_propertyId := workSpace[PropertyId]

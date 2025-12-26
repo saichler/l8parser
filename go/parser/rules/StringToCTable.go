@@ -1,3 +1,18 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package rules
 
 import (
@@ -9,16 +24,23 @@ import (
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
 )
 
+// StringToCTable is a parsing rule that converts a multi-line string into a structured table (CTable).
+// It parses tabular output (like CLI command output) by detecting columns from the header
+// and extracting values from subsequent rows.
+// Parameters: "columns" (expected number of columns), "keycolumn" (column indices for the key).
 type StringToCTable struct{}
 
+// Name returns the rule identifier "StringToCTable".
 func (this *StringToCTable) Name() string {
 	return "StringToCTable"
 }
 
+// ParamNames returns the required parameter names for this rule.
 func (this *StringToCTable) ParamNames() []string {
 	return []string{"columns", "keycolumn"}
 }
 
+// Parse executes the StringToCTable rule, converting a string input to a CTable structure.
 func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 	input, ok := workSpace[Input].(string)
 	if !ok {

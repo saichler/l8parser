@@ -1,3 +1,18 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package tests
 
 import (
@@ -11,43 +26,57 @@ import (
 
 	"github.com/saichler/l8collector/go/collector/service"
 	inventory "github.com/saichler/l8inventory/go/inv/service"
-	"github.com/saichler/l8parser/go/parser/boot"
 	parsing "github.com/saichler/l8parser/go/parser/service"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/probler/go/prob/common/creates"
+	"github.com/saichler/probler/go/serializers"
 	types2 "github.com/saichler/probler/go/types"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
+// TestCluster tests the Kubernetes cluster parsing capabilities.
+// It verifies that kubectl output is correctly parsed into K8sCluster structures
+// including nodes, pods, deployments, and other Kubernetes resources.
 func TestCluster(t *testing.T) {
 	linksID := common2.K8s_Links_ID
-	k8sPolls := boot.CreateK8sBootPolls()
+
 	cluster := creates.CreateCluster("lab")
 	cluster.State = l8tpollaris.L8PTargetState_Up
 
 	vnic := topo.VnicByVnetNum(2, 2)
 
-	sla := ifs.NewServiceLevelAgreement(&pollaris.PollarisService{}, pollaris.ServiceName, pollaris.ServiceArea, true, nil)
-	sla.SetInitItems([]interface{}{k8sPolls})
-	vnic.Resources().Services().Activate(sla, vnic)
+	vnic.Resources().Registry().Register(&types2.K8SReadyState{})
+	vnic.Resources().Registry().Register(&types2.K8SRestartsState{})
 
-	targets.Activate("postgres", "probler", vnic)
-	targets.Links.Collector(linksID)
+	info, err := vnic.Resources().Registry().Info("K8SReadyState")
+	if err != nil {
+		vnic.Resources().Logger().Error(err)
+	} else {
+		info.AddSerializer(&serializers.Ready{})
+	}
 
-	collServiceName, collServiceArea := targets.Links.Collector(linksID)
-	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, collServiceName, collServiceArea, true, nil)
-	vnic.Resources().Services().Activate(sla, vnic)
+	info, err = vnic.Resources().Registry().Info("K8SRestartsState")
+	if err != nil {
+		vnic.Resources().Logger().Error(err)
+	} else {
+		info.AddSerializer(&serializers.Restarts{})
+	}
 
-	parserServiceName, parserServiceArea := targets.Links.Parser(linksID)
-	sla = ifs.NewServiceLevelAgreement(&parsing.ParsingService{}, parserServiceName, parserServiceArea, true, nil)
-	sla.SetServiceItem(&types2.K8SCluster{})
-	sla.SetPrimaryKeys("Name")
-	sla.SetArgs(false)
-	vnic.Resources().Services().Activate(sla, vnic)
+	vnic.Resources().Registry().RegisterEnums(types2.K8SPodStatus_value)
+
+	pollaris.Activate(vnic)
+
+	targets.Activate(common2.DB_CREDS, common2.DB_NAME, vnic)
+
+	service.Activate(linksID, vnic)
+
+	//Activate Inventory parser
+	parsing.Activate(common2.NetworkDevice_Links_ID, &types2.NetworkDevice{}, false, vnic, "Id")
+	parsing.Activate(linksID, &types2.K8SCluster{}, false, vnic, "Name")
 
 	k8sServiceName, k8sServiceArea := targets.Links.Cache(linksID)
-	sla = ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, k8sServiceName, k8sServiceArea, true, nil)
+	sla := ifs.NewServiceLevelAgreement(&inventory.InventoryService{}, k8sServiceName, k8sServiceArea, true, nil)
 	sla.SetServiceItem(&types2.K8SCluster{})
 	sla.SetServiceItemList(&types2.K8SClusterList{})
 	sla.SetPrimaryKeys("Name")

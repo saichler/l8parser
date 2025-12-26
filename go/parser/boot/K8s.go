@@ -1,3 +1,18 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package boot
 
 import (
@@ -5,6 +20,10 @@ import (
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
 
+// CreateK8sBootPolls creates the Kubernetes polling configuration for cluster monitoring.
+// It configures polling for all major K8s resources including nodes, pods, deployments,
+// statefulsets, daemonsets, services, namespaces, and network policies.
+// It also sets up on-demand detail queries and log collection jobs.
 func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
 	k8sPollaris := &l8tpollaris.L8Pollaris{}
 	k8sPollaris.Name = "kubernetes"
@@ -258,6 +277,8 @@ func createNetworkPolicyDetails(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
+// LogsJob creates a collection job for retrieving pod logs from a Kubernetes cluster.
+// Parameters: cluster (target cluster ID), context (kubectl context), namespace, podname.
 func LogsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -268,6 +289,7 @@ func LogsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
 	return job
 }
 
+// NodeDetailsJob creates a collection job for retrieving detailed node information in JSON format.
 func NodeDetailsJob(cluster, context, nodename string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -278,6 +300,7 @@ func NodeDetailsJob(cluster, context, nodename string) *l8tpollaris.CJob {
 	return job
 }
 
+// PodDetailsJob creates a collection job for retrieving detailed pod information in JSON format.
 func PodDetailsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -288,6 +311,7 @@ func PodDetailsJob(cluster, context, namespace, podname string) *l8tpollaris.CJo
 	return job
 }
 
+// DeploymentDetailsJob creates a collection job for retrieving detailed deployment information.
 func DeploymentDetailsJob(cluster, context, namespace, deploymentname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -298,6 +322,7 @@ func DeploymentDetailsJob(cluster, context, namespace, deploymentname string) *l
 	return job
 }
 
+// StatefulsetDetailsJob creates a collection job for retrieving detailed statefulset information.
 func StatefulsetDetailsJob(cluster, context, namespace, statefulsetname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -308,6 +333,7 @@ func StatefulsetDetailsJob(cluster, context, namespace, statefulsetname string) 
 	return job
 }
 
+// DaemonsetDetailsJob creates a collection job for retrieving detailed daemonset information.
 func DaemonsetDetailsJob(cluster, context, namespace, daemonsetname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -318,6 +344,7 @@ func DaemonsetDetailsJob(cluster, context, namespace, daemonsetname string) *l8t
 	return job
 }
 
+// ServiceDetailsJob creates a collection job for retrieving detailed service information.
 func ServiceDetailsJob(cluster, context, namespace, servicename string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -328,6 +355,7 @@ func ServiceDetailsJob(cluster, context, namespace, servicename string) *l8tpoll
 	return job
 }
 
+// NamespaceDetailsJob creates a collection job for retrieving detailed namespace information.
 func NamespaceDetailsJob(cluster, context, namespace string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -338,6 +366,7 @@ func NamespaceDetailsJob(cluster, context, namespace string) *l8tpollaris.CJob {
 	return job
 }
 
+// NetworkPolicyDetailsJob creates a collection job for retrieving detailed network policy information.
 func NetworkPolicyDetailsJob(cluster, context, namespace, networkpolicyname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster

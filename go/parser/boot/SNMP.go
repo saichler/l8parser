@@ -1,3 +1,22 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+// Package boot provides SNMP and Kubernetes polling configurations for the L8Parser.
+// It contains vendor-specific polling definitions for various network devices including
+// Cisco, Juniper, Palo Alto, Fortinet, Arista, Nokia, Huawei, Dell, and HPE.
+// The package also includes Kubernetes resource monitoring configurations.
 package boot
 
 import (
@@ -11,14 +30,26 @@ import (
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
 )
 
+// DEFAULT_CADENCE defines the standard polling intervals (5min, 15min, 1hr, 2hr) for SNMP collection.
 var DEFAULT_CADENCE = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 900, 3600, 7200}, Enabled: true}
+
+// EVERY_5_MINUTES defines polling intervals starting at 5 minutes with backoff to 1hr and 2hr.
 var EVERY_5_MINUTES = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 3600, 7200}, Enabled: true}
+
+// EVERY_5_MINUTES_ALWAYS defines a constant 5-minute polling interval without backoff.
 var EVERY_5_MINUTES_ALWAYS = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300}, Enabled: true}
+
+// DISABLED represents a disabled polling configuration with a 2-hour fallback.
 var DISABLED = &l8tpollaris.L8PCadencePlan{Cadences: []int64{7200}, Enabled: false}
+
+// DEFAULT_TIMEOUT specifies the default SNMP request timeout in seconds.
 var DEFAULT_TIMEOUT int64 = 60
 
+// stringConvert is a utility for converting values to strings with type prefixes.
 var stringConvert = &strings2.String{TypesPrefix: true}
 
+// CreateBoot00 creates the initial boot stage Pollaris model for IP address collection.
+// This is the first stage in the device discovery process.
 func CreateBoot00() *l8tpollaris.L8Pollaris {
 	boot00 := &l8tpollaris.L8Pollaris{}
 	boot00.Name = "boot00"
@@ -28,6 +59,8 @@ func CreateBoot00() *l8tpollaris.L8Pollaris {
 	return boot00
 }
 
+// CreateBoot01 creates the system MIB polling Pollaris model.
+// This stage collects basic system information like sysName, sysOID, and vendor details.
 func CreateBoot01() *l8tpollaris.L8Pollaris {
 	boot01 := &l8tpollaris.L8Pollaris{}
 	boot01.Name = "boot01"
@@ -37,6 +70,8 @@ func CreateBoot01() *l8tpollaris.L8Pollaris {
 	return boot01
 }
 
+// CreateBoot02 creates the device status polling Pollaris model.
+// This stage monitors device availability and operational status.
 func CreateBoot02() *l8tpollaris.L8Pollaris {
 	boot02 := &l8tpollaris.L8Pollaris{}
 	boot02.Name = "boot02"
@@ -46,7 +81,8 @@ func CreateBoot02() *l8tpollaris.L8Pollaris {
 	return boot02
 }
 
-// CreateSNMPBootPolls creates generic SNMP collection and parsing Pollaris model
+// CreateBoot03 creates the generic SNMP collection and parsing Pollaris model.
+// This stage collects interface table and entity MIB data for physical inventory.
 func CreateBoot03() *l8tpollaris.L8Pollaris {
 	boot03 := &l8tpollaris.L8Pollaris{}
 	boot03.Name = "boot03"
