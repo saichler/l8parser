@@ -113,7 +113,7 @@ func (this *ParsingService) Post(pbs ifs.IElements, vnic ifs.IVNic) ifs.IElement
 				}
 			}
 		}
-		vnic.Resources().Logger().Info("Received Job ", job.TargetId, " - ", job.HostId, " - ", job.PollarisName, " - ", job.JobName, " response")
+		vnic.Resources().Logger().Debug("Received Job ", job.TargetId, " - ", job.HostId, " - ", job.PollarisName, " - ", job.JobName, " response")
 		this.JobComplete(job, this.resources)
 	}
 	return nil
