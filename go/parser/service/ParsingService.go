@@ -17,6 +17,7 @@ package service
 
 import (
 	"github.com/saichler/l8pollaris/go/pollaris/targets"
+	"github.com/saichler/l8utils/go/utils/aggregator"
 	"os"
 	"sync"
 
@@ -40,6 +41,7 @@ type ParsingService struct {
 	elem        interface{}
 	primaryKey  string
 	vnic        ifs.IVNic
+	agg         *aggregator.Aggregator
 	persistJobs bool
 	//itemsQueue    map[string]*InventoryQueue
 	//itemsQueueMtx *sync.Mutex
@@ -64,6 +66,7 @@ func Activate(linksID string, serviceItem interface{}, persist bool, vnic ifs.IV
 // registers required types with the registry, and sets up job persistence if enabled.
 func (this *ParsingService) Activate(sla *ifs.ServiceLevelAgreement, vnic ifs.IVNic) error {
 	this.vnic = vnic
+	this.agg = aggregator.NewAggregator(vnic, 5, 30)
 	this.registeredLinks = &sync.Map{}
 	this.resources = vnic.Resources()
 	this.resources.Registry().Register(&l8tpollaris.CMap{})

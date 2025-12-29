@@ -66,6 +66,7 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 
 		cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
 		fmt.Println(cacheServiceName, ":", cacheServiceArea, ":", elem)
-		this.vnic.Leader(cacheServiceName, cacheServiceArea, ifs.PATCH, elem)
+		this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
+		//this.vnic.Leader(cacheServiceName, cacheServiceArea, ifs.PATCH, elem)
 	}
 }
