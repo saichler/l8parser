@@ -67,6 +67,7 @@ func createJuniperRoutingEnginePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("juniperRoutingEngine")
 	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createRoutingEngineUtilization())
 	p.Polling[poll.Name] = poll
