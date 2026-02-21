@@ -27,6 +27,7 @@ func CreateHPEServerBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createHPESystemPoll(polaris)
 	createHPEMibSystemPoll(polaris)
+	createHPESerialPoll(polaris)
 	createHPEStoragePoll(polaris)
 	createHPETemperaturePoll(polaris)
 	return polaris
@@ -93,5 +94,22 @@ func createHPEVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.232.2.2.4.2.0"))
+	return attr
+}
+
+func createHPESerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("hpeSerial")
+	poll.What = ".1.3.6.1.4.1.232.2.2.2.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createHPESerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createHPESerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.232.2.2.2.1.0")) // cpqSiSysSerialNum
 	return attr
 }

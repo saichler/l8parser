@@ -28,6 +28,7 @@ func CreateCiscoSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoSystemPoll(polaris)
 	createCiscoVersionPoll(polaris)
 	createCiscoSerialPoll(polaris)
+	createCiscoFirmwarePoll(polaris)
 	createCiscoInterfacesPoll(polaris)
 	createCiscoCpuPoll(polaris)
 	createCiscoMemoryPoll(polaris)
@@ -44,6 +45,7 @@ func CreateCiscoRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoSystemPoll(polaris)
 	createCiscoVersionPoll(polaris)
 	createCiscoSerialPoll(polaris)
+	createCiscoFirmwarePoll(polaris)
 	createCiscoInterfacesPoll(polaris)
 	createCiscoCpuPoll(polaris)
 	createCiscoMemoryPoll(polaris)
@@ -207,6 +209,23 @@ func createCiscoSerial() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.9.3.6.3.0"))
+	return attr
+}
+
+func createCiscoFirmwarePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("ciscoFirmware")
+	poll.What = ".1.3.6.1.4.1.9.9.25.1.1.1.2.2"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createCiscoFirmwareVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createCiscoFirmwareVersion() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.9.9.25.1.1.1.2.2")) // CISCO-IMAGE-MIB
 	return attr
 }
 

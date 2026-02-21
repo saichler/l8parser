@@ -27,6 +27,8 @@ func CreatePaloAltoFirewallBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createPaloAltoSystemPoll(polaris)
 	createPaloAltoMibSystemPoll(polaris)
+	createPaloAltoSerialPoll(polaris)
+	createPaloAltoFirmwarePoll(polaris)
 	createPaloAltoSessionsPoll(polaris)
 	createPaloAltoThreatsPoll(polaris)
 	createPaloAltoTemperaturePoll(polaris)
@@ -126,5 +128,39 @@ func createPaloAltoVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.1.1.0"))
+	return attr
+}
+
+func createPaloAltoSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("paloAltoSerial")
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1.3.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createPaloAltoSerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createPaloAltoSerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.1.3.0")) // panSysSerialNumber
+	return attr
+}
+
+func createPaloAltoFirmwarePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("paloAltoFirmware")
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createPaloAltoFirmwareVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createPaloAltoFirmwareVersion() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.1.1.0")) // panSysSwVersion
 	return attr
 }

@@ -27,6 +27,8 @@ func CreateFortinetFirewallBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createFortinetSystemPoll(polaris)
 	createFortinetMibSystemPoll(polaris)
+	createFortinetSerialPoll(polaris)
+	createFortinetFirmwarePoll(polaris)
 	createFortinetInterfacesPoll(polaris)
 	createFortinetSessionsPoll(polaris)
 	createFortinetVpnPoll(polaris)
@@ -122,6 +124,40 @@ func createFortinetActiveSessions() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.performance.activeconnections"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.101.4.1.8.0"))
+	return attr
+}
+
+func createFortinetSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("fortinetSerial")
+	poll.What = ".1.3.6.1.4.1.12356.100.1.2.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createFortinetSerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createFortinetSerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.100.1.2.0")) // fgSysSerial
+	return attr
+}
+
+func createFortinetFirmwarePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("fortinetFirmware")
+	poll.What = ".1.3.6.1.4.1.12356.100.1.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createFortinetFirmwareVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createFortinetFirmwareVersion() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.100.1.1.0")) // fgSysVersion
 	return attr
 }
 

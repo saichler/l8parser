@@ -27,6 +27,8 @@ func CreateAristaSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createAristaSystemPoll(polaris)
 	createAristaMibSystemPoll(polaris)
+	createAristaSerialPoll(polaris)
+	createAristaFirmwarePoll(polaris)
 	createAristaInterfacesPoll(polaris)
 	createAristaTemperaturePoll(polaris)
 	return polaris
@@ -95,5 +97,39 @@ func createAristaVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.30065.1.3.1.1.0"))
+	return attr
+}
+
+func createAristaSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("aristaSerial")
+	poll.What = ".1.3.6.1.2.1.47.1.1.1.1.11.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createAristaSerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createAristaSerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.11.1")) // entPhysicalSerialNum (Arista supports standard Entity MIB)
+	return attr
+}
+
+func createAristaFirmwarePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("aristaFirmware")
+	poll.What = ".1.3.6.1.4.1.30065.1.3.1.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createAristaFirmwareVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createAristaFirmwareVersion() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.30065.1.3.1.1.0")) // ARISTA-GENERAL-MIB
 	return attr
 }

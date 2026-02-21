@@ -27,6 +27,7 @@ func CreateDellServerBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createDellSystemPoll(polaris)
 	createDellMibSystemPoll(polaris)
+	createDellSerialPoll(polaris)
 	createDellStoragePoll(polaris)
 	createDellTemperaturePoll(polaris)
 	return polaris
@@ -93,5 +94,22 @@ func createDellVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.674.10892.5.1.3.1.6.0"))
+	return attr
+}
+
+func createDellSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("dellSerial")
+	poll.What = ".1.3.6.1.4.1.674.10892.5.1.3.2.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createDellSerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createDellSerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.674.10892.5.1.3.2.0")) // systemServiceTag
 	return attr
 }

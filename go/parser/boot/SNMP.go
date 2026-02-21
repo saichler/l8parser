@@ -314,6 +314,7 @@ func createSystemMibPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createSystemUptime())      // networkdevice.equipmentinfo.uptime
 	poll.Attributes = append(poll.Attributes, createSystemLocation())    // networkdevice.equipmentinfo.location
 	poll.Attributes = append(poll.Attributes, createSystemDeviceType())  // networkdevice.equipmentinfo.device_type
+	poll.Attributes = append(poll.Attributes, createInterfaceCountAttribute()) // networkdevice.equipmentinfo.interfacecount
 	p.Polling[poll.Name] = poll
 }
 
@@ -390,6 +391,16 @@ func createEntityMibPoll(p *l8tpollaris.L8Pollaris) {
 
 	// Standard Entity MIB temperature sensors
 	mapPoll.Attributes = append(mapPoll.Attributes, createTemperatureSensors())
+
+	// EquipmentInfo attributes from Entity MIB (RFC 4133)
+	mapPoll.Attributes = append(mapPoll.Attributes, createFirmwareVersionAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createVendorTypeOidAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPhysicalAliasAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createAssetIdAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createIsFruAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createManufacturingDateAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createManufacturerNameAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createIdentificationUrisAttribute())
 
 	p.Polling[mapPoll.Name] = mapPoll
 }

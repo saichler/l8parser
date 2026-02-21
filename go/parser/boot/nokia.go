@@ -27,6 +27,7 @@ func CreateNokiaRouterBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createNokiaSystemPoll(polaris)
 	createNokiaMibSystemPoll(polaris)
+	createNokiaSerialPoll(polaris)
 	createNokiaInterfacesPoll(polaris)
 	createNokiaTemperaturePoll(polaris)
 	return polaris
@@ -94,5 +95,22 @@ func createNokiaVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.6527.3.1.2.2.1.4.0"))
+	return attr
+}
+
+func createNokiaSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("nokiaSerial")
+	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.1.6.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createNokiaSerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createNokiaSerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.6527.3.1.2.2.1.6.0")) // TIMETRA-CHASSIS-MIB
 	return attr
 }

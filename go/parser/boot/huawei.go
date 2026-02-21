@@ -27,6 +27,7 @@ func CreateHuaweiRouterBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createHuaweiSystemPoll(polaris)
 	createHuaweiMibSystemPoll(polaris)
+	createHuaweiSerialPoll(polaris)
 	createHuaweiInterfacesPoll(polaris)
 	createHuaweiTemperaturePoll(polaris)
 	return polaris
@@ -94,5 +95,22 @@ func createHuaweiVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2011.5.25.1.1.1.0"))
+	return attr
+}
+
+func createHuaweiSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("huaweiSerial")
+	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.15.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createHuaweiSerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createHuaweiSerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.15.1")) // HUAWEI-ENTITY-EXTENT-MIB
 	return attr
 }

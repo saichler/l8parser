@@ -27,6 +27,8 @@ func CreateJuniperRouterBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createJuniperSystemPoll(polaris)
 	createJuniperMibSystemPoll(polaris)
+	createJuniperSerialPoll(polaris)
+	createJuniperFirmwarePoll(polaris)
 	createJuniperInterfacesPoll(polaris)
 	createJuniperRoutingEnginePoll(polaris)
 	createJuniperTemperaturePoll(polaris)
@@ -106,5 +108,39 @@ func createJuniperVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.2.0"))
+	return attr
+}
+
+func createJuniperSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("juniperSerial")
+	poll.What = ".1.3.6.1.4.1.2636.3.1.3.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createJuniperSerial())
+	p.Polling[poll.Name] = poll
+}
+
+func createJuniperSerial() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.3.0")) // jnxBoxSerialNo
+	return attr
+}
+
+func createJuniperFirmwarePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("juniperFirmware")
+	poll.What = ".1.3.6.1.4.1.2636.3.40.1.4.1.1.1.5"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createJuniperFirmwareVersion())
+	p.Polling[poll.Name] = poll
+}
+
+func createJuniperFirmwareVersion() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.40.1.4.1.1.1.5")) // jnxFWDetectorVersion
 	return attr
 }
