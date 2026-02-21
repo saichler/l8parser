@@ -47,12 +47,9 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 	}
 
 	value, _, err := GetValueInput(resources, input, params, pollWhat)
-	if err != nil {
-		return err
-	}
-
-	if value == nil {
-		return resources.Logger().Error("nil value for property id", propertyId)
+	if err != nil || value == nil {
+		// Missing/blank OID data is expected for some devices — skip gracefully
+		return nil
 	}
 
 	// Skip SNMP error strings gracefully - device doesn't support this OID
