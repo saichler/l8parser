@@ -21,7 +21,6 @@ package rules
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -78,10 +77,6 @@ func GetValueInput(resources ifs.IResources, input interface{}, params map[strin
 		from := params[From]
 		if from == nil {
 			return nil, reflect.Invalid, errors.New("missing 'from' key in map input")
-		}
-		fmt.Println("GetValueInput: looking for key=", from.Value, "in CMap with", len(m.Data), "keys:")
-		for k := range m.Data {
-			fmt.Println("  CMap key:", k)
 		}
 		rawData := m.Data[from.Value]
 		if rawData == nil || len(rawData) == 0 {

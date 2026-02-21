@@ -21,7 +21,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/pollaris"
@@ -70,15 +69,11 @@ func newParser() *_Parser {
 // and executes each rule defined in the poll's attributes to transform the data.
 // Parameters: job (completed collection job), any (target object to populate), resources (system resources).
 func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs.IResources) error {
-	fmt.Println("Parser.Parse: pollarisName=", job.PollarisName, "jobName=", job.JobName, "targetId=", job.TargetId)
-
 	if job.Error != "" {
-		fmt.Println("Parser.Parse: job has error=", job.Error)
 		return errors.New(job.Error)
 	}
 
 	if job.Result == nil || len(job.Result) < 4 {
-		fmt.Println("Parser.Parse: invalid job result, len=", len(job.Result))
 		return resources.Logger().Error("Invalid job result ", job.TargetId, " - ", job.PollarisName,
 			" - ", job.JobName, " - ", string(job.Result))
 	}
@@ -87,29 +82,22 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 	enc := object.NewDecode(job.Result, 0, resources.Registry())
 	data, err := enc.Get()
 	if err != nil {
-		fmt.Println("Parser.Parse: decode error=", err)
 		return resources.Logger().Error(err)
 	}
-	fmt.Println("Parser.Parse: decoded data type=", fmt.Sprintf("%T", data))
 
 	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
 	if err != nil {
-		fmt.Println("Parser.Parse: cannot find poll, pollarisName=", job.PollarisName, "jobName=", job.JobName)
 		return resources.Logger().Error("cannot find poll for polaris ", job.PollarisName, ":", job.JobName)
 	}
 	workSpace[rules.Input] = data
 	workSpace[rules.JobEnded] = job.Ended
 	if poll.Attributes == nil {
-		fmt.Println("Parser.Parse: no attributes defined")
 		return resources.Logger().Error("No attributes are defined on pollaris "+job.PollarisName, ":", job.JobName)
 	}
 
-	fmt.Println("Parser.Parse: processing", len(poll.Attributes), "attributes")
-	for i, attr := range poll.Attributes {
-		fmt.Println("Parser.Parse: attr[", i, "] propertyId=", attr.PropertyId, "rules count=", len(attr.Rules))
+	for _, attr := range poll.Attributes {
 		workSpace[rules.PropertyId] = attr.PropertyId
-		for j, rData := range attr.Rules {
-			fmt.Println("Parser.Parse: attr[", i, "] rule[", j, "] name=", rData.Name)
+		for _, rData := range attr.Rules {
 			if rData.Params != nil {
 				for p, v := range rData.Params {
 					workSpace[p] = v.Value
@@ -117,16 +105,13 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 			}
 			ruleImpl, ok := this.rules[rData.Name]
 			if !ok {
-				fmt.Println("Parser.Parse: rule not found:", rData.Name)
 				return resources.Logger().Error("Cannot find parsing rule ", rData.Name)
 			}
 			err = ruleImpl.Parse(resources, workSpace, rData.Params, any, poll.What)
 			if err != nil {
-				fmt.Println("Parser.Parse: rule error:", err)
 				return err
 			}
 		}
 	}
-	fmt.Println("Parser.Parse: completed successfully for", job.PollarisName, "/", job.JobName)
 	return nil
 }

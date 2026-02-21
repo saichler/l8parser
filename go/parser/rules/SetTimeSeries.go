@@ -17,7 +17,6 @@ package rules
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strconv"
 
@@ -51,28 +50,20 @@ func (this *SetTimeSeries) Parse(resources ifs.IResources, workSpace map[string]
 	_propertyId := workSpace[PropertyId]
 	propertyId := _propertyId.(string)
 
-	fmt.Println("SetTimeSeries: propertyId=", propertyId)
-	fmt.Println("SetTimeSeries: input type=", fmt.Sprintf("%T", input))
-	fmt.Println("SetTimeSeries: pollWhat=", pollWhat)
-
 	if input == nil {
-		fmt.Println("SetTimeSeries: input is nil")
 		return resources.Logger().Error("nil input for SetTimeSeries")
 	}
 
 	value, kind, err := GetValueInput(resources, input, params, pollWhat)
-	fmt.Println("SetTimeSeries: value=", value, "kind=", kind, "err=", err)
 	if err != nil {
 		return err
 	}
 
 	if value == nil {
-		fmt.Println("SetTimeSeries: value is nil for propertyId=", propertyId)
 		return resources.Logger().Error("nil value for property id", propertyId)
 	}
 
 	floatValue, err := convertToFloat64(value, kind)
-	fmt.Println("SetTimeSeries: floatValue=", floatValue, "convertErr=", err)
 	if err != nil {
 		return resources.Logger().Error("SetTimeSeries: cannot convert value to float64:", err.Error())
 	}
@@ -83,37 +74,26 @@ func (this *SetTimeSeries) Parse(resources ifs.IResources, workSpace map[string]
 			stamp = s
 		}
 	}
-	fmt.Println("SetTimeSeries: stamp=", stamp)
 
 	point := &l8api.L8TimeSeriesPoint{
 		Stamp: stamp,
 		Value: floatValue,
 	}
-	fmt.Println("SetTimeSeries: created point=", point)
 
 	if _propertyId != nil {
 		modifiedPropertyId := injectIndexOrKey(propertyId, workSpace)
-		fmt.Println("SetTimeSeries: modifiedPropertyId=", modifiedPropertyId)
-
 		instance, err := properties.PropertyOf(modifiedPropertyId, resources)
-		fmt.Println("SetTimeSeries: PropertyOf instance=", instance, "err=", err)
 		if err != nil {
 			return resources.Logger().Error("error parsing instance path", err.Error())
 		}
 		if instance != nil {
 			_, _, err := instance.Set(any, point)
-			fmt.Println("SetTimeSeries: Set result err=", err)
 			if err != nil {
 				return resources.Logger().Error("error setting time series value:", err.Error())
 			}
-		} else {
-			fmt.Println("SetTimeSeries: instance is nil for modifiedPropertyId=", modifiedPropertyId)
 		}
-	} else {
-		fmt.Println("SetTimeSeries: _propertyId is nil")
 	}
 	workSpace[Output] = point
-	fmt.Println("SetTimeSeries: completed successfully for propertyId=", propertyId)
 	return nil
 }
 
