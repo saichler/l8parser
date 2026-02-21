@@ -30,6 +30,7 @@ func CreateFortinetFirewallBootPolls() *l8tpollaris.L8Pollaris {
 	createFortinetInterfacesPoll(polaris)
 	createFortinetSessionsPoll(polaris)
 	createFortinetVpnPoll(polaris)
+	createFortinetTemperaturePoll(polaris)
 	return polaris
 }
 
@@ -79,6 +80,24 @@ func createFortinetVpnPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createFortinetVpnTunnelStatus())
 	p.Polling[poll.Name] = poll
+}
+
+func createFortinetTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("fortinetTemperature")
+	poll.What = ".1.3.6.1.4.1.12356.101.4.1.3.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createFortinetTemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createFortinetTemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.12356.101.4.1.3.0"))
+	return attr
 }
 
 // Fortinet-specific attribute creation functions

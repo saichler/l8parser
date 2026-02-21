@@ -28,6 +28,7 @@ func CreateHuaweiRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createHuaweiSystemPoll(polaris)
 	createHuaweiMibSystemPoll(polaris)
 	createHuaweiInterfacesPoll(polaris)
+	createHuaweiTemperaturePoll(polaris)
 	return polaris
 }
 
@@ -59,6 +60,24 @@ func createHuaweiInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createInterfaceName())
 	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
 	p.Polling[poll.Name] = poll
+}
+
+func createHuaweiTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("huaweiTemperature")
+	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createHuaweiTemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createHuaweiTemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.1"))
+	return attr
 }
 
 // Huawei-specific attribute creation functions

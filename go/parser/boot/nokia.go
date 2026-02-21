@@ -28,6 +28,7 @@ func CreateNokiaRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createNokiaSystemPoll(polaris)
 	createNokiaMibSystemPoll(polaris)
 	createNokiaInterfacesPoll(polaris)
+	createNokiaTemperaturePoll(polaris)
 	return polaris
 }
 
@@ -59,6 +60,24 @@ func createNokiaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createInterfaceName())
 	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
 	p.Polling[poll.Name] = poll
+}
+
+func createNokiaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("nokiaTemperature")
+	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createNokiaTemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createNokiaTemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.1"))
+	return attr
 }
 
 // Nokia-specific attribute creation functions

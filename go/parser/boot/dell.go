@@ -28,6 +28,7 @@ func CreateDellServerBootPolls() *l8tpollaris.L8Pollaris {
 	createDellSystemPoll(polaris)
 	createDellMibSystemPoll(polaris)
 	createDellStoragePoll(polaris)
+	createDellTemperaturePoll(polaris)
 	return polaris
 }
 
@@ -58,6 +59,24 @@ func createDellStoragePoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDiskStatus())
 	p.Polling[poll.Name] = poll
+}
+
+func createDellTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("dellTemperature")
+	poll.What = ".1.3.6.1.4.1.674.10892.5.4.700.20.1.6.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createDellTemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createDellTemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.674.10892.5.4.700.20.1.6.1"))
+	return attr
 }
 
 // Dell-specific attribute creation functions

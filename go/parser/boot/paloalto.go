@@ -29,6 +29,7 @@ func CreatePaloAltoFirewallBootPolls() *l8tpollaris.L8Pollaris {
 	createPaloAltoMibSystemPoll(polaris)
 	createPaloAltoSessionsPoll(polaris)
 	createPaloAltoThreatsPoll(polaris)
+	createPaloAltoTemperaturePoll(polaris)
 	return polaris
 }
 
@@ -90,6 +91,24 @@ func createPaloAltoIfTableRule() *l8tpollaris.L8PAttribute {
 	rule.Params = make(map[string]*l8tpollaris.L8PParameter)
 	attr.Rules = append(attr.Rules, rule)
 
+	return attr
+}
+
+func createPaloAltoTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("paloAltoTemperature")
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.19.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createPaloAltoTemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createPaloAltoTemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.25461.2.1.2.3.19.0"))
 	return attr
 }
 

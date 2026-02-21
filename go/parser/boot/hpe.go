@@ -28,6 +28,7 @@ func CreateHPEServerBootPolls() *l8tpollaris.L8Pollaris {
 	createHPESystemPoll(polaris)
 	createHPEMibSystemPoll(polaris)
 	createHPEStoragePoll(polaris)
+	createHPETemperaturePoll(polaris)
 	return polaris
 }
 
@@ -58,6 +59,24 @@ func createHPEStoragePoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDiskStatus())
 	p.Polling[poll.Name] = poll
+}
+
+func createHPETemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("hpeTemperature")
+	poll.What = ".1.3.6.1.4.1.232.6.2.6.8.1.4.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createHPETemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createHPETemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.232.6.2.6.8.1.4.1"))
+	return attr
 }
 
 // HPE-specific attribute creation functions

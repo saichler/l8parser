@@ -28,6 +28,7 @@ func CreateAristaSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createAristaSystemPoll(polaris)
 	createAristaMibSystemPoll(polaris)
 	createAristaInterfacesPoll(polaris)
+	createAristaTemperaturePoll(polaris)
 	return polaris
 }
 
@@ -60,6 +61,24 @@ func createAristaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
 	poll.Attributes = append(poll.Attributes, createInterfaceSpeed())
 	p.Polling[poll.Name] = poll
+}
+
+func createAristaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("aristaTemperature")
+	poll.What = ".1.3.6.1.4.1.30065.3.12.1.1.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createAristaTemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createAristaTemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.30065.3.12.1.1.1"))
+	return attr
 }
 
 // Arista-specific attribute creation functions

@@ -31,6 +31,7 @@ func CreateCiscoSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoInterfacesPoll(polaris)
 	createCiscoCpuPoll(polaris)
 	createCiscoMemoryPoll(polaris)
+	createCiscoTemperaturePoll(polaris)
 	return polaris
 }
 
@@ -46,6 +47,7 @@ func CreateCiscoRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoInterfacesPoll(polaris)
 	createCiscoCpuPoll(polaris)
 	createCiscoMemoryPoll(polaris)
+	createCiscoTemperaturePoll(polaris)
 	createCiscoRoutingPoll(polaris)
 	return polaris
 }
@@ -179,6 +181,24 @@ func createCiscoVersion() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.9.9.25.1.1.1.2.2"))
+	return attr
+}
+
+func createCiscoTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("ciscoTemperature")
+	poll.What = ".1.3.6.1.4.1.9.9.13.1.3.1.3.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createCiscoTemperature())
+	p.Polling[poll.Name] = poll
+}
+
+func createCiscoTemperature() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.9.9.13.1.3.1.3.1"))
 	return attr
 }
 
