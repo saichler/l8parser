@@ -162,6 +162,18 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 	return modifiedId
 }
 
+// isSnmpErrorString checks if a string value is an SNMP error indicator
+// rather than actual data. Devices that don't support a particular OID
+// return these strings instead of values.
+func isSnmpErrorString(s string) bool {
+	lower := strings.ToLower(s)
+	return strings.Contains(lower, "oid not supported") ||
+		strings.Contains(lower, "no such object") ||
+		strings.Contains(lower, "no such instance") ||
+		strings.Contains(lower, "nosuchobject") ||
+		strings.Contains(lower, "nosuchinstance")
+}
+
 func getIntInput(workSpace map[string]interface{}, paramName string) (int, error) {
 	v, ok := workSpace[paramName].(string)
 	if !ok {

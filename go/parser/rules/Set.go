@@ -16,8 +16,6 @@ limitations under the License.
 package rules
 
 import (
-	"fmt"
-
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8reflect/go/reflect/properties"
 	"github.com/saichler/l8types/go/ifs"
@@ -57,6 +55,13 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 		return resources.Logger().Error("nil value for property id", propertyId)
 	}
 
+	// Skip SNMP error strings gracefully - device doesn't support this OID
+	if strVal, ok := value.(string); ok {
+		if isSnmpErrorString(strVal) {
+			return nil
+		}
+	}
+
 	if _propertyId != nil {
 		// Inject slice index or map key into PropertyId before creating property instance
 		modifiedPropertyId := injectIndexOrKey(propertyId, workSpace)
@@ -66,10 +71,8 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 			return resources.Logger().Error("error parsing instance path", err.Error())
 		}
 		if instance != nil {
-			fmt.Println("PropertyId:", propertyId, ":", modifiedPropertyId)
 			_, _, err := instance.Set(any, value)
 			if err != nil {
-				fmt.Println(value)
 				return resources.Logger().Error("error setting property value:", err.Error())
 			}
 		}

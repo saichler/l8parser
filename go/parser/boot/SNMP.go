@@ -67,6 +67,7 @@ func CreateBoot01() *l8tpollaris.L8Pollaris {
 	boot01.Groups = []string{common.BOOT_STAGE_01}
 	boot01.Polling = make(map[string]*l8tpollaris.L8Poll)
 	createSystemMibPoll(boot01)
+	createInterfaceCountPoll(boot01)
 	return boot01
 }
 
@@ -314,7 +315,16 @@ func createSystemMibPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createSystemUptime())      // networkdevice.equipmentinfo.uptime
 	poll.Attributes = append(poll.Attributes, createSystemLocation())    // networkdevice.equipmentinfo.location
 	poll.Attributes = append(poll.Attributes, createSystemDeviceType())  // networkdevice.equipmentinfo.device_type
-	poll.Attributes = append(poll.Attributes, createInterfaceCountAttribute()) // networkdevice.equipmentinfo.interfacecount
+	p.Polling[poll.Name] = poll
+}
+
+func createInterfaceCountPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("interfaceCount")
+	poll.What = ".1.3.6.1.2.1.2.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createInterfaceCountAttribute())
 	p.Polling[poll.Name] = poll
 }
 

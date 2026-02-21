@@ -30,7 +30,7 @@ func CreatePaloAltoFirewallBootPolls() *l8tpollaris.L8Pollaris {
 	createPaloAltoSerialPoll(polaris)
 	createPaloAltoFirmwarePoll(polaris)
 	createPaloAltoSessionsPoll(polaris)
-	createPaloAltoThreatsPoll(polaris)
+	// createPaloAltoThreatsPoll disabled - needs network_health field in NetworkDevice proto
 	createPaloAltoTemperaturePoll(polaris)
 	return polaris
 }
@@ -73,14 +73,17 @@ func createPaloAltoSessionsPoll(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
-func createPaloAltoThreatsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("paloAltoThreats")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2.1.0"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createThreatCount())
-	p.Polling[poll.Name] = poll
-}
+// createPaloAltoThreatsPoll is disabled until NetworkDevice proto includes
+// the network_health field. The PropertyId "networkdevice.networkhealth.alertcount"
+// cannot be resolved without it.
+// func createPaloAltoThreatsPoll(p *l8tpollaris.L8Pollaris) {
+// 	poll := createBaseSNMPPoll("paloAltoThreats")
+// 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2.1.0"
+// 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+// 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+// 	poll.Attributes = append(poll.Attributes, createThreatCount())
+// 	p.Polling[poll.Name] = poll
+// }
 
 func createPaloAltoIfTableRule() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}

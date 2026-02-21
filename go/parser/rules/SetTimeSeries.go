@@ -63,6 +63,13 @@ func (this *SetTimeSeries) Parse(resources ifs.IResources, workSpace map[string]
 		return resources.Logger().Error("nil value for property id", propertyId)
 	}
 
+	// Skip SNMP error strings gracefully - device doesn't support this OID
+	if kind == reflect.String {
+		if isSnmpErrorString(value.(string)) {
+			return nil
+		}
+	}
+
 	floatValue, err := convertToFloat64(value, kind)
 	if err != nil {
 		return resources.Logger().Error("SetTimeSeries: cannot convert value to float64:", err.Error())

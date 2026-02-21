@@ -105,18 +105,19 @@ func createCiscoInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createInterfaceMtu())
 
 	// Enhanced Physical Interface Attributes (nested in ports)
+	// Only include attributes whose OIDs are under the walked subtree .1.3.6.1.2.1.2.2.1
 	poll.Attributes = append(poll.Attributes, createInterfaceIdAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceNameAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceStatusAttribute())
-	poll.Attributes = append(poll.Attributes, createInterfaceDescriptionAttribute())
+	// ifAlias (.1.3.6.1.2.1.31.1.1.1.18) is in ifXTable, not ifEntry - needs separate poll
 	poll.Attributes = append(poll.Attributes, createInterfaceTypeAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceSpeedAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceMacAddressAttribute())
-	poll.Attributes = append(poll.Attributes, createInterfaceIpAddressAttribute())
+	// ipAdEntAddr (.1.3.6.1.2.1.4.20.1.1) is in IP-MIB, not ifEntry - needs separate poll
 	poll.Attributes = append(poll.Attributes, createInterfaceMtuAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceAdminStatusAttribute())
 
-	// Interface Statistics
+	// Interface Statistics (all under .1.3.6.1.2.1.2.2.1.*)
 	poll.Attributes = append(poll.Attributes, createInterfaceRxPacketsAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceTxPacketsAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceRxBytesAttribute())
@@ -125,15 +126,15 @@ func createCiscoInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createInterfaceTxErrorsAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceRxDropsAttribute())
 	poll.Attributes = append(poll.Attributes, createInterfaceTxDropsAttribute())
-	poll.Attributes = append(poll.Attributes, createInterfaceCollisionsAttribute())
+	// dot3StatsLateCollisions (.1.3.6.1.2.1.10.7) is in EtherLike-MIB, not ifEntry
 
 	// Logical Interfaces (for VLANs, Loopbacks, etc.)
 	poll.Attributes = append(poll.Attributes, createLogicalInterfaceIdAttribute())
 	poll.Attributes = append(poll.Attributes, createLogicalInterfaceNameAttribute())
 	poll.Attributes = append(poll.Attributes, createLogicalInterfaceStatusAttribute())
-	poll.Attributes = append(poll.Attributes, createLogicalInterfaceDescriptionAttribute())
+	// ifAlias (.1.3.6.1.2.1.31.1.1.1.18) is in ifXTable - needs separate poll
 	poll.Attributes = append(poll.Attributes, createLogicalInterfaceTypeAttribute())
-	poll.Attributes = append(poll.Attributes, createLogicalInterfaceIpAddressAttribute())
+	// ipAdEntAddr (.1.3.6.1.2.1.4.20.1.1) is in IP-MIB - needs separate poll
 	poll.Attributes = append(poll.Attributes, createLogicalInterfaceMtuAttribute())
 	poll.Attributes = append(poll.Attributes, createLogicalInterfaceAdminStatusAttribute())
 

@@ -16,7 +16,6 @@ limitations under the License.
 package service
 
 import (
-	"fmt"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
@@ -32,7 +31,6 @@ func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interfa
 	if !field.CanSet() {
 		panic("cannot set field " + this.primaryKey)
 	}
-	fmt.Println(job.TargetId)
 	field.Set(reflect.ValueOf(job.TargetId))
 	return newElem.Interface()
 }
@@ -65,7 +63,6 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 		}
 
 		cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
-		fmt.Println(cacheServiceName, ":", cacheServiceArea, ":", elem)
 		this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
 		//this.vnic.Leader(cacheServiceName, cacheServiceArea, ifs.PATCH, elem)
 	}
