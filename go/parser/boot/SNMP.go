@@ -328,12 +328,70 @@ func createIfTable(p *l8tpollaris.L8Pollaris) {
 }
 
 func createEntityMibPoll(p *l8tpollaris.L8Pollaris) {
+	// Table poll for EntityMibToPhysicals custom rule (needs CTable input)
 	poll := createBaseSNMPPoll("entityMib")
 	poll.What = ".1.3.6.1.2.1.47.1.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createEntityMibRule())
 	p.Polling[poll.Name] = poll
+
+	// Map poll for standard Entity MIB attributes using Set rules (needs CMap input)
+	mapPoll := createBaseSNMPPoll("entityMibAttributes")
+	mapPoll.What = ".1.3.6.1.2.1.47.1.1.1.1"
+	mapPoll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	mapPoll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+
+	// Standard Entity MIB chassis attributes (RFC 2737)
+	mapPoll.Attributes = append(mapPoll.Attributes, createChassisSerialAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createChassisModelAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createChassisDescriptionAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createChassisComponentStatus())
+
+	// Standard Entity MIB module attributes
+	mapPoll.Attributes = append(mapPoll.Attributes, createModuleName())
+	mapPoll.Attributes = append(mapPoll.Attributes, createModuleModel())
+	mapPoll.Attributes = append(mapPoll.Attributes, createModuleStatus())
+	mapPoll.Attributes = append(mapPoll.Attributes, createModuleNameAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createModuleDescriptionAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createModuleTypeAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createRouteProcessorStatus())
+	mapPoll.Attributes = append(mapPoll.Attributes, createCardStatus())
+
+	// Standard Entity MIB CPU attributes
+	mapPoll.Attributes = append(mapPoll.Attributes, createCpuIdAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createCpuNameAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createCpuModelAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createCpuArchitectureAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createCpuStatusAttribute())
+
+	// Standard Entity MIB memory attributes
+	mapPoll.Attributes = append(mapPoll.Attributes, createMemoryIdAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createMemoryNameAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createMemoryTypeAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createMemoryStatusAttribute())
+
+	// Standard Entity MIB power supply attributes
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplyIdAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplyNameAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplyModelAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplySerialNumberAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplyStatusAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplyPowerTypeAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplyStatus())
+	mapPoll.Attributes = append(mapPoll.Attributes, createPowerSupplyModel())
+
+	// Standard Entity MIB fan attributes
+	mapPoll.Attributes = append(mapPoll.Attributes, createFanIdAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createFanNameAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createFanDescriptionAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createFanStatusAttribute())
+	mapPoll.Attributes = append(mapPoll.Attributes, createFanStatus())
+
+	// Standard Entity MIB temperature sensors
+	mapPoll.Attributes = append(mapPoll.Attributes, createTemperatureSensors())
+
+	p.Polling[mapPoll.Name] = mapPoll
 }
 
 func createIpAddressPoll(p *l8tpollaris.L8Pollaris) {
@@ -462,6 +520,14 @@ func createSetRule(from string) *l8tpollaris.L8PRule {
 	return rule
 }
 
+func createSetTimeSeriesRule(from string) *l8tpollaris.L8PRule {
+	rule := &l8tpollaris.L8PRule{}
+	rule.Name = "SetTimeSeries"
+	rule.Params = make(map[string]*l8tpollaris.L8PParameter)
+	addParameter("from", from, rule)
+	return rule
+}
+
 func createDeviceStatusRule() *l8tpollaris.L8PRule {
 	rule := &l8tpollaris.L8PRule{}
 	rule.Name = "MapToDeviceStatus"
@@ -484,7 +550,7 @@ func createInterfaceName() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.2"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.2.1"))
 	return attr
 }
 
@@ -492,7 +558,7 @@ func createInterfaceStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8.1"))
 	return attr
 }
 
@@ -500,7 +566,7 @@ func createInterfaceSpeed() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.speed"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.5"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.5.1"))
 	return attr
 }
 
@@ -508,7 +574,7 @@ func createInterfaceMtu() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.mtu"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.4"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.4.1"))
 	return attr
 }
 
@@ -517,7 +583,7 @@ func createModuleName() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1"))
 	return attr
 }
 
@@ -525,7 +591,7 @@ func createModuleModel() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.model"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13.1"))
 	return attr
 }
 
@@ -533,7 +599,7 @@ func createModuleStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1"))
 	return attr
 }
 
@@ -541,7 +607,7 @@ func createChassisComponentStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.6"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.6.1"))
 	return attr
 }
 
@@ -550,7 +616,7 @@ func createPowerSupplyStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3.1"))
 	return attr
 }
 
@@ -558,7 +624,7 @@ func createPowerSupplyModel() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.model"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1"))
 	return attr
 }
 
@@ -566,7 +632,7 @@ func createFanStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3.1"))
 	return attr
 }
 
@@ -574,7 +640,7 @@ func createTemperatureSensors() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.temperaturecelsius"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.4"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.4.1"))
 	return attr
 }
 
@@ -583,7 +649,7 @@ func createCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.9.9.109.1.1.1.1.5"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.9.9.109.1.1.1.1.5.1"))
 	return attr
 }
 
@@ -591,7 +657,7 @@ func createMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.9.9.48.1.1.1.6"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.9.9.48.1.1.1.6.1"))
 	return attr
 }
 
@@ -599,7 +665,7 @@ func createRoutingEngineUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.utilizationpercent"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.13.1.8"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.13.1.8.1"))
 	return attr
 }
 
@@ -608,7 +674,7 @@ func createRouteProcessorStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1"))
 	return attr
 }
 
@@ -616,7 +682,7 @@ func createRoutingTableEntry() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.ipaddress"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.4.21.1.1"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.4.21.1.1.1"))
 	return attr
 }
 
@@ -624,7 +690,7 @@ func createCardStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.9"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.9.1"))
 	return attr
 }
 
@@ -649,7 +715,7 @@ func createVpnTunnelStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.networklinks.linkstatus"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.4.1.3"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.25461.2.1.2.4.1.3.1"))
 	return attr
 }
 
@@ -658,7 +724,7 @@ func createDiskStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.processes.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.2.3.1.4"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.2.3.1.4.1"))
 	return attr
 }
 
@@ -753,14 +819,6 @@ func createFamilyAttribute() *l8tpollaris.L8PAttribute {
 	return attr
 }
 
-func createInterfaceCountAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.interfacecount"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.1.0")) // ifNumber
-	return attr
-}
-
 // Physical Component Attributes
 func createChassisSerialAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
@@ -799,7 +857,7 @@ func createModuleNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7")) // entPhysicalName (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7.1")) // entPhysicalName (table)
 	return attr
 }
 
@@ -807,7 +865,7 @@ func createModuleModelAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.model"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13")) // entPhysicalModelName (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13.1")) // entPhysicalModelName (table)
 	return attr
 }
 
@@ -815,7 +873,7 @@ func createModuleDescriptionAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.description"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2")) // entPhysicalDescr (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1")) // entPhysicalDescr (table)
 	return attr
 }
 
@@ -823,7 +881,7 @@ func createModuleStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5")) // entPhysicalClass (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass (table)
 	return attr
 }
 
@@ -832,7 +890,7 @@ func createModuleTypeAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.moduletype"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// NOTE: ModuleType derived from entPhysicalClass and description parsing
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5")) // entPhysicalClass
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
 	return attr
 }
 
@@ -840,7 +898,7 @@ func createModuleTemperatureAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4")) // entSensorValue (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4.1")) // entSensorValue (table)
 	return attr
 }
 
@@ -849,7 +907,7 @@ func createCpuIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.id"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1")) // entPhysicalIndex for CPU
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1.1")) // entPhysicalIndex for CPU
 	return attr
 }
 
@@ -857,7 +915,7 @@ func createCpuNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7")) // entPhysicalName for CPU
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7.1")) // entPhysicalName for CPU
 	return attr
 }
 
@@ -865,7 +923,7 @@ func createCpuModelAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.model"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13")) // entPhysicalModelName for CPU
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13.1")) // entPhysicalModelName for CPU
 	return attr
 }
 
@@ -875,7 +933,7 @@ func createCpuArchitectureAttribute() *l8tpollaris.L8PAttribute {
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// NOTE: Architecture not typically available via standard SNMP, would need vendor-specific MIBs
 	// Placeholder using description field
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1"))
 	return attr
 }
 
@@ -901,7 +959,7 @@ func createCpuStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5")) // entPhysicalClass
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
 	return attr
 }
 
@@ -909,7 +967,7 @@ func createCpuTemperatureAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4")) // entSensorValue for CPU temp
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4.1")) // entSensorValue for CPU temp
 	return attr
 }
 
@@ -918,7 +976,7 @@ func createMemoryIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.memorymodules.id"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1")) // entPhysicalIndex for Memory
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1.1")) // entPhysicalIndex for Memory
 	return attr
 }
 
@@ -926,7 +984,7 @@ func createMemoryNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.memorymodules.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7")) // entPhysicalName for Memory
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7.1")) // entPhysicalName for Memory
 	return attr
 }
 
@@ -935,7 +993,7 @@ func createMemoryTypeAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.memorymodules.type"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// NOTE: Memory type not typically available via standard SNMP
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2")) // Parse from description
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1")) // Parse from description
 	return attr
 }
 
@@ -961,7 +1019,7 @@ func createMemoryStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.memorymodules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5")) // entPhysicalClass
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
 	return attr
 }
 
@@ -970,7 +1028,7 @@ func createPortIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.id"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.1")) // ifIndex (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.1.1")) // ifIndex (table)
 	return attr
 }
 
@@ -979,7 +1037,7 @@ func createInterfaceIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.id"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.1")) // ifIndex
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.1.1")) // ifIndex
 	return attr
 }
 
@@ -987,7 +1045,7 @@ func createInterfaceNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.2")) // ifDescr
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.2.1")) // ifDescr
 	return attr
 }
 
@@ -995,7 +1053,7 @@ func createInterfaceStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8")) // ifOperStatus
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8.1")) // ifOperStatus
 	return attr
 }
 
@@ -1003,7 +1061,7 @@ func createInterfaceDescriptionAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.description"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.31.1.1.1.18")) // ifAlias
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.31.1.1.1.18.1")) // ifAlias
 	return attr
 }
 
@@ -1011,7 +1069,7 @@ func createInterfaceTypeAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.interfacetype"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.3")) // ifType
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.3.1")) // ifType
 	return attr
 }
 
@@ -1019,7 +1077,7 @@ func createInterfaceSpeedAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.speed"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.5")) // ifSpeed
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.5.1")) // ifSpeed
 	return attr
 }
 
@@ -1027,7 +1085,7 @@ func createInterfaceMacAddressAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.macaddress"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.6")) // ifPhysAddress
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.6.1")) // ifPhysAddress
 	return attr
 }
 
@@ -1035,7 +1093,7 @@ func createInterfaceIpAddressAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.ipaddress"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.4.20.1.1")) // ipAdEntAddr (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.4.20.1.1.1")) // ipAdEntAddr (table)
 	return attr
 }
 
@@ -1043,7 +1101,7 @@ func createInterfaceMtuAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.mtu"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.4")) // ifMtu
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.4.1")) // ifMtu
 	return attr
 }
 
@@ -1051,7 +1109,7 @@ func createInterfaceAdminStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.adminstatus"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.7")) // ifAdminStatus
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.7.1")) // ifAdminStatus
 	return attr
 }
 
@@ -1060,7 +1118,7 @@ func createInterfaceRxPacketsAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.rxpackets"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.11")) // ifInUcastPkts
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.11.1")) // ifInUcastPkts
 	return attr
 }
 
@@ -1068,7 +1126,7 @@ func createInterfaceTxPacketsAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.txpackets"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.17")) // ifOutUcastPkts
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.17.1")) // ifOutUcastPkts
 	return attr
 }
 
@@ -1076,7 +1134,7 @@ func createInterfaceRxBytesAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.rxbytes"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.10")) // ifInOctets
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.10.1")) // ifInOctets
 	return attr
 }
 
@@ -1084,7 +1142,7 @@ func createInterfaceTxBytesAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.txbytes"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.16")) // ifOutOctets
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.16.1")) // ifOutOctets
 	return attr
 }
 
@@ -1092,7 +1150,7 @@ func createInterfaceRxErrorsAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.rxerrors"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.14")) // ifInErrors
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.14.1")) // ifInErrors
 	return attr
 }
 
@@ -1100,7 +1158,7 @@ func createInterfaceTxErrorsAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.txerrors"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.20")) // ifOutErrors
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.20.1")) // ifOutErrors
 	return attr
 }
 
@@ -1108,7 +1166,7 @@ func createInterfaceRxDropsAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.rxdrops"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.13")) // ifInDiscards
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.13.1")) // ifInDiscards
 	return attr
 }
 
@@ -1116,7 +1174,7 @@ func createInterfaceTxDropsAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.txdrops"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.19")) // ifOutDiscards
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.19.1")) // ifOutDiscards
 	return attr
 }
 
@@ -1125,7 +1183,7 @@ func createInterfaceCollisionsAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.ports.interfaces.statistics.collisions"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// NOTE: Collisions not available in standard IF-MIB, would need EtherLike-MIB
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.10.7.2.1.4")) // dot3StatsLateCollisions
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.10.7.2.1.4.1")) // dot3StatsLateCollisions
 	return attr
 }
 
@@ -1134,7 +1192,7 @@ func createPowerSupplyIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.id"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1")) // entPhysicalIndex for PSU
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1.1")) // entPhysicalIndex for PSU
 	return attr
 }
 
@@ -1142,7 +1200,7 @@ func createPowerSupplyNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7")) // entPhysicalName
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7.1")) // entPhysicalName
 	return attr
 }
 
@@ -1150,7 +1208,7 @@ func createPowerSupplyModelAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.model"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13")) // entPhysicalModelName
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.13.1")) // entPhysicalModelName
 	return attr
 }
 
@@ -1158,7 +1216,7 @@ func createPowerSupplySerialNumberAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.serialnumber"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.11")) // entPhysicalSerialNum
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.11.1")) // entPhysicalSerialNum
 	return attr
 }
 
@@ -1175,7 +1233,7 @@ func createPowerSupplyPowerTypeAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.powersupplies.powertype"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// NOTE: Power type (AC/DC) not typically available via standard SNMP
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2")) // Parse from description
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1")) // Parse from description
 	return attr
 }
 
@@ -1183,7 +1241,7 @@ func createPowerSupplyStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5")) // entPhysicalClass/status
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass/status
 	return attr
 }
 
@@ -1191,7 +1249,7 @@ func createPowerSupplyTemperatureAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4")) // entSensorValue for PSU temp
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4.1")) // entSensorValue for PSU temp
 	return attr
 }
 
@@ -1224,7 +1282,7 @@ func createFanIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.id"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1")) // entPhysicalIndex for Fan
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.1.1")) // entPhysicalIndex for Fan
 	return attr
 }
 
@@ -1232,7 +1290,7 @@ func createFanNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7")) // entPhysicalName
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.7.1")) // entPhysicalName
 	return attr
 }
 
@@ -1240,7 +1298,7 @@ func createFanDescriptionAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.description"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2")) // entPhysicalDescr
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1")) // entPhysicalDescr
 	return attr
 }
 
@@ -1248,7 +1306,7 @@ func createFanStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5")) // entPhysicalClass/status
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass/status
 	return attr
 }
 
@@ -1256,7 +1314,7 @@ func createFanSpeedRpmAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.speedrpm"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4")) // entSensorValue for fan speed
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4.1")) // entSensorValue for fan speed
 	return attr
 }
 
@@ -1272,7 +1330,7 @@ func createFanTemperatureAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4")) // entSensorValue for fan temp
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4.1")) // entSensorValue for fan temp
 	return attr
 }
 
@@ -1281,89 +1339,6 @@ func createFanVariableSpeedAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.fans.variablespeed"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// NOTE: Variable speed capability not typically available via standard SNMP
-	return attr
-}
-
-// Performance Metrics Attributes
-func createPerformanceCpuUsageAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.3.3.1.2.1")) // hrProcessorLoad
-	return attr
-}
-
-func createPerformanceMemoryUsageAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Memory usage percentage calculation required from hrStorageUsed/hrStorageSize
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.2.3.1.6.1")) // hrStorageUsed
-	return attr
-}
-
-func createPerformanceTemperatureAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.temperaturecelsius"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.99.1.1.1.4.1")) // entSensorValue (main temp sensor)
-	return attr
-}
-
-func createPerformanceUptimeAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.uptime"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.3.0")) // sysUpTime
-	return attr
-}
-
-func createPerformanceLoadAverageAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.loadaverage"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2021.10.1.3.1")) // laLoad.1 (if UCD-SNMP-MIB available)
-	return attr
-}
-
-// Process Information Attributes
-func createProcessNameAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.processes.name"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.4.2.1.2")) // hrSWRunName (table)
-	return attr
-}
-
-func createProcessPidAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.processes.pid"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.4.2.1.1")) // hrSWRunIndex (table)
-	return attr
-}
-
-func createProcessCpuPercentAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.processes.cpupercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Per-process CPU percentage not available in standard HOST-RESOURCES-MIB
-	return attr
-}
-
-func createProcessMemoryPercentAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.processes.memorypercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Per-process memory percentage not available in standard HOST-RESOURCES-MIB
-	return attr
-}
-
-func createProcessStatusAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.processes.status"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.4.2.1.7")) // hrSWRunStatus (table)
 	return attr
 }
 
@@ -1376,7 +1351,7 @@ func createLogicalInterfaceIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.id"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.1")) // ifIndex for logical interfaces
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.1.1")) // ifIndex for logical interfaces
 	return attr
 }
 
@@ -1384,7 +1359,7 @@ func createLogicalInterfaceNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.name"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.2")) // ifDescr for logical interfaces
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.2.1")) // ifDescr for logical interfaces
 	return attr
 }
 
@@ -1392,7 +1367,7 @@ func createLogicalInterfaceStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8")) // ifOperStatus
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8.1")) // ifOperStatus
 	return attr
 }
 
@@ -1400,7 +1375,7 @@ func createLogicalInterfaceDescriptionAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.description"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.31.1.1.1.18")) // ifAlias
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.31.1.1.1.18.1")) // ifAlias
 	return attr
 }
 
@@ -1408,7 +1383,7 @@ func createLogicalInterfaceTypeAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.interfacetype"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.3")) // ifType
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.3.1")) // ifType
 	return attr
 }
 
@@ -1416,7 +1391,7 @@ func createLogicalInterfaceIpAddressAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.ipaddress"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.4.20.1.1")) // ipAdEntAddr (table)
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.4.20.1.1.1")) // ipAdEntAddr (table)
 	return attr
 }
 
@@ -1424,7 +1399,7 @@ func createLogicalInterfaceMtuAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.mtu"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.4")) // ifMtu
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.4.1")) // ifMtu
 	return attr
 }
 
@@ -1432,7 +1407,7 @@ func createLogicalInterfaceAdminStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.logicals.interfaces.adminstatus"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.7")) // ifAdminStatus
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.7.1")) // ifAdminStatus
 	return attr
 }
 
@@ -1528,365 +1503,6 @@ func createNetworkNodeTierAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.topology.nodes.tier"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// NOTE: Tier classification not available via SNMP - network design concept
-	return attr
-}
-
-// =====================================
-// NETWORK LINKS SECTION
-// =====================================
-
-// Network Link Attributes
-func createNetworkLinkIdAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.linkid"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Link ID generated by topology discovery, not available via SNMP
-	return attr
-}
-
-func createNetworkLinkNameAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.name"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Link name typically configured or generated by management system
-	return attr
-}
-
-func createNetworkLinkFromNodeAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.fromnode"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: From node determined by topology discovery
-	return attr
-}
-
-func createNetworkLinkToNodeAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.tonode"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: To node determined by topology discovery
-	return attr
-}
-
-func createNetworkLinkStatusAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.linkstatus"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Link status derived from interface operational states
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.8")) // ifOperStatus
-	return attr
-}
-
-func createNetworkLinkBandwidthAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.bandwidth"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.5")) // ifSpeed
-	return attr
-}
-
-func createNetworkLinkTypeAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.linktype"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.3")) // ifType
-	return attr
-}
-
-func createNetworkLinkUtilizationAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.utilizationpercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Utilization calculated from ifInOctets/ifOutOctets vs ifSpeed over time
-	return attr
-}
-
-func createNetworkLinkLatencyAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.latencyms"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Latency not available via SNMP - requires active measurement
-	return attr
-}
-
-func createNetworkLinkDistanceAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.distancekm"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Distance not available via SNMP - geographic calculation or configuration
-	return attr
-}
-
-func createNetworkLinkUptimeAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.uptime"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Link uptime calculated from interface uptime tracking
-	return attr
-}
-
-func createNetworkLinkErrorRateAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.errorrate"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Error rate calculated from ifInErrors/ifOutErrors over time
-	return attr
-}
-
-func createNetworkLinkAvailabilityAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.availabilitypercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Availability calculated from uptime tracking
-	return attr
-}
-
-// Network Link Metrics
-func createLinkMetricsBytesTransmittedAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.bytestransmitted"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.16")) // ifOutOctets
-	return attr
-}
-
-func createLinkMetricsBytesReceivedAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.bytesreceived"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.10")) // ifInOctets
-	return attr
-}
-
-func createLinkMetricsPacketsTransmittedAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.packetstransmitted"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.17")) // ifOutUcastPkts
-	return attr
-}
-
-func createLinkMetricsPacketsReceivedAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.packetsreceived"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.11")) // ifInUcastPkts
-	return attr
-}
-
-func createLinkMetricsErrorCountAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.errorcount"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Combined error count from ifInErrors + ifOutErrors
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.14")) // ifInErrors
-	return attr
-}
-
-func createLinkMetricsDropCountAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.dropcount"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Combined drop count from ifInDiscards + ifOutDiscards
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.2.1.13")) // ifInDiscards
-	return attr
-}
-
-func createLinkMetricsJitterAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.jitterms"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Jitter not available via SNMP - requires active measurement
-	return attr
-}
-
-func createLinkMetricsPacketLossAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.packetlosspercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Packet loss calculated from error/drop statistics over time
-	return attr
-}
-
-func createLinkMetricsThroughputAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.throughputbps"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Throughput calculated from octets counters over time
-	return attr
-}
-
-func createLinkMetricsLastMeasurementAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networklinks.metrics.lastmeasurement"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Last measurement timestamp managed by polling system
-	return attr
-}
-
-// =====================================
-// NETWORK HEALTH SECTION
-// =====================================
-
-// Network Health Attributes
-func createHealthOverallStatusAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.overallstatus"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Overall status calculated from device and interface states
-	return attr
-}
-
-func createHealthTotalDevicesAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.totaldevices"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Total devices managed by inventory system, not available via single device SNMP
-	return attr
-}
-
-func createHealthOnlineDevicesAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.onlinedevices"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Online devices count managed by monitoring system
-	return attr
-}
-
-func createHealthOfflineDevicesAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.offlinedevices"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Offline devices count managed by monitoring system
-	return attr
-}
-
-func createHealthWarningDevicesAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.warningdevices"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Warning devices count calculated from threshold monitoring
-	return attr
-}
-
-func createHealthCriticalDevicesAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.criticaldevices"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Critical devices count calculated from threshold monitoring
-	return attr
-}
-
-func createHealthTotalLinksAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.totallinks"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Total links count from topology discovery
-	return attr
-}
-
-func createHealthActiveLinksAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.activelinks"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Active links count from interface status monitoring
-	return attr
-}
-
-func createHealthInactiveLinksAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.inactivelinks"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Inactive links count from interface status monitoring
-	return attr
-}
-
-func createHealthWarningLinksAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.warninglinks"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Warning links count from utilization/error threshold monitoring
-	return attr
-}
-
-func createHealthNetworkAvailabilityAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.networkavailabilitypercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Network availability calculated from uptime statistics
-	return attr
-}
-
-func createHealthLastHealthCheckAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.lasthealthcheck"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Last health check timestamp managed by monitoring system
-	return attr
-}
-
-// Health Alert Attributes
-func createHealthAlertIdAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.alertid"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Alert ID generated by alerting system, not available via SNMP
-	return attr
-}
-
-func createHealthAlertSeverityAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.severity"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Alert severity calculated from threshold breaches
-	return attr
-}
-
-func createHealthAlertTitleAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.title"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Alert title generated by alerting rules
-	return attr
-}
-
-func createHealthAlertDescriptionAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.description"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Alert description generated by alerting rules
-	return attr
-}
-
-func createHealthAlertAffectedComponentAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.affectedcomponent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Affected component identified by monitoring system
-	return attr
-}
-
-func createHealthAlertComponentTypeAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.componenttype"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Component type classification by monitoring system
-	return attr
-}
-
-func createHealthAlertTimestampAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.timestamp"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Alert timestamp when threshold breach detected
-	return attr
-}
-
-func createHealthAlertAcknowledgedAttribute() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.networkhealth.alerts.acknowledged"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Acknowledgement status managed by alerting system
 	return attr
 }
 

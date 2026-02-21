@@ -28,15 +28,14 @@ func CreateHPEServerBootPolls() *l8tpollaris.L8Pollaris {
 	createHPESystemPoll(polaris)
 	createHPEMibSystemPoll(polaris)
 	createHPEStoragePoll(polaris)
-	createHPEPowerThermalPoll(polaris)
 	return polaris
 }
 
 // HPE server-specific polling functions
 func createHPESystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("hpeSystem")
-	poll.What = ".1.3.6.1.4.1.232.2.2.4"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.232.2.2.4.2.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHPEVersion())
 	p.Polling[poll.Name] = poll
@@ -58,16 +57,6 @@ func createHPEStoragePoll(p *l8tpollaris.L8Pollaris) {
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDiskStatus())
-	p.Polling[poll.Name] = poll
-}
-
-func createHPEPowerThermalPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("hpePowerThermal")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createPowerSupplyStatus())
-	poll.Attributes = append(poll.Attributes, createTemperatureSensors())
 	p.Polling[poll.Name] = poll
 }
 

@@ -35,8 +35,8 @@ func CreatePaloAltoFirewallBootPolls() *l8tpollaris.L8Pollaris {
 // Palo Alto Networks device-specific polling functions
 func createPaloAltoSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoSystem")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoVersion())
 	p.Polling[poll.Name] = poll
@@ -63,8 +63,8 @@ func createPaloAltoInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 
 func createPaloAltoSessionsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoSessions")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createActiveSessions())
 	p.Polling[poll.Name] = poll
@@ -72,8 +72,8 @@ func createPaloAltoSessionsPoll(p *l8tpollaris.L8Pollaris) {
 
 func createPaloAltoThreatsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoThreats")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.2.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createThreatCount())
 	p.Polling[poll.Name] = poll

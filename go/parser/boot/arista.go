@@ -28,15 +28,14 @@ func CreateAristaSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createAristaSystemPoll(polaris)
 	createAristaMibSystemPoll(polaris)
 	createAristaInterfacesPoll(polaris)
-	createAristaEnvironmentalPoll(polaris)
 	return polaris
 }
 
 // Arista device-specific polling functions
 func createAristaSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("aristaSystem")
-	poll.What = ".1.3.6.1.4.1.30065.1.3.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.30065.1.3.1.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createAristaVersion())
 	p.Polling[poll.Name] = poll
@@ -60,15 +59,6 @@ func createAristaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createInterfaceName())
 	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
 	poll.Attributes = append(poll.Attributes, createInterfaceSpeed())
-	p.Polling[poll.Name] = poll
-}
-
-func createAristaEnvironmentalPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("aristaEnvironmental")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createTemperatureSensors())
 	p.Polling[poll.Name] = poll
 }
 

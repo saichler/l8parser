@@ -28,7 +28,6 @@ func CreateJuniperRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createJuniperSystemPoll(polaris)
 	createJuniperMibSystemPoll(polaris)
 	createJuniperInterfacesPoll(polaris)
-	createJuniperChassisComponentsPoll(polaris)
 	createJuniperRoutingEnginePoll(polaris)
 	return polaris
 }
@@ -36,8 +35,8 @@ func CreateJuniperRouterBootPolls() *l8tpollaris.L8Pollaris {
 // Juniper device-specific polling functions
 func createJuniperSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("juniperSystem")
-	poll.What = ".1.3.6.1.4.1.2636.3.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.2636.3.1.2.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createJuniperVersion())
 	p.Polling[poll.Name] = poll
@@ -61,15 +60,6 @@ func createJuniperInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createInterfaceName())
 	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
 	poll.Attributes = append(poll.Attributes, createInterfaceSpeed())
-	p.Polling[poll.Name] = poll
-}
-
-func createJuniperChassisComponentsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("juniperChassis")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createChassisComponentStatus())
 	p.Polling[poll.Name] = poll
 }
 

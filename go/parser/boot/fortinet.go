@@ -36,8 +36,8 @@ func CreateFortinetFirewallBootPolls() *l8tpollaris.L8Pollaris {
 // Fortinet device-specific polling functions
 func createFortinetSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("fortinetSystem")
-	poll.What = ".1.3.6.1.4.1.12356.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.12356.1.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createFortinetVersion())
 	p.Polling[poll.Name] = poll
@@ -65,8 +65,8 @@ func createFortinetInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 
 func createFortinetSessionsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("fortinetSessions")
-	poll.What = ".1.3.6.1.4.1.12356.101.4.1.8"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.12356.101.4.1.8.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createFortinetActiveSessions())
 	p.Polling[poll.Name] = poll
@@ -110,6 +110,6 @@ func createFortinetVpnTunnelStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.networklinks.linkstatus"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.101.12.2.3.1.3"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.12356.101.12.2.3.1.3.1"))
 	return attr
 }

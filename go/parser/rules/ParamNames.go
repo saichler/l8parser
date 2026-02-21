@@ -33,4 +33,6 @@ const (
 	Columns = "columns"
 	// KeyColumn is the parameter name for specifying which columns form the key.
 	KeyColumn = "key_column"
+	// JobEnded is the workspace key for the job's end timestamp (unix seconds).
+	JobEnded = "job_ended"
 )

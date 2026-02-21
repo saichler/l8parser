@@ -28,15 +28,14 @@ func CreateHuaweiRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createHuaweiSystemPoll(polaris)
 	createHuaweiMibSystemPoll(polaris)
 	createHuaweiInterfacesPoll(polaris)
-	createHuaweiEnvironmentalPoll(polaris)
 	return polaris
 }
 
 // Huawei device-specific polling functions
 func createHuaweiSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("huaweiSystem")
-	poll.What = ".1.3.6.1.4.1.2011.5.25.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.2011.5.25.1.1.1.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHuaweiVersion())
 	p.Polling[poll.Name] = poll
@@ -59,15 +58,6 @@ func createHuaweiInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createInterfaceName())
 	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
-	p.Polling[poll.Name] = poll
-}
-
-func createHuaweiEnvironmentalPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("huaweiEnvironmental")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createTemperatureSensors())
 	p.Polling[poll.Name] = poll
 }
 

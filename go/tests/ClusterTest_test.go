@@ -67,7 +67,7 @@ func TestCluster(t *testing.T) {
 
 	pollaris.Activate(vnic)
 
-	targets.Activate(common2.DB_CREDS, common2.DB_NAME, vnic)
+	targets.Activate("admin", "admin", vnic)
 
 	service.Activate(linksID, vnic)
 

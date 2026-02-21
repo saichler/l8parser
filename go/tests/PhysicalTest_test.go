@@ -41,7 +41,7 @@ import (
 // into NetworkDevice physical structures (chassis, ports, interfaces).
 func TestPhysical(t *testing.T) {
 	linksId := common2.NetworkDevice_Links_ID
-	ip := "10.20.30.9"
+	ip := "10.20.30.3"
 	common.SmoothFirstCollection = true
 
 	//use opensim to simulate this device with this ip
@@ -56,7 +56,7 @@ func TestPhysical(t *testing.T) {
 	utils_collector.SetPolls(sla)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	targets.Activate("postgres", "problerdb", vnic)
+	targets.Activate("admin", "admin", vnic)
 
 	collSN, collSA := targets.Links.Collector(linksId)
 	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, collSN, collSA, true, nil)
@@ -110,7 +110,10 @@ func TestPhysical(t *testing.T) {
 
 	for physicalKey, physical := range networkDevice.Physicals {
 		fmt.Printf("DEBUG: Physical key '%s' has %d ports\n", physicalKey, len(physical.Ports))
-
+		if physical.Performance == nil || physical.Performance.CpuUsagePercent == nil {
+			vnic.Resources().Logger().Fail(t, "No performance")
+			return
+		}
 		if physical.Ports == nil || len(physical.Ports) < 2 {
 			fmt.Printf("DEBUG: Physical '%s' has insufficient ports. Expected > 2, got %d\n", physicalKey, len(physical.Ports))
 

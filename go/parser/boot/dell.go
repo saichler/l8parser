@@ -28,15 +28,14 @@ func CreateDellServerBootPolls() *l8tpollaris.L8Pollaris {
 	createDellSystemPoll(polaris)
 	createDellMibSystemPoll(polaris)
 	createDellStoragePoll(polaris)
-	createDellPowerThermalPoll(polaris)
 	return polaris
 }
 
 // Dell server-specific polling functions
 func createDellSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("dellSystem")
-	poll.What = ".1.3.6.1.4.1.674.10892.5.1.3"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.674.10892.5.1.3.1.6.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDellVersion())
 	p.Polling[poll.Name] = poll
@@ -58,16 +57,6 @@ func createDellStoragePoll(p *l8tpollaris.L8Pollaris) {
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDiskStatus())
-	p.Polling[poll.Name] = poll
-}
-
-func createDellPowerThermalPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("dellPowerThermal")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createPowerSupplyStatus())
-	poll.Attributes = append(poll.Attributes, createTemperatureSensors())
 	p.Polling[poll.Name] = poll
 }
 

@@ -28,15 +28,14 @@ func CreateNokiaRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createNokiaSystemPoll(polaris)
 	createNokiaMibSystemPoll(polaris)
 	createNokiaInterfacesPoll(polaris)
-	createNokiaCardsPoll(polaris)
 	return polaris
 }
 
 // Nokia device-specific polling functions
 func createNokiaSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("nokiaSystem")
-	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.1.4.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNokiaVersion())
 	p.Polling[poll.Name] = poll
@@ -59,15 +58,6 @@ func createNokiaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createInterfaceName())
 	poll.Attributes = append(poll.Attributes, createInterfaceStatus())
-	p.Polling[poll.Name] = poll
-}
-
-func createNokiaCardsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaCards")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createCardStatus())
 	p.Polling[poll.Name] = poll
 }
 

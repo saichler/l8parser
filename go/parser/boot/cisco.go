@@ -29,9 +29,6 @@ func CreateCiscoSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoVersionPoll(polaris)
 	createCiscoSerialPoll(polaris)
 	createCiscoInterfacesPoll(polaris)
-	createCiscoModulesPoll(polaris)
-	createCiscoPowerSupplyPoll(polaris)
-	createCiscoFanPoll(polaris)
 	createCiscoCpuPoll(polaris)
 	createCiscoMemoryPoll(polaris)
 	return polaris
@@ -47,17 +44,9 @@ func CreateCiscoRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoVersionPoll(polaris)
 	createCiscoSerialPoll(polaris)
 	createCiscoInterfacesPoll(polaris)
-	createCiscoRouterModulesPoll(polaris)
-	createCiscoPowerSupplyPoll(polaris)
 	createCiscoCpuPoll(polaris)
 	createCiscoMemoryPoll(polaris)
 	createCiscoRoutingPoll(polaris)
-
-	// Enhanced Comprehensive Polling
-	createCiscoPhysicalComponentsPoll(polaris)
-	createCiscoPerformanceMetricsPoll(polaris)
-	createCiscoNetworkHealthPoll(polaris)
-	createCiscoNetworkLinksPoll(polaris)
 	return polaris
 }
 
@@ -84,8 +73,8 @@ func createCiscoSystemPoll(p *l8tpollaris.L8Pollaris) {
 
 func createCiscoVersionPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ciscoVersion")
-	poll.What = ".1.3.6.1.4.1.9.9.25.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.9.9.25.1.1.1.2.2"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCiscoVersion())
 	p.Polling[poll.Name] = poll
@@ -93,8 +82,8 @@ func createCiscoVersionPoll(p *l8tpollaris.L8Pollaris) {
 
 func createCiscoSerialPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ciscoSerial")
-	poll.What = ".1.3.6.1.4.1.9.3.6"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.9.3.6.3.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCiscoSerial())
 	p.Polling[poll.Name] = poll
@@ -147,74 +136,10 @@ func createCiscoInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
-func createCiscoModulesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoModules")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	// Original Module Attributes
-	poll.Attributes = append(poll.Attributes, createModuleName())
-	poll.Attributes = append(poll.Attributes, createModuleModel())
-	poll.Attributes = append(poll.Attributes, createModuleStatus())
-
-	// Enhanced Chassis Attributes
-	poll.Attributes = append(poll.Attributes, createChassisSerialAttribute())
-	poll.Attributes = append(poll.Attributes, createChassisModelAttribute())
-	poll.Attributes = append(poll.Attributes, createChassisDescriptionAttribute())
-	poll.Attributes = append(poll.Attributes, createChassisTemperatureAttribute())
-
-	// Enhanced Module Attributes
-	poll.Attributes = append(poll.Attributes, createModuleNameAttribute())
-	poll.Attributes = append(poll.Attributes, createModuleModelAttribute())
-	poll.Attributes = append(poll.Attributes, createModuleDescriptionAttribute())
-	poll.Attributes = append(poll.Attributes, createModuleStatusAttribute())
-	poll.Attributes = append(poll.Attributes, createModuleTypeAttribute())
-	poll.Attributes = append(poll.Attributes, createModuleTemperatureAttribute())
-
-	// CPU Attributes (nested in modules)
-	poll.Attributes = append(poll.Attributes, createCpuIdAttribute())
-	poll.Attributes = append(poll.Attributes, createCpuNameAttribute())
-	poll.Attributes = append(poll.Attributes, createCpuModelAttribute())
-	poll.Attributes = append(poll.Attributes, createCpuArchitectureAttribute())
-	poll.Attributes = append(poll.Attributes, createCpuCoresAttribute())
-	poll.Attributes = append(poll.Attributes, createCpuFrequencyAttribute())
-	poll.Attributes = append(poll.Attributes, createCpuStatusAttribute())
-	poll.Attributes = append(poll.Attributes, createCpuTemperatureAttribute())
-
-	// Memory Attributes (nested in modules)
-	poll.Attributes = append(poll.Attributes, createMemoryIdAttribute())
-	poll.Attributes = append(poll.Attributes, createMemoryNameAttribute())
-	poll.Attributes = append(poll.Attributes, createMemoryTypeAttribute())
-	poll.Attributes = append(poll.Attributes, createMemorySizeAttribute())
-	poll.Attributes = append(poll.Attributes, createMemoryFrequencyAttribute())
-	poll.Attributes = append(poll.Attributes, createMemoryStatusAttribute())
-
-	p.Polling[poll.Name] = poll
-}
-
-func createCiscoPowerSupplyPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoPowerSupply")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createPowerSupplyStatus())
-	poll.Attributes = append(poll.Attributes, createPowerSupplyModel())
-	p.Polling[poll.Name] = poll
-}
-
-func createCiscoFanPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoFans")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createFanStatus())
-	p.Polling[poll.Name] = poll
-}
-
 func createCiscoCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ciscoCpu")
-	poll.What = ".1.3.6.1.4.1.9.9.109.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.9.9.109.1.1.1.1.5.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -222,19 +147,10 @@ func createCiscoCpuPoll(p *l8tpollaris.L8Pollaris) {
 
 func createCiscoMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ciscoMemory")
-	poll.What = ".1.3.6.1.4.1.9.9.48.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.What = ".1.3.6.1.4.1.9.9.48.1.1.1.6.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createMemoryUtilization())
-	p.Polling[poll.Name] = poll
-}
-
-func createCiscoRouterModulesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoRouterModules")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createRouteProcessorStatus())
 	p.Polling[poll.Name] = poll
 }
 
@@ -272,139 +188,3 @@ func createCiscoSerial() *l8tpollaris.L8PAttribute {
 	return attr
 }
 
-// =====================================
-// COMPREHENSIVE CISCO POLLING FUNCTIONS
-// Supporting all NetworkDevice model attributes with Cisco-specific optimizations
-// =====================================
-
-// Cisco Physical Components Polling
-func createCiscoPhysicalComponentsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoPhysicalComponents")
-	poll.What = ".1.3.6.1.2.1.47.1.1.1.1" // ENTITY-MIB
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-
-	// Power Supply Attributes (comprehensive)
-	poll.Attributes = append(poll.Attributes, createPowerSupplyIdAttribute())
-	poll.Attributes = append(poll.Attributes, createPowerSupplyNameAttribute())
-	poll.Attributes = append(poll.Attributes, createPowerSupplyModelAttribute())
-	poll.Attributes = append(poll.Attributes, createPowerSupplySerialNumberAttribute())
-	poll.Attributes = append(poll.Attributes, createPowerSupplyStatusAttribute())
-	poll.Attributes = append(poll.Attributes, createPowerSupplyTemperatureAttribute())
-	poll.Attributes = append(poll.Attributes, createPowerSupplyWattageAttribute()) // NOTE: Vendor-specific required
-	poll.Attributes = append(poll.Attributes, createPowerSupplyPowerTypeAttribute())
-	poll.Attributes = append(poll.Attributes, createPowerSupplyLoadPercentAttribute()) // NOTE: Vendor-specific required
-	poll.Attributes = append(poll.Attributes, createPowerSupplyVoltageAttribute())     // NOTE: Vendor-specific required
-	poll.Attributes = append(poll.Attributes, createPowerSupplyCurrentAttribute())     // NOTE: Vendor-specific required
-
-	// Fan Attributes (comprehensive)
-	poll.Attributes = append(poll.Attributes, createFanIdAttribute())
-	poll.Attributes = append(poll.Attributes, createFanNameAttribute())
-	poll.Attributes = append(poll.Attributes, createFanDescriptionAttribute())
-	poll.Attributes = append(poll.Attributes, createFanStatusAttribute())
-	poll.Attributes = append(poll.Attributes, createFanSpeedRpmAttribute())
-	poll.Attributes = append(poll.Attributes, createFanMaxSpeedRpmAttribute()) // NOTE: Vendor-specific required
-	poll.Attributes = append(poll.Attributes, createFanTemperatureAttribute())
-	poll.Attributes = append(poll.Attributes, createFanVariableSpeedAttribute()) // NOTE: Vendor-specific required
-
-	// Port Attributes (comprehensive)
-	poll.Attributes = append(poll.Attributes, createPortIdAttribute())
-
-	p.Polling[poll.Name] = poll
-}
-
-// Cisco Performance Metrics Polling
-func createCiscoPerformanceMetricsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoPerformanceMetrics")
-	poll.What = ".1.3.6.1.2.1.25" // HOST-RESOURCES-MIB
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-
-	// Performance Metrics
-	poll.Attributes = append(poll.Attributes, createPerformanceCpuUsageAttribute())
-	poll.Attributes = append(poll.Attributes, createPerformanceMemoryUsageAttribute())
-	poll.Attributes = append(poll.Attributes, createPerformanceTemperatureAttribute())
-	poll.Attributes = append(poll.Attributes, createPerformanceUptimeAttribute())
-	poll.Attributes = append(poll.Attributes, createPerformanceLoadAverageAttribute()) // NOTE: UCD-SNMP-MIB if available
-	poll.Attributes = append(poll.Attributes, createInterfaceCountAttribute())
-
-	// Process Information
-	poll.Attributes = append(poll.Attributes, createProcessNameAttribute())
-	poll.Attributes = append(poll.Attributes, createProcessPidAttribute())
-	poll.Attributes = append(poll.Attributes, createProcessCpuPercentAttribute())    // NOTE: Not available in standard MIB
-	poll.Attributes = append(poll.Attributes, createProcessMemoryPercentAttribute()) // NOTE: Not available in standard MIB
-	poll.Attributes = append(poll.Attributes, createProcessStatusAttribute())
-
-	p.Polling[poll.Name] = poll
-}
-
-// Cisco Network Health Polling
-func createCiscoNetworkHealthPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoNetworkHealth")
-	poll.What = ".1.3.6.1.2.1.2" // IF-MIB for interface health
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-
-	// Network Health Attributes (NOTE: Many calculated by management system)
-	poll.Attributes = append(poll.Attributes, createHealthOverallStatusAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthTotalDevicesAttribute())        // NOTE: Management system
-	poll.Attributes = append(poll.Attributes, createHealthOnlineDevicesAttribute())       // NOTE: Management system
-	poll.Attributes = append(poll.Attributes, createHealthOfflineDevicesAttribute())      // NOTE: Management system
-	poll.Attributes = append(poll.Attributes, createHealthWarningDevicesAttribute())      // NOTE: Management system
-	poll.Attributes = append(poll.Attributes, createHealthCriticalDevicesAttribute())     // NOTE: Management system
-	poll.Attributes = append(poll.Attributes, createHealthTotalLinksAttribute())          // NOTE: Topology discovery
-	poll.Attributes = append(poll.Attributes, createHealthActiveLinksAttribute())         // NOTE: Interface monitoring
-	poll.Attributes = append(poll.Attributes, createHealthInactiveLinksAttribute())       // NOTE: Interface monitoring
-	poll.Attributes = append(poll.Attributes, createHealthWarningLinksAttribute())        // NOTE: Threshold monitoring
-	poll.Attributes = append(poll.Attributes, createHealthNetworkAvailabilityAttribute()) // NOTE: Calculated
-	poll.Attributes = append(poll.Attributes, createHealthLastHealthCheckAttribute())     // NOTE: Management system
-
-	// Health Alert Attributes (NOTE: Generated by alerting system)
-	poll.Attributes = append(poll.Attributes, createHealthAlertIdAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthAlertSeverityAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthAlertTitleAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthAlertDescriptionAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthAlertAffectedComponentAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthAlertComponentTypeAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthAlertTimestampAttribute())
-	poll.Attributes = append(poll.Attributes, createHealthAlertAcknowledgedAttribute())
-
-	p.Polling[poll.Name] = poll
-}
-
-// Cisco Network Links Polling
-func createCiscoNetworkLinksPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("ciscoNetworkLinks")
-	poll.What = ".1.3.6.1.2.1.2" // IF-MIB for link information
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-
-	// Network Link Attributes (NOTE: Many derived from topology discovery)
-	poll.Attributes = append(poll.Attributes, createNetworkLinkIdAttribute())           // NOTE: Topology discovery
-	poll.Attributes = append(poll.Attributes, createNetworkLinkNameAttribute())         // NOTE: Management system
-	poll.Attributes = append(poll.Attributes, createNetworkLinkFromNodeAttribute())     // NOTE: Topology discovery
-	poll.Attributes = append(poll.Attributes, createNetworkLinkToNodeAttribute())       // NOTE: Topology discovery
-	poll.Attributes = append(poll.Attributes, createNetworkLinkStatusAttribute())       // From ifOperStatus
-	poll.Attributes = append(poll.Attributes, createNetworkLinkBandwidthAttribute())    // From ifSpeed
-	poll.Attributes = append(poll.Attributes, createNetworkLinkTypeAttribute())         // From ifType
-	poll.Attributes = append(poll.Attributes, createNetworkLinkUtilizationAttribute())  // NOTE: Calculated
-	poll.Attributes = append(poll.Attributes, createNetworkLinkLatencyAttribute())      // NOTE: Active measurement
-	poll.Attributes = append(poll.Attributes, createNetworkLinkDistanceAttribute())     // NOTE: Geographic calculation
-	poll.Attributes = append(poll.Attributes, createNetworkLinkUptimeAttribute())       // NOTE: Calculated
-	poll.Attributes = append(poll.Attributes, createNetworkLinkErrorRateAttribute())    // NOTE: Calculated
-	poll.Attributes = append(poll.Attributes, createNetworkLinkAvailabilityAttribute()) // NOTE: Calculated
-
-	// Network Link Metrics (from interface statistics)
-	poll.Attributes = append(poll.Attributes, createLinkMetricsBytesTransmittedAttribute())   // ifOutOctets
-	poll.Attributes = append(poll.Attributes, createLinkMetricsBytesReceivedAttribute())      // ifInOctets
-	poll.Attributes = append(poll.Attributes, createLinkMetricsPacketsTransmittedAttribute()) // ifOutUcastPkts
-	poll.Attributes = append(poll.Attributes, createLinkMetricsPacketsReceivedAttribute())    // ifInUcastPkts
-	poll.Attributes = append(poll.Attributes, createLinkMetricsErrorCountAttribute())         // ifInErrors + ifOutErrors
-	poll.Attributes = append(poll.Attributes, createLinkMetricsDropCountAttribute())          // ifInDiscards + ifOutDiscards
-	poll.Attributes = append(poll.Attributes, createLinkMetricsJitterAttribute())             // NOTE: Active measurement
-	poll.Attributes = append(poll.Attributes, createLinkMetricsPacketLossAttribute())         // NOTE: Calculated
-	poll.Attributes = append(poll.Attributes, createLinkMetricsThroughputAttribute())         // NOTE: Calculated
-	poll.Attributes = append(poll.Attributes, createLinkMetricsLastMeasurementAttribute())    // NOTE: Management system
-
-	p.Polling[poll.Name] = poll
-}

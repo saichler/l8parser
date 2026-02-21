@@ -21,13 +21,15 @@ package rules
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8utils/go/utils/strings"
+	l8strings "github.com/saichler/l8utils/go/utils/strings"
 )
 
 // ParsingRule defines the interface for all parsing rules in the L8Parser.
@@ -77,6 +79,10 @@ func GetValueInput(resources ifs.IResources, input interface{}, params map[strin
 		if from == nil {
 			return nil, reflect.Invalid, errors.New("missing 'from' key in map input")
 		}
+		fmt.Println("GetValueInput: looking for key=", from.Value, "in CMap with", len(m.Data), "keys:")
+		for k := range m.Data {
+			fmt.Println("  CMap key:", k)
+		}
 		rawData := m.Data[from.Value]
 		if rawData == nil || len(rawData) == 0 {
 			return nil, reflect.Invalid, errors.New("Value for From " + from.Value + " is blank")
@@ -105,6 +111,62 @@ func GetValueInput(resources ifs.IResources, input interface{}, params map[strin
 	return nil, reflect.Invalid, errors.New("unsupported input type")
 }
 
+// injectIndexOrKey injects slice indices or map keys into PropertyId paths
+// Format: <{reflect.Kind}value> before the attribute that needs indexing
+func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) string {
+	// Map of collection attributes that need indexing/keying
+	collectionMappings := map[string]string{
+		"physicals":      "{24}physical-0", // map<string, Physical> - use string key
+		"logicals":       "{24}logical-0",  // map<string, Logical> - use string key
+		"networklinks":   "{2}0",           // repeated NetworkLink - use int index (alt name)
+		"network_links":  "{2}0",           // repeated NetworkLink - use int index
+		"chassis":        "{2}0",           // repeated Chassis - use int index
+		"ports":          "{2}0",           // repeated Port - use int index
+		"power_supplies": "{2}0",           // repeated PowerSupply - use int index
+		"powersupplies":  "{2}0",           // repeated PowerSupply - use int index (alt name)
+		"fans":           "{2}0",           // repeated Fan - use int index
+		"modules":        "{2}0",           // repeated Module - use int index
+		"cpus":           "{2}0",           // repeated Cpu - use int index
+		"interfaces":     "{2}0",           // repeated Interface - use int index
+		"processes":      "{2}0",           // repeated ProcessInfo - use int index
+	}
+
+	// Field name mappings for proto compatibility
+	fieldMappings := map[string]string{
+		"powersupplies": "powersupplies", // powersupplies -> power_supplies
+		"networklinks":  "networklinks",  // networklinks -> network_links
+		"networkhealth": "networkhealth", // networkhealth -> network_health
+	}
+
+	parts := strings.Split(propertyId, ".")
+	result := make([]string, 0, len(parts))
+
+	for i, part := range parts {
+		// Apply field name mapping first
+		mappedPart := part
+		if mapped, exists := fieldMappings[part]; exists {
+			mappedPart = mapped
+		}
+
+		// Apply collection indexing
+		if indexKey, exists := collectionMappings[part]; exists {
+			// Check if this is not the last part (we need a following attribute)
+			if i < len(parts)-1 {
+				// Inject the index/key before the next attribute
+				result = append(result, mappedPart+"<"+indexKey+">")
+			} else {
+				result = append(result, mappedPart)
+			}
+		} else {
+			result = append(result, mappedPart)
+		}
+	}
+
+	modifiedId := strings.Join(result, ".")
+
+	return modifiedId
+}
+
 func getIntInput(workSpace map[string]interface{}, paramName string) (int, error) {
 	v, ok := workSpace[paramName].(string)
 	if !ok {
@@ -122,7 +184,7 @@ func getIntArrInput(workSpace map[string]interface{}, paramName string) ([]int, 
 	if !ok {
 		return []int{}, errors.New("'" + paramName + "' does not exist")
 	}
-	arr, e := strings.FromString(v, nil)
+	arr, e := l8strings.FromString(v, nil)
 	if e != nil {
 		return []int{}, e
 	}

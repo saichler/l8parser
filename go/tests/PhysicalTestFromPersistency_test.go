@@ -49,7 +49,7 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	utils_collector.SetPolls(sla)
 	vnic.Resources().Services().Activate(sla, vnic)
 
-	targets.Activate("postgres", "probler", vnic)
+	targets.Activate("admin", "admin", vnic)
 
 	collSN, collSA := targets.Links.Collector(linksId)
 	sla = ifs.NewServiceLevelAgreement(&service.CollectorService{}, collSN, collSA, true, nil)
