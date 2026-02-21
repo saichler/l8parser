@@ -16,10 +16,12 @@ limitations under the License.
 package rules
 
 import (
-	"fmt"
+	"reflect"
+
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8reflect/go/reflect/properties"
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
 )
 
 // Set is a parsing rule that directly sets a value from input to a target property.
@@ -64,28 +66,60 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 		// Inject slice index or map key into PropertyId before creating property instance
 		modifiedPropertyId := injectIndexOrKey(propertyId, workSpace)
 
-		fmt.Println("[DEBUG Set] propertyId=", propertyId, " modifiedPropertyId=", modifiedPropertyId, " valueType=", fmt.Sprintf("%T", value))
-
 		instance, err := properties.PropertyOf(modifiedPropertyId, resources)
 		if err != nil {
 			return resources.Logger().Error("error parsing instance path", err.Error())
 		}
 		if instance != nil {
-			fmt.Println("[DEBUG Set] calling instance.Set for modifiedPropertyId=", modifiedPropertyId)
-			func() {
-				defer func() {
-					if r := recover(); r != nil {
-						fmt.Println("[DEBUG Set] PANIC on propertyId=", propertyId, " modifiedPropertyId=", modifiedPropertyId, " value=", value, " recover=", r)
-					}
-				}()
-				_, _, err = instance.Set(any, value)
-			}()
+			value = coerceValue(value, instance, workSpace)
+			_, _, err = instance.Set(any, value)
 			if err != nil {
 				return resources.Logger().Error("error setting property value:", err.Error())
 			}
-			fmt.Println("[DEBUG Set] instance.Set succeeded for modifiedPropertyId=", modifiedPropertyId)
 		}
 	}
 	workSpace[Output] = value
 	return nil
+}
+
+// coerceValue converts the input value to match the target property's type when
+// a direct assignment would fail. Handles SNMP int64→bool (TruthValue) and
+// int64→*L8TimeSeriesPoint conversions.
+func coerceValue(value interface{}, instance *properties.Property, workSpace map[string]interface{}) interface{} {
+	node := instance.Node()
+	if node == nil {
+		return value
+	}
+	typeName := node.TypeName
+
+	valueKind := reflect.TypeOf(value).Kind()
+
+	// int64 → bool (SNMP TruthValue: 1=true, 2=false; ifAdminStatus: 1=up, 2=down)
+	if typeName == "bool" && (valueKind == reflect.Int64 || valueKind == reflect.Int) {
+		return reflect.ValueOf(value).Int() == 1
+	}
+
+	// int64/uint64/float64 → *L8TimeSeriesPoint (wrap numeric into time series point)
+	if typeName == "L8TimeSeriesPoint" {
+		var floatVal float64
+		switch valueKind {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			floatVal = float64(reflect.ValueOf(value).Int())
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			floatVal = float64(reflect.ValueOf(value).Uint())
+		case reflect.Float32, reflect.Float64:
+			floatVal = reflect.ValueOf(value).Float()
+		default:
+			return value
+		}
+		var stamp int64
+		if ended, ok := workSpace[JobEnded]; ok {
+			if s, ok := ended.(int64); ok {
+				stamp = s
+			}
+		}
+		return &l8api.L8TimeSeriesPoint{Stamp: stamp, Value: floatVal}
+	}
+
+	return value
 }

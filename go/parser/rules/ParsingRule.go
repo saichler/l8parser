@@ -122,6 +122,7 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 		"fans":           "{2}0",           // repeated Fan - use int index
 		"modules":        "{2}0",           // repeated Module - use int index
 		"cpus":           "{2}0",           // repeated Cpu - use int index
+		"memorymodules":  "{2}0",           // repeated Memory - use int index
 		"interfaces":     "{2}0",           // repeated Interface - use int index
 		"processes":      "{2}0",           // repeated ProcessInfo - use int index
 	}
