@@ -16,6 +16,7 @@ limitations under the License.
 package rules
 
 import (
+	"fmt"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8reflect/go/reflect/properties"
 	"github.com/saichler/l8types/go/ifs"
@@ -63,15 +64,26 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 		// Inject slice index or map key into PropertyId before creating property instance
 		modifiedPropertyId := injectIndexOrKey(propertyId, workSpace)
 
+		fmt.Println("[DEBUG Set] propertyId=", propertyId, " modifiedPropertyId=", modifiedPropertyId, " valueType=", fmt.Sprintf("%T", value))
+
 		instance, err := properties.PropertyOf(modifiedPropertyId, resources)
 		if err != nil {
 			return resources.Logger().Error("error parsing instance path", err.Error())
 		}
 		if instance != nil {
-			_, _, err := instance.Set(any, value)
+			fmt.Println("[DEBUG Set] calling instance.Set for modifiedPropertyId=", modifiedPropertyId)
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						fmt.Println("[DEBUG Set] PANIC on propertyId=", propertyId, " modifiedPropertyId=", modifiedPropertyId, " value=", value, " recover=", r)
+					}
+				}()
+				_, _, err = instance.Set(any, value)
+			}()
 			if err != nil {
 				return resources.Logger().Error("error setting property value:", err.Error())
 			}
+			fmt.Println("[DEBUG Set] instance.Set succeeded for modifiedPropertyId=", modifiedPropertyId)
 		}
 	}
 	workSpace[Output] = value
