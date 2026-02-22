@@ -71,7 +71,7 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 			return resources.Logger().Error("error parsing instance path", err.Error())
 		}
 		if instance != nil {
-			value = coerceValue(value, instance, workSpace)
+			value = coerceValue(resources, value, instance, workSpace)
 			_, _, err = instance.Set(any, value)
 			if err != nil {
 				return resources.Logger().Error("error setting property value:", err.Error())
@@ -85,7 +85,7 @@ func (this *Set) Parse(resources ifs.IResources, workSpace map[string]interface{
 // coerceValue converts the input value to match the target property's type when
 // a direct assignment would fail. Handles SNMP int64→bool (TruthValue) and
 // int64→*L8TimeSeriesPoint conversions.
-func coerceValue(value interface{}, instance *properties.Property, workSpace map[string]interface{}) interface{} {
+func coerceValue(resources ifs.IResources, value interface{}, instance *properties.Property, workSpace map[string]interface{}) interface{} {
 	node := instance.Node()
 	if node == nil {
 		return value
@@ -121,5 +121,45 @@ func coerceValue(value interface{}, instance *properties.Property, workSpace map
 		return &l8api.L8TimeSeriesPoint{Stamp: stamp, Value: floatVal}
 	}
 
+	// Check if the value type matches the node type
+	valueType := reflect.TypeOf(value).String()
+	if valueType != typeName {
+		propertyId, _ := instance.PropertyId()
+		resources.Logger().Info("coerceValue type mismatch: property=%s, nodeType=%s, valueType=%s, value=%v",
+			propertyId, typeName, valueType, value)
+		info, err := resources.Registry().Info(typeName)
+		if err != nil {
+			return defaultValueForType(typeName)
+		}
+		value, err = info.NewInstance()
+		if err != nil {
+			return defaultValueForType(typeName)
+		}
+	}
+
 	return value
+}
+
+// defaultValueForType returns the zero/default value for a given type name.
+func defaultValueForType(typeName string) interface{} {
+	switch typeName {
+	case "string":
+		return ""
+	case "bool":
+		return false
+	case "int32":
+		return int32(0)
+	case "int64":
+		return int64(0)
+	case "uint32":
+		return uint32(0)
+	case "uint64":
+		return uint64(0)
+	case "float32":
+		return float32(0)
+	case "float64":
+		return float64(0)
+	default:
+		return nil
+	}
 }
