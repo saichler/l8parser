@@ -19,44 +19,44 @@ import (
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
 
-// CreateNokiaRouterBootPolls creates collection and parsing Pollaris model for Nokia routers
-func CreateNokiaRouterBootPolls() *l8tpollaris.L8Pollaris {
+// CreateCheckPointFirewallBootPolls creates collection and parsing Pollaris model for Check Point firewalls
+func CreateCheckPointFirewallBootPolls() *l8tpollaris.L8Pollaris {
 	polaris := &l8tpollaris.L8Pollaris{}
-	polaris.Name = "nokia-router"
-	polaris.Groups = []string{"nokia", "nokia-router"}
+	polaris.Name = "checkpoint-firewall"
+	polaris.Groups = []string{"checkpoint", "checkpoint-firewall"}
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
-	createNokiaSystemPoll(polaris)
-	createNokiaMibSystemPoll(polaris)
-	createNokiaSerialPoll(polaris)
-	createNokiaInterfacesPoll(polaris)
-	createNokiaCpuPoll(polaris)
-	createNokiaMemoryPoll(polaris)
-	createNokiaTemperaturePoll(polaris)
+	createCheckPointSystemPoll(polaris)
+	createCheckPointMibSystemPoll(polaris)
+	createCheckPointSerialPoll(polaris)
+	createCheckPointInterfacesPoll(polaris)
+	createCheckPointCpuPoll(polaris)
+	createCheckPointMemoryPoll(polaris)
+	createCheckPointTemperaturePoll(polaris)
 	return polaris
 }
 
-// Nokia device-specific polling functions
-func createNokiaSystemPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaSystem")
-	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.1.4.0"
+// Check Point device-specific polling functions
+func createCheckPointSystemPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("checkPointSystem")
+	poll.What = ".1.3.6.1.4.1.2620.1.6.4.1.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNokiaVersion())
+	poll.Attributes = append(poll.Attributes, createCheckPointVersion())
 	p.Polling[poll.Name] = poll
 }
 
-func createNokiaMibSystemPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaMibSystem")
+func createCheckPointMibSystemPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("checkPointMibSystem")
 	poll.What = ".1.3.6.1.2.1.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNokiaVendor())
+	poll.Attributes = append(poll.Attributes, createCheckPointVendor())
 	poll.Attributes = append(poll.Attributes, createSysName())
 	p.Polling[poll.Name] = poll
 }
 
-func createNokiaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaInterfaces")
+func createCheckPointInterfacesPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("checkPointInterfaces")
 	poll.What = ".1.3.6.1.2.1.2.2.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
@@ -65,90 +65,90 @@ func createNokiaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
-func createNokiaCpuPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaCpu")
-	poll.What = ".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.5.1"
+func createCheckPointCpuPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("checkPointCpu")
+	poll.What = ".1.3.6.1.4.1.2620.1.6.7.2.7.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNokiaCpuUtilization())
+	poll.Attributes = append(poll.Attributes, createCheckPointCpuUtilization())
 	p.Polling[poll.Name] = poll
 }
 
-func createNokiaCpuUtilization() *l8tpollaris.L8PAttribute {
+func createCheckPointCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.5.1"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2620.1.6.7.2.7.0"))
 	return attr
 }
 
-func createNokiaMemoryPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaMemory")
-	poll.What = ".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.10.1"
+func createCheckPointMemoryPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("checkPointMemory")
+	poll.What = ".1.3.6.1.4.1.2620.1.6.7.4.3.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNokiaMemoryUtilization())
+	poll.Attributes = append(poll.Attributes, createCheckPointMemoryUtilization())
 	p.Polling[poll.Name] = poll
 }
 
-func createNokiaMemoryUtilization() *l8tpollaris.L8PAttribute {
+func createCheckPointMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.10.1"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2620.1.6.7.4.3.0"))
 	return attr
 }
 
-func createNokiaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaTemperature")
-	poll.What = ".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.7.1"
+func createCheckPointTemperaturePoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("checkPointTemperature")
+	poll.What = ".1.3.6.1.4.1.2620.1.6.7.8.1.1.3.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNokiaTemperature())
+	poll.Attributes = append(poll.Attributes, createCheckPointTemperature())
 	p.Polling[poll.Name] = poll
 }
 
-func createNokiaTemperature() *l8tpollaris.L8PAttribute {
+func createCheckPointTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.7.1"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2620.1.6.7.8.1.1.3.0"))
 	return attr
 }
 
-// Nokia-specific attribute creation functions
-func createNokiaVendor() *l8tpollaris.L8PAttribute {
+// Check Point-specific attribute creation functions
+func createCheckPointVendor() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createContainsRule("nokia", ".1.3.6.1.2.1.1.1.0", "Nokia"))
+	attr.Rules = append(attr.Rules, createContainsRule("checkpoint", ".1.3.6.1.2.1.1.1.0", "Check Point"))
 	return attr
 }
 
-func createNokiaVersion() *l8tpollaris.L8PAttribute {
+func createCheckPointVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.equipmentinfo.version"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.6527.3.1.2.2.1.4.0"))
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2620.1.6.4.1.0"))
 	return attr
 }
 
-func createNokiaSerialPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("nokiaSerial")
-	poll.What = ".1.3.6.1.4.1.6527.3.1.2.2.1.6.0"
+func createCheckPointSerialPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("checkPointSerial")
+	poll.What = ".1.3.6.1.4.1.2620.1.6.1.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNokiaSerial())
+	poll.Attributes = append(poll.Attributes, createCheckPointSerial())
 	p.Polling[poll.Name] = poll
 }
 
-func createNokiaSerial() *l8tpollaris.L8PAttribute {
+func createCheckPointSerial() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.6527.3.1.2.2.1.6.0")) // TIMETRA-CHASSIS-MIB
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2620.1.6.1.0"))
 	return attr
 }

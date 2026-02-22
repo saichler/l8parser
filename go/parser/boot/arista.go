@@ -30,6 +30,8 @@ func CreateAristaSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createAristaSerialPoll(polaris)
 	createAristaFirmwarePoll(polaris)
 	createAristaInterfacesPoll(polaris)
+	createAristaCpuPoll(polaris)
+	createAristaMemoryPoll(polaris)
 	createAristaTemperaturePoll(polaris)
 	return polaris
 }
@@ -65,9 +67,45 @@ func createAristaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
+func createAristaCpuPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("aristaCpu")
+	poll.What = ".1.3.6.1.2.1.25.3.3.1.2.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createAristaCpuUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createAristaCpuUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.3.3.1.2.1"))
+	return attr
+}
+
+func createAristaMemoryPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("aristaMemory")
+	poll.What = ".1.3.6.1.2.1.25.2.3.1.6.1"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createAristaMemoryUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createAristaMemoryUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.2.3.1.6.1"))
+	return attr
+}
+
 func createAristaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("aristaTemperature")
-	poll.What = ".1.3.6.1.4.1.30065.3.12.1.1.1"
+	poll.What = ".1.3.6.1.2.1.99.1.1.1.4.100006"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
@@ -79,7 +117,7 @@ func createAristaTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.30065.3.12.1.1.1"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.99.1.1.1.4.100006"))
 	return attr
 }
 

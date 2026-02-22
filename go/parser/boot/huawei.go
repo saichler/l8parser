@@ -29,6 +29,8 @@ func CreateHuaweiRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createHuaweiMibSystemPoll(polaris)
 	createHuaweiSerialPoll(polaris)
 	createHuaweiInterfacesPoll(polaris)
+	createHuaweiCpuPoll(polaris)
+	createHuaweiMemoryPoll(polaris)
 	createHuaweiTemperaturePoll(polaris)
 	return polaris
 }
@@ -63,9 +65,45 @@ func createHuaweiInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
+func createHuaweiCpuPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("huaweiCpu")
+	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createHuaweiCpuUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createHuaweiCpuUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.0"))
+	return attr
+}
+
+func createHuaweiMemoryPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("huaweiMemory")
+	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createHuaweiMemoryUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createHuaweiMemoryUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.0"))
+	return attr
+}
+
 func createHuaweiTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("huaweiTemperature")
-	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.1"
+	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
@@ -77,7 +115,7 @@ func createHuaweiTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.1"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.0"))
 	return attr
 }
 

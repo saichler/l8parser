@@ -31,6 +31,8 @@ func CreatePaloAltoFirewallBootPolls() *l8tpollaris.L8Pollaris {
 	createPaloAltoFirmwarePoll(polaris)
 	createPaloAltoSessionsPoll(polaris)
 	// createPaloAltoThreatsPoll disabled - needs network_health field in NetworkDevice proto
+	createPaloAltoCpuPoll(polaris)
+	createPaloAltoMemoryPoll(polaris)
 	createPaloAltoTemperaturePoll(polaris)
 	return polaris
 }
@@ -99,9 +101,45 @@ func createPaloAltoIfTableRule() *l8tpollaris.L8PAttribute {
 	return attr
 }
 
+func createPaloAltoCpuPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("paloAltoCpu")
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1.2.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createPaloAltoCpuUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createPaloAltoCpuUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.25461.2.1.2.1.2.0"))
+	return attr
+}
+
+func createPaloAltoMemoryPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("paloAltoMemory")
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.2.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createPaloAltoMemoryUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createPaloAltoMemoryUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.25461.2.1.2.3.2.0"))
+	return attr
+}
+
 func createPaloAltoTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoTemperature")
-	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.19.0"
+	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.8.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
@@ -113,7 +151,7 @@ func createPaloAltoTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.25461.2.1.2.3.19.0"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.25461.2.1.2.3.8.0"))
 	return attr
 }
 

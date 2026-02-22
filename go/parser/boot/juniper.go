@@ -30,7 +30,8 @@ func CreateJuniperRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createJuniperSerialPoll(polaris)
 	createJuniperFirmwarePoll(polaris)
 	createJuniperInterfacesPoll(polaris)
-	createJuniperRoutingEnginePoll(polaris)
+	createJuniperCpuPoll(polaris)
+	createJuniperMemoryPoll(polaris)
 	createJuniperTemperaturePoll(polaris)
 	return polaris
 }
@@ -66,19 +67,45 @@ func createJuniperInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	p.Polling[poll.Name] = poll
 }
 
-func createJuniperRoutingEnginePoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseSNMPPoll("juniperRoutingEngine")
-	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+func createJuniperCpuPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("juniperCpu")
+	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createRoutingEngineUtilization())
+	poll.Attributes = append(poll.Attributes, createJuniperCpuUtilization())
 	p.Polling[poll.Name] = poll
+}
+
+func createJuniperCpuUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0"))
+	return attr
+}
+
+func createJuniperMemoryPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("juniperMemory")
+	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.11.9.1.0.0"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createJuniperMemoryUtilization())
+	p.Polling[poll.Name] = poll
+}
+
+func createJuniperMemoryUtilization() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2636.3.1.13.1.11.9.1.0.0"))
+	return attr
 }
 
 func createJuniperTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("juniperTemperature")
-	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.7.1"
+	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.7.9.1.0.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
@@ -90,7 +117,7 @@ func createJuniperTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2636.3.1.13.1.7.1"))
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2636.3.1.13.1.7.9.1.0.0"))
 	return attr
 }
 

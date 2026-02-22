@@ -144,6 +144,36 @@ func GetPollarisByOid(sysOid string) *l8tpollaris.L8Pollaris {
 		return CreateHPEServerBootPolls()
 	}
 
+	// SonicWall devices
+	if isSonicWallOid(sysOid) {
+		return CreateSonicWallFirewallBootPolls()
+	}
+
+	// Check Point devices
+	if isCheckPointOid(sysOid) {
+		return CreateCheckPointFirewallBootPolls()
+	}
+
+	// Extreme devices
+	if isExtremeOid(sysOid) {
+		return CreateExtremeSwitchBootPolls()
+	}
+
+	// D-Link devices
+	if isDLinkOid(sysOid) {
+		return CreateDLinkSwitchBootPolls()
+	}
+
+	// IBM servers
+	if isIBMOid(sysOid) {
+		return CreateIBMServerBootPolls()
+	}
+
+	// NEC devices
+	if isNECOid(sysOid) {
+		return CreateNECRouterBootPolls()
+	}
+
 	// Default to generic SNMP polling if no vendor match
 	return CreateBoot03()
 }
@@ -190,6 +220,24 @@ func GetAllPolarisModels() []*l8tpollaris.L8Pollaris {
 
 	// HPE devices
 	models = append(models, CreateHPEServerBootPolls())
+
+	// SonicWall devices
+	models = append(models, CreateSonicWallFirewallBootPolls())
+
+	// Check Point devices
+	models = append(models, CreateCheckPointFirewallBootPolls())
+
+	// Extreme devices
+	models = append(models, CreateExtremeSwitchBootPolls())
+
+	// D-Link devices
+	models = append(models, CreateDLinkSwitchBootPolls())
+
+	// IBM devices
+	models = append(models, CreateIBMServerBootPolls())
+
+	// NEC devices
+	models = append(models, CreateNECRouterBootPolls())
 
 	return models
 }
@@ -297,6 +345,54 @@ func isHPEOid(sysOid string) bool {
 		normalizedOid = "." + normalizedOid
 	}
 	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.232.")
+}
+
+func isSonicWallOid(sysOid string) bool {
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.8714.")
+}
+
+func isCheckPointOid(sysOid string) bool {
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.2620.")
+}
+
+func isExtremeOid(sysOid string) bool {
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.1916.")
+}
+
+func isDLinkOid(sysOid string) bool {
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.171.")
+}
+
+func isIBMOid(sysOid string) bool {
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.2.6.")
+}
+
+func isNECOid(sysOid string) bool {
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.119.")
 }
 
 func createSystemMibPoll(p *l8tpollaris.L8Pollaris) {
@@ -712,14 +808,6 @@ func createMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.9.9.48.1.1.1.6.1"))
-	return attr
-}
-
-func createRoutingEngineUtilization() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.utilizationpercent"
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.13.1.8.1"))
 	return attr
 }
 
