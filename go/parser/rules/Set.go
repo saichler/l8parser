@@ -125,16 +125,9 @@ func coerceValue(resources ifs.IResources, value interface{}, instance *properti
 	valueType := reflect.TypeOf(value).String()
 	if valueType != typeName {
 		propertyId, _ := instance.PropertyId()
-		resources.Logger().Info("coerceValue type mismatch: property=%s, nodeType=%s, valueType=%s, value=%v",
+		resources.Logger().Error("coerceValue type mismatch: property=%s, nodeType=%s, valueType=%s, value=%v",
 			propertyId, typeName, valueType, value)
-		info, err := resources.Registry().Info(typeName)
-		if err != nil {
-			return defaultValueForType(typeName)
-		}
-		value, err = info.NewInstance()
-		if err != nil {
-			return defaultValueForType(typeName)
-		}
+		return defaultValueForType(typeName)
 	}
 
 	return value
