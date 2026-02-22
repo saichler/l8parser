@@ -16,6 +16,7 @@ limitations under the License.
 package rules
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
@@ -119,6 +120,65 @@ func coerceValue(resources ifs.IResources, value interface{}, instance *properti
 			}
 		}
 		return &l8api.L8TimeSeriesPoint{Stamp: stamp, Value: floatVal}
+	}
+
+	// Numeric → string (e.g., SNMP uptime timeticks arriving as int64 for a string field)
+	if typeName == "string" {
+		switch valueKind {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return fmt.Sprintf("%d", reflect.ValueOf(value).Int())
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return fmt.Sprintf("%d", reflect.ValueOf(value).Uint())
+		case reflect.Float32, reflect.Float64:
+			return fmt.Sprintf("%g", reflect.ValueOf(value).Float())
+		}
+	}
+
+	// Numeric → numeric (e.g., SNMP int64 → uint32/int32/float64 protobuf fields)
+	if valueKind == reflect.Int64 || valueKind == reflect.Int {
+		intVal := reflect.ValueOf(value).Int()
+		switch typeName {
+		case "int32":
+			return int32(intVal)
+		case "uint32":
+			return uint32(intVal)
+		case "uint64":
+			return uint64(intVal)
+		case "float32":
+			return float32(intVal)
+		case "float64":
+			return float64(intVal)
+		}
+	}
+
+	if valueKind == reflect.Uint64 || valueKind == reflect.Uint {
+		uintVal := reflect.ValueOf(value).Uint()
+		switch typeName {
+		case "int32":
+			return int32(uintVal)
+		case "int64":
+			return int64(uintVal)
+		case "uint32":
+			return uint32(uintVal)
+		case "float32":
+			return float32(uintVal)
+		case "float64":
+			return float64(uintVal)
+		}
+	}
+
+	if valueKind == reflect.Float64 || valueKind == reflect.Float32 {
+		floatVal := reflect.ValueOf(value).Float()
+		switch typeName {
+		case "int32":
+			return int32(floatVal)
+		case "int64":
+			return int64(floatVal)
+		case "uint32":
+			return uint32(floatVal)
+		case "uint64":
+			return uint64(floatVal)
+		}
 	}
 
 	// Check if the value type matches the node type
