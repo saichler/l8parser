@@ -181,6 +181,27 @@ func coerceValue(resources ifs.IResources, value interface{}, instance *properti
 		}
 	}
 
+	// For non-basic type names (e.g., protobuf enums like ComponentStatus, ModuleType),
+	// resolve the underlying kind via the introspector and coerce accordingly.
+	if !isBasicTypeName(typeName) {
+		nodeKind := resources.Introspector().Kind(node)
+		switch nodeKind {
+		case reflect.Int32:
+			// Protobuf enums have underlying kind int32
+			switch valueKind {
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				return int32(reflect.ValueOf(value).Int())
+			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				return int32(reflect.ValueOf(value).Uint())
+			case reflect.Float32, reflect.Float64:
+				return int32(reflect.ValueOf(value).Float())
+			default:
+				// String or other non-numeric value for an enum field — skip gracefully
+				return int32(0)
+			}
+		}
+	}
+
 	// Check if the value type matches the node type
 	valueType := reflect.TypeOf(value).String()
 	if valueType != typeName {
@@ -190,6 +211,18 @@ func coerceValue(resources ifs.IResources, value interface{}, instance *properti
 	}
 
 	return value
+}
+
+// isBasicTypeName returns true if the type name is a Go basic type.
+func isBasicTypeName(typeName string) bool {
+	switch typeName {
+	case "string", "bool",
+		"int", "int8", "int16", "int32", "int64",
+		"uint", "uint8", "uint16", "uint32", "uint64",
+		"float32", "float64":
+		return true
+	}
+	return false
 }
 
 // defaultValueForType returns the zero/default value for a given type name.

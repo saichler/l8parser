@@ -61,6 +61,8 @@ func newParser() *_Parser {
 	p.rules[mapToDeviceStatus.Name()] = mapToDeviceStatus
 	setTimeSeries := &rules.SetTimeSeries{}
 	p.rules[setTimeSeries.Name()] = setTimeSeries
+	normalizeEnum := &rules.NormalizeEnum{}
+	p.rules[normalizeEnum.Name()] = normalizeEnum
 	return p
 }
 

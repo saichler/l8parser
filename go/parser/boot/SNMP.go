@@ -557,6 +557,35 @@ func createDeviceStatusRule() *l8tpollaris.L8PRule {
 	return rule
 }
 
+// createNormalizeEnumRule creates a NormalizeEnum rule with the given value mapping.
+// The mapping format is "inputVal:outputVal,inputVal:outputVal,...,*:defaultVal".
+// The special key "*" provides a fallback for any unmapped values (defaults to 0).
+func createNormalizeEnumRule(mapping string) *l8tpollaris.L8PRule {
+	rule := &l8tpollaris.L8PRule{}
+	rule.Name = "NormalizeEnum"
+	rule.Params = make(map[string]*l8tpollaris.L8PParameter)
+	addParameter("map", mapping, rule)
+	return rule
+}
+
+// ComponentStatus enum values:
+//   0 = UNKNOWN, 1 = OK, 2 = WARNING, 3 = ERROR, 4 = CRITICAL, 5 = OFFLINE, 6 = NOT_PRESENT
+//
+// entPhysicalClass (OID .5) values:
+//   1=other, 2=unknown, 3=chassis, 4=backplane, 5=container, 6=PSU, 7=fan,
+//   8=sensor, 9=module, 10=port, 11=stack, 12=cpu
+//
+// Since entPhysicalClass reports what TYPE the component is (not its operational status),
+// a valid response for any class means the component is present and OK.
+const normalizeEntPhysClassToComponentStatus = "1:1,2:0,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1,11:1,12:1,*:0"
+
+// ModuleType enum values:
+//   0=UNKNOWN, 1=SUPERVISOR, 2=LINE_CARD, 3=ROUTE_PROCESSOR, 4=INTERFACE_MODULE,
+//   5=MANAGEMENT_PROCESSOR, 6=SECURITY_PROCESSING_UNIT, 7=SERVICE_MODULE, 8=FABRIC_MODULE
+//
+// Mapping from entPhysicalClass to ModuleType:
+const normalizeEntPhysClassToModuleType = "9:2,12:3,4:8,*:0"
+
 func createBaseSNMPPoll(jobName string) *l8tpollaris.L8Poll {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = jobName
@@ -621,6 +650,7 @@ func createModuleStatus() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1"))
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -629,6 +659,7 @@ func createChassisComponentStatus() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.6.1"))
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -638,6 +669,7 @@ func createPowerSupplyStatus() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.powersupplies.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3.1"))
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -654,6 +686,7 @@ func createFanStatus() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.fans.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3.1"))
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -696,6 +729,7 @@ func createRouteProcessorStatus() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1"))
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -712,6 +746,7 @@ func createCardStatus() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.9.1"))
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -903,6 +938,7 @@ func createModuleStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass (table)
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -910,8 +946,9 @@ func createModuleTypeAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.moduletype"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: ModuleType derived from entPhysicalClass and description parsing
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
+	// entPhysicalClass: 9=module→LINE_CARD, 12=cpu→ROUTE_PROCESSOR, 4=backplane→FABRIC_MODULE
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1"))
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToModuleType))
 	return attr
 }
 
@@ -981,6 +1018,7 @@ func createCpuStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.cpus.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -1041,6 +1079,7 @@ func createMemoryStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr.PropertyId = "networkdevice.physicals.chassis.modules.memorymodules.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -1253,8 +1292,9 @@ func createPowerSupplyPowerTypeAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.powertype"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	// NOTE: Power type (AC/DC) not typically available via standard SNMP
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.2.1")) // Parse from description
+	// NOTE: Power type (AC/DC) not available via standard SNMP Entity MIB.
+	// entPhysicalDescr returns a description string (e.g., "IBM Power System S922 Server")
+	// which cannot be mapped to the PowerType enum. Vendor-specific MIBs are needed.
 	return attr
 }
 
@@ -1262,7 +1302,8 @@ func createPowerSupplyStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.powersupplies.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass/status
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
@@ -1327,7 +1368,8 @@ func createFanStatusAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
 	attr.PropertyId = "networkdevice.physicals.fans.status"
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass/status
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.5.1")) // entPhysicalClass
+	attr.Rules = append(attr.Rules, createNormalizeEnumRule(normalizeEntPhysClassToComponentStatus))
 	return attr
 }
 
