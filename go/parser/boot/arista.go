@@ -33,6 +33,9 @@ func CreateAristaSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createAristaCpuPoll(polaris)
 	createAristaMemoryPoll(polaris)
 	createAristaTemperaturePoll(polaris)
+	createOspfPoll(polaris, "aristaOspf")
+	createBgpPoll(polaris, "aristaBgp")
+	createVrfSshPoll(polaris, "aristaVrf", "show vrf detail", "eos")
 	return polaris
 }
 

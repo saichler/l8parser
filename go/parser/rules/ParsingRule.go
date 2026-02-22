@@ -125,6 +125,10 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 		"memorymodules":  "{2}0",           // repeated Memory - use int index
 		"interfaces":     "{2}0",           // repeated Interface - use int index
 		"processes":      "{2}0",           // repeated ProcessInfo - use int index
+		"neighbors":      "{2}0",           // repeated OspfNeighbor - use int index
+		"peers":          "{2}0",           // repeated BgpPeer - use int index
+		"lsas":           "{2}0",           // repeated OspfLsa - use int index
+		"routes":         "{2}0",           // repeated BgpRoute/VrfRoute - use int index
 	}
 
 	// Field name mappings for proto compatibility

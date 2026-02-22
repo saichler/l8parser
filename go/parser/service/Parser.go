@@ -63,6 +63,12 @@ func newParser() *_Parser {
 	p.rules[setTimeSeries.Name()] = setTimeSeries
 	normalizeEnum := &rules.NormalizeEnum{}
 	p.rules[normalizeEnum.Name()] = normalizeEnum
+	snmpOspfToVrf := &rules.SnmpOspfToVrf{}
+	p.rules[snmpOspfToVrf.Name()] = snmpOspfToVrf
+	snmpBgpToVrf := &rules.SnmpBgpToVrf{}
+	p.rules[snmpBgpToVrf.Name()] = snmpBgpToVrf
+	sshVrfParse := &rules.SshVrfParse{}
+	p.rules[sshVrfParse.Name()] = sshVrfParse
 	return p
 }
 

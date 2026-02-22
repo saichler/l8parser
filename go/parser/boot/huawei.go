@@ -32,6 +32,9 @@ func CreateHuaweiRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createHuaweiCpuPoll(polaris)
 	createHuaweiMemoryPoll(polaris)
 	createHuaweiTemperaturePoll(polaris)
+	createOspfPoll(polaris, "huaweiOspf")
+	createBgpPoll(polaris, "huaweiBgp")
+	createVrfSshPoll(polaris, "huaweiVrf", "display ip vpn-instance verbose", "vrp")
 	return polaris
 }
 

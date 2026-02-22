@@ -33,6 +33,9 @@ func CreateCiscoSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoCpuPoll(polaris)
 	createCiscoMemoryPoll(polaris)
 	createCiscoTemperaturePoll(polaris)
+	createOspfPoll(polaris, "ciscoSwitchOspf")
+	createBgpPoll(polaris, "ciscoSwitchBgp")
+	createVrfSshPoll(polaris, "ciscoSwitchVrf", "show ip vrf detail", "ios")
 	return polaris
 }
 
@@ -51,6 +54,9 @@ func CreateCiscoRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createCiscoMemoryPoll(polaris)
 	createCiscoTemperaturePoll(polaris)
 	createCiscoRoutingPoll(polaris)
+	createOspfPoll(polaris, "ciscoRouterOspf")
+	createBgpPoll(polaris, "ciscoRouterBgp")
+	createVrfSshPoll(polaris, "ciscoRouterVrf", "show vrf all detail", "iosxr")
 	return polaris
 }
 

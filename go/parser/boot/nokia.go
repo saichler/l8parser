@@ -32,6 +32,9 @@ func CreateNokiaRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createNokiaCpuPoll(polaris)
 	createNokiaMemoryPoll(polaris)
 	createNokiaTemperaturePoll(polaris)
+	createOspfPoll(polaris, "nokiaOspf")
+	createBgpPoll(polaris, "nokiaBgp")
+	createVrfSshPoll(polaris, "nokiaVrf", "show router vrf", "timos")
 	return polaris
 }
 

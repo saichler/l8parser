@@ -32,6 +32,9 @@ func CreateExtremeSwitchBootPolls() *l8tpollaris.L8Pollaris {
 	createExtremeCpuPoll(polaris)
 	createExtremeMemoryPoll(polaris)
 	createExtremeTemperaturePoll(polaris)
+	createOspfPoll(polaris, "extremeOspf")
+	createBgpPoll(polaris, "extremeBgp")
+	createVrfSshPoll(polaris, "extremeVrf", "show ip vrf detail", "voss")
 	return polaris
 }
 

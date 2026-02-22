@@ -33,6 +33,9 @@ func CreateJuniperRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createJuniperCpuPoll(polaris)
 	createJuniperMemoryPoll(polaris)
 	createJuniperTemperaturePoll(polaris)
+	createOspfPoll(polaris, "juniperOspf")
+	createBgpPoll(polaris, "juniperBgp")
+	createVrfSshPoll(polaris, "juniperVrf", "show route instance detail", "junos")
 	return polaris
 }
 

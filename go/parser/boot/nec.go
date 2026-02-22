@@ -32,6 +32,9 @@ func CreateNECRouterBootPolls() *l8tpollaris.L8Pollaris {
 	createNECCpuPoll(polaris)
 	createNECMemoryPoll(polaris)
 	createNECTemperaturePoll(polaris)
+	createOspfPoll(polaris, "necOspf")
+	createBgpPoll(polaris, "necBgp")
+	createVrfSshPoll(polaris, "necVrf", "show ip vrf detail", "univerge")
 	return polaris
 }
 
