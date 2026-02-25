@@ -74,7 +74,7 @@ func createJuniperCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("juniperCpu")
 	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createJuniperCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -92,7 +92,7 @@ func createJuniperMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("juniperMemory")
 	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.11.9.1.0.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createJuniperMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -110,7 +110,7 @@ func createJuniperTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("juniperTemperature")
 	poll.What = ".1.3.6.1.4.1.2636.3.1.13.1.7.9.1.0.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createJuniperTemperature())
 	p.Polling[poll.Name] = poll

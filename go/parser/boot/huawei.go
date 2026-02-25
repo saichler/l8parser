@@ -72,7 +72,7 @@ func createHuaweiCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("huaweiCpu")
 	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHuaweiCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -90,7 +90,7 @@ func createHuaweiMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("huaweiMemory")
 	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHuaweiMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -108,7 +108,7 @@ func createHuaweiTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("huaweiTemperature")
 	poll.What = ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHuaweiTemperature())
 	p.Polling[poll.Name] = poll

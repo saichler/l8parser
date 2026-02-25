@@ -68,7 +68,7 @@ func createHPECpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("hpeCpu")
 	poll.What = ".1.3.6.1.4.1.232.11.2.3.1.1.3.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHPECpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -86,7 +86,7 @@ func createHPEMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("hpeMemory")
 	poll.What = ".1.3.6.1.4.1.232.11.2.13.1.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHPEMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -104,7 +104,7 @@ func createHPETemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("hpeTemperature")
 	poll.What = ".1.3.6.1.4.1.232.6.2.6.8.1.4.0.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createHPETemperature())
 	p.Polling[poll.Name] = poll

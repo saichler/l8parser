@@ -69,7 +69,7 @@ func createCheckPointCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("checkPointCpu")
 	poll.What = ".1.3.6.1.4.1.2620.1.6.7.2.7.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCheckPointCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -87,7 +87,7 @@ func createCheckPointMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("checkPointMemory")
 	poll.What = ".1.3.6.1.4.1.2620.1.6.7.4.3.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCheckPointMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -105,7 +105,7 @@ func createCheckPointTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("checkPointTemperature")
 	poll.What = ".1.3.6.1.4.1.2620.1.6.7.8.1.1.3.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCheckPointTemperature())
 	p.Polling[poll.Name] = poll

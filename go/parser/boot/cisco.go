@@ -151,7 +151,7 @@ func createCiscoCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ciscoCpu")
 	poll.What = ".1.3.6.1.4.1.9.9.109.1.1.1.1.5.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -161,7 +161,7 @@ func createCiscoMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ciscoMemory")
 	poll.What = ".1.3.6.1.4.1.9.9.48.1.1.1.6.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -197,7 +197,7 @@ func createCiscoTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ciscoTemperature")
 	poll.What = ".1.3.6.1.4.1.9.9.13.1.3.1.3.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createCiscoTemperature())
 	p.Polling[poll.Name] = poll

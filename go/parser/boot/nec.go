@@ -72,7 +72,7 @@ func createNECCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("necCpu")
 	poll.What = ".1.3.6.1.4.1.119.2.3.84.3.1.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNECCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -90,7 +90,7 @@ func createNECMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("necMemory")
 	poll.What = ".1.3.6.1.4.1.119.2.3.84.3.3.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNECMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -108,7 +108,7 @@ func createNECTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("necTemperature")
 	poll.What = ".1.3.6.1.4.1.119.2.3.84.3.5.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNECTemperature())
 	p.Polling[poll.Name] = poll

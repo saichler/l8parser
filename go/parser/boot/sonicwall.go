@@ -69,7 +69,7 @@ func createSonicWallCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("sonicWallCpu")
 	poll.What = ".1.3.6.1.4.1.8714.2.1.3.1.1.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createSonicWallCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -87,7 +87,7 @@ func createSonicWallMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("sonicWallMemory")
 	poll.What = ".1.3.6.1.4.1.8714.2.1.3.1.2.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createSonicWallMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -105,7 +105,7 @@ func createSonicWallTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("sonicWallTemperature")
 	poll.What = ".1.3.6.1.4.1.8714.2.1.3.1.4.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createSonicWallTemperature())
 	p.Polling[poll.Name] = poll

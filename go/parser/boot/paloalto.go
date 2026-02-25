@@ -105,7 +105,7 @@ func createPaloAltoCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoCpu")
 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.1.2.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -123,7 +123,7 @@ func createPaloAltoMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoMemory")
 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.2.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -141,7 +141,7 @@ func createPaloAltoTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("paloAltoTemperature")
 	poll.What = ".1.3.6.1.4.1.25461.2.1.2.3.8.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createPaloAltoTemperature())
 	p.Polling[poll.Name] = poll

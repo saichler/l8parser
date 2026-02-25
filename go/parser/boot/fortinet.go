@@ -90,7 +90,7 @@ func createFortinetCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("fortinetCpu")
 	poll.What = ".1.3.6.1.4.1.12356.101.4.1.3.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createFortinetCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -108,7 +108,7 @@ func createFortinetMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("fortinetMemory")
 	poll.What = ".1.3.6.1.4.1.12356.101.4.1.4.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createFortinetMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -126,7 +126,7 @@ func createFortinetTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("fortinetTemperature")
 	poll.What = ".1.3.6.1.4.1.12356.101.4.3.1.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createFortinetTemperature())
 	p.Polling[poll.Name] = poll

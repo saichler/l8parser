@@ -70,7 +70,7 @@ func createDLinkCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("dLinkCpu")
 	poll.What = ".1.3.6.1.4.1.171.12.1.1.6.1.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDLinkCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -88,7 +88,7 @@ func createDLinkMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("dLinkMemory")
 	poll.What = ".1.3.6.1.4.1.171.12.1.1.9.4.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDLinkMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -106,7 +106,7 @@ func createDLinkTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("dLinkTemperature")
 	poll.What = ".1.3.6.1.4.1.171.12.11.1.1.6.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDLinkTemperature())
 	p.Polling[poll.Name] = poll

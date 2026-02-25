@@ -68,7 +68,7 @@ func createIBMCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ibmCpu")
 	poll.What = ".1.3.6.1.4.1.2.6.220.2.1.1.1.5.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createIBMCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -86,7 +86,7 @@ func createIBMMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ibmMemory")
 	poll.What = ".1.3.6.1.4.1.2.6.220.2.1.2.1.5.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createIBMMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -104,7 +104,7 @@ func createIBMTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("ibmTemperature")
 	poll.What = ".1.3.6.1.4.1.2.6.220.2.1.3.1.4.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createIBMTemperature())
 	p.Polling[poll.Name] = poll

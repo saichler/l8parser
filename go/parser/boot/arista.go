@@ -74,7 +74,7 @@ func createAristaCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("aristaCpu")
 	poll.What = ".1.3.6.1.2.1.25.3.3.1.2.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createAristaCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -92,7 +92,7 @@ func createAristaMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("aristaMemory")
 	poll.What = ".1.3.6.1.2.1.25.2.3.1.6.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createAristaMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -110,7 +110,7 @@ func createAristaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("aristaTemperature")
 	poll.What = ".1.3.6.1.2.1.99.1.1.1.4.100006"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createAristaTemperature())
 	p.Polling[poll.Name] = poll

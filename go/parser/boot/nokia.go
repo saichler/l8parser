@@ -72,7 +72,7 @@ func createNokiaCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("nokiaCpu")
 	poll.What = ".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.5.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNokiaCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -90,7 +90,7 @@ func createNokiaMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("nokiaMemory")
 	poll.What = ".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.10.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNokiaMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -108,7 +108,7 @@ func createNokiaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("nokiaTemperature")
 	poll.What = ".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.7.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNokiaTemperature())
 	p.Polling[poll.Name] = poll

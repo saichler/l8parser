@@ -39,6 +39,8 @@ var EVERY_5_MINUTES = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 3600, 7
 // EVERY_5_MINUTES_ALWAYS defines a constant 5-minute polling interval without backoff.
 var EVERY_5_MINUTES_ALWAYS = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300}, Enabled: true}
 
+var EVERY_15_MINUTES_ALWAYS = &l8tpollaris.L8PCadencePlan{Cadences: []int64{900}, Enabled: true}
+
 // DISABLED represents a disabled polling configuration with a 2-hour fallback.
 var DISABLED = &l8tpollaris.L8PCadencePlan{Cadences: []int64{7200}, Enabled: false}
 
@@ -665,19 +667,22 @@ func createNormalizeEnumRule(mapping string) *l8tpollaris.L8PRule {
 }
 
 // ComponentStatus enum values:
-//   0 = UNKNOWN, 1 = OK, 2 = WARNING, 3 = ERROR, 4 = CRITICAL, 5 = OFFLINE, 6 = NOT_PRESENT
+//
+//	0 = UNKNOWN, 1 = OK, 2 = WARNING, 3 = ERROR, 4 = CRITICAL, 5 = OFFLINE, 6 = NOT_PRESENT
 //
 // entPhysicalClass (OID .5) values:
-//   1=other, 2=unknown, 3=chassis, 4=backplane, 5=container, 6=PSU, 7=fan,
-//   8=sensor, 9=module, 10=port, 11=stack, 12=cpu
+//
+//	1=other, 2=unknown, 3=chassis, 4=backplane, 5=container, 6=PSU, 7=fan,
+//	8=sensor, 9=module, 10=port, 11=stack, 12=cpu
 //
 // Since entPhysicalClass reports what TYPE the component is (not its operational status),
 // a valid response for any class means the component is present and OK.
 const normalizeEntPhysClassToComponentStatus = "1:1,2:0,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1,11:1,12:1,*:0"
 
 // ModuleType enum values:
-//   0=UNKNOWN, 1=SUPERVISOR, 2=LINE_CARD, 3=ROUTE_PROCESSOR, 4=INTERFACE_MODULE,
-//   5=MANAGEMENT_PROCESSOR, 6=SECURITY_PROCESSING_UNIT, 7=SERVICE_MODULE, 8=FABRIC_MODULE
+//
+//	0=UNKNOWN, 1=SUPERVISOR, 2=LINE_CARD, 3=ROUTE_PROCESSOR, 4=INTERFACE_MODULE,
+//	5=MANAGEMENT_PROCESSOR, 6=SECURITY_PROCESSING_UNIT, 7=SERVICE_MODULE, 8=FABRIC_MODULE
 //
 // Mapping from entPhysicalClass to ModuleType:
 const normalizeEntPhysClassToModuleType = "9:2,12:3,4:8,*:0"

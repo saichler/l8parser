@@ -73,7 +73,7 @@ func createExtremeCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("extremeCpu")
 	poll.What = ".1.3.6.1.4.1.1916.1.32.1.4.1.5.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createExtremeCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -91,7 +91,7 @@ func createExtremeMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("extremeMemory")
 	poll.What = ".1.3.6.1.4.1.1916.1.32.2.2.1.3.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createExtremeMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -109,7 +109,7 @@ func createExtremeTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("extremeTemperature")
 	poll.What = ".1.3.6.1.4.1.1916.1.1.1.8.0"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createExtremeTemperature())
 	p.Polling[poll.Name] = poll

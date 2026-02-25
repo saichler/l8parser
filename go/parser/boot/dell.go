@@ -68,7 +68,7 @@ func createDellCpuPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("dellCpu")
 	poll.What = ".1.3.6.1.4.1.674.10892.5.4.200.10.1.12.1.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDellCpuUtilization())
 	p.Polling[poll.Name] = poll
@@ -86,7 +86,7 @@ func createDellMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("dellMemory")
 	poll.What = ".1.3.6.1.2.1.25.2.3.1.6.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDellMemoryUtilization())
 	p.Polling[poll.Name] = poll
@@ -104,7 +104,7 @@ func createDellTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseSNMPPoll("dellTemperature")
 	poll.What = ".1.3.6.1.4.1.674.10892.5.4.700.20.1.6.1.1"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createDellTemperature())
 	p.Polling[poll.Name] = poll
