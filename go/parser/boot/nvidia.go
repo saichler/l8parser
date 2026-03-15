@@ -32,12 +32,24 @@ func CreateNvidiaGpuBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Name = "nvidia-gpu"
 	polaris.Groups = []string{"nvidia", "nvidia-gpu"}
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
+	// SNMP polls (1-6)
 	createNvidiaSystemPoll(polaris)
 	createNvidiaGpuModulePoll(polaris)
 	createNvidiaGpuInfoPoll(polaris)
 	createNvidiaGpuMetricsPoll(polaris)
 	createNvidiaHostResourcesPoll(polaris)
 	createNvidiaInterfacesPoll(polaris)
+	// SSH polls (7-11)
+	createNvidiaGpuUtilizationPoll(polaris)
+	createNvidiaGpuTemperaturePoll(polaris)
+	createNvidiaGpuPowerPoll(polaris)
+	createNvidiaVersionPoll(polaris)
+	createNvidiaCpuInfoPoll(polaris)
+	// REST polls (12-15)
+	createNvidiaGpuDevicesPoll(polaris)
+	createNvidiaGpuTopologyPoll(polaris)
+	createNvidiaDcgmHealthPoll(polaris)
+	createNvidiaSystemMemoryPoll(polaris)
 	return polaris
 }
 
@@ -65,6 +77,7 @@ func createNvidiaGpuModulePoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNvidiaGpuCount())
 	poll.Attributes = append(poll.Attributes, createNvidiaDcgmVersion())
+	poll.Attributes = append(poll.Attributes, createNvidiaCudaVersion())
 	p.Polling[poll.Name] = poll
 }
 
@@ -96,6 +109,7 @@ func createNvidiaHostResourcesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNvidiaMemoryTotal())
+	poll.Attributes = append(poll.Attributes, createNvidiaMemoryUsed())
 	poll.Attributes = append(poll.Attributes, createNvidiaCpuModel())
 	poll.Attributes = append(poll.Attributes, createNvidiaCpuUtilization())
 	poll.Attributes = append(poll.Attributes, createNvidiaStorageDescription())
@@ -282,6 +296,26 @@ func createNvidiaStorageUsed() *l8tpollaris.L8PAttribute {
 	return attr
 }
 
+// --- Phase 1: Additional SNMP attributes ---
+
+func createNvidiaCudaVersion() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "gpudevice.deviceinfo.cudaversion"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	// CUDA version from GPU 0 static data
+	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.53246.1.1.1.1.14.0"))
+	return attr
+}
+
+func createNvidiaMemoryUsed() *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = "gpudevice.system.memoryusedbytes"
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	// Physical Memory used from HR MIB storage index 1
+	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.2.3.1.6.1"))
+	return attr
+}
+
 // --- IF-MIB interface table ---
 
 func createNvidiaIfTable() *l8tpollaris.L8PAttribute {
@@ -293,3 +327,4 @@ func createNvidiaIfTable() *l8tpollaris.L8PAttribute {
 	attr.Rules = append(attr.Rules, createTableToMap())
 	return attr
 }
+

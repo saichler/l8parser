@@ -106,6 +106,9 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		}
 	}
 
+	// Track which GPU indices we've seen so we can auto-set gpu_index
+	seenGpuIndices := make(map[int]bool)
+
 	// Iterate CMap entries and group by GPU index
 	for oidKey, rawData := range cmap.Data {
 		if len(rawData) == 0 {
@@ -135,6 +138,16 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		gpuIndex, err := strconv.Atoi(parts[1])
 		if err != nil {
 			continue
+		}
+
+		// Auto-set gpu_index for each GPU we encounter
+		if !seenGpuIndices[gpuIndex] {
+			seenGpuIndices[gpuIndex] = true
+			gpuIndexPropId := fmt.Sprintf("%s<{2}%d>.gpuindex", propertyId, gpuIndex)
+			gpuIndexPropId = injectIndexOrKey(gpuIndexPropId, workSpace)
+			if inst, e := properties.PropertyOf(gpuIndexPropId, resources); e == nil && inst != nil {
+				inst.Set(any, uint32(gpuIndex))
+			}
 		}
 
 		mapping, exists := suffixMap[metricId]

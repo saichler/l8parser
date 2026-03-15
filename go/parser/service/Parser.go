@@ -71,6 +71,10 @@ func newParser() *_Parser {
 	p.rules[sshVrfParse.Name()] = sshVrfParse
 	snmpGpuTable := &rules.SnmpGpuTable{}
 	p.rules[snmpGpuTable.Name()] = snmpGpuTable
+	sshNvidiaSmiParse := &rules.SshNvidiaSmiParse{}
+	p.rules[sshNvidiaSmiParse.Name()] = sshNvidiaSmiParse
+	restJsonParse := &rules.RestJsonParse{}
+	p.rules[restJsonParse.Name()] = restJsonParse
 	return p
 }
 
