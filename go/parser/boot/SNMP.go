@@ -176,6 +176,11 @@ func GetPollarisByOid(sysOid string) *l8tpollaris.L8Pollaris {
 		return CreateNECRouterBootPolls()
 	}
 
+	// NVIDIA GPU servers
+	if isNvidiaOid(sysOid) {
+		return CreateNvidiaGpuBootPolls()
+	}
+
 	// Default to generic SNMP polling if no vendor match
 	return CreateBoot03()
 }
@@ -240,6 +245,9 @@ func GetAllPolarisModels() []*l8tpollaris.L8Pollaris {
 
 	// NEC devices
 	models = append(models, CreateNECRouterBootPolls())
+
+	// NVIDIA GPU servers
+	models = append(models, CreateNvidiaGpuBootPolls())
 
 	return models
 }
@@ -395,6 +403,14 @@ func isNECOid(sysOid string) bool {
 		normalizedOid = "." + normalizedOid
 	}
 	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.119.")
+}
+
+func isNvidiaOid(sysOid string) bool {
+	normalizedOid := sysOid
+	if !strings.HasPrefix(normalizedOid, ".") {
+		normalizedOid = "." + normalizedOid
+	}
+	return strings.HasPrefix(normalizedOid, ".1.3.6.1.4.1.53246.")
 }
 
 func createSystemMibPoll(p *l8tpollaris.L8Pollaris) {

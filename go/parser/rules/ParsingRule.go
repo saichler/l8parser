@@ -127,8 +127,12 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 		"processes":      "{2}0",           // repeated ProcessInfo - use int index
 		"neighbors":      "{2}0",           // repeated OspfNeighbor - use int index
 		"peers":          "{2}0",           // repeated BgpPeer - use int index
-		"lsas":           "{2}0",           // repeated OspfLsa - use int index
-		"routes":         "{2}0",           // repeated BgpRoute/VrfRoute - use int index
+		"lsas":              "{2}0",           // repeated OspfLsa - use int index
+		"routes":            "{2}0",           // repeated BgpRoute/VrfRoute - use int index
+		"gpus":              "{2}0",           // repeated Gpu - use int index (GpuDevice)
+		"networkinterfaces": "{2}0",           // repeated GpuNetworkInterface - use int index (GpuDeviceSystem)
+		"gpu_links":         "{2}0",           // repeated GpuLink - use int index (GpuTopology)
+		"checks":            "{2}0",           // repeated GpuHealthCheck - use int index (GpuDeviceHealth)
 	}
 
 	// Field name mappings for proto compatibility

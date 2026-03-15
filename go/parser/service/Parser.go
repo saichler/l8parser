@@ -69,6 +69,8 @@ func newParser() *_Parser {
 	p.rules[snmpBgpToVrf.Name()] = snmpBgpToVrf
 	sshVrfParse := &rules.SshVrfParse{}
 	p.rules[sshVrfParse.Name()] = sshVrfParse
+	snmpGpuTable := &rules.SnmpGpuTable{}
+	p.rules[snmpGpuTable.Name()] = snmpGpuTable
 	return p
 }
 
