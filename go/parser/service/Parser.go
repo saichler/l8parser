@@ -77,6 +77,8 @@ func newParser() *_Parser {
 	p.rules[sshNvidiaSmiParse.Name()] = sshNvidiaSmiParse
 	restJsonParse := &rules.RestJsonParse{}
 	p.rules[restJsonParse.Name()] = restJsonParse
+	restGpuParse := &rules.RestGpuParse{}
+	p.rules[restGpuParse.Name()] = restGpuParse
 	return p
 }
 

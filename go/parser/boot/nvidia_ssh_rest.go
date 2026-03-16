@@ -113,7 +113,7 @@ func createSshNvidiaAttribute(propertyId, format string) *l8tpollaris.L8PAttribu
 
 // --- REST polls (Polls 12-15) ---
 
-// Poll 12: Static GPU device info (compute capability, persistence mode, VRAM total)
+// Poll 12: Static GPU device info (compute capability, persistence mode)
 func createNvidiaGpuDevicesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = "nvidiaGpuDevices"
@@ -123,9 +123,10 @@ func createNvidiaGpuDevicesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Timeout = DEFAULT_TIMEOUT
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Get
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createRestAttribute(
+	poll.Attributes = append(poll.Attributes, createRestGpuAttribute(
 		"gpudevice.gpus",
-		"gpus:gpudevice.gpus"))
+		"devices",
+		"compute_capability:computecapability,persistence_mode:persistencemode"))
 	p.Polling[poll.Name] = poll
 }
 
@@ -178,6 +179,21 @@ func createNvidiaSystemMemoryPoll(p *l8tpollaris.L8Pollaris) {
 		"gpudevice.system",
 		"system_memory.free_bytes:gpudevice.system.memoryfreebytes"))
 	p.Polling[poll.Name] = poll
+}
+
+// createRestGpuAttribute creates an attribute that uses RestGpuParse to extract per-GPU
+// fields from a JSON array, keyed by PCI Bus ID.
+func createRestGpuAttribute(propertyId, arrayPath, mapping string) *l8tpollaris.L8PAttribute {
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = map[string]string{"gpudevice": propertyId}
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	rule := &l8tpollaris.L8PRule{}
+	rule.Name = "RestGpuParse"
+	rule.Params = make(map[string]*l8tpollaris.L8PParameter)
+	addParameter("array_path", arrayPath, rule)
+	addParameter("mapping", mapping, rule)
+	attr.Rules = append(attr.Rules, rule)
+	return attr
 }
 
 // createRestAttribute creates an attribute that uses RestJsonParse with a mapping parameter.
