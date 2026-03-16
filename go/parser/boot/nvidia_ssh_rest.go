@@ -117,7 +117,7 @@ func createSshNvidiaAttribute(propertyId, format string) *l8tpollaris.L8PAttribu
 func createNvidiaGpuDevicesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = "nvidiaGpuDevices"
-	poll.What = "/api/v1/gpu/devices"
+	poll.What = "GET::/api/v1/gpu/devices::"
 	poll.Protocol = l8tpollaris.L8PProtocol_L8PRESTAPI
 	poll.Cadence = DEFAULT_CADENCE
 	poll.Timeout = DEFAULT_TIMEOUT
@@ -134,7 +134,7 @@ func createNvidiaGpuDevicesPoll(p *l8tpollaris.L8Pollaris) {
 func createNvidiaGpuTopologyPoll(p *l8tpollaris.L8Pollaris) {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = "nvidiaGpuTopology"
-	poll.What = "/api/v1/gpu/topology"
+	poll.What = "GET::/api/v1/gpu/topology::"
 	poll.Protocol = l8tpollaris.L8PProtocol_L8PRESTAPI
 	poll.Cadence = DEFAULT_CADENCE
 	poll.Timeout = DEFAULT_TIMEOUT
@@ -152,7 +152,7 @@ func createNvidiaGpuTopologyPoll(p *l8tpollaris.L8Pollaris) {
 func createNvidiaDcgmHealthPoll(p *l8tpollaris.L8Pollaris) {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = "nvidiaDcgmHealth"
-	poll.What = "/api/v1/dcgm/health"
+	poll.What = "GET::/api/v1/dcgm/health::"
 	poll.Protocol = l8tpollaris.L8PProtocol_L8PRESTAPI
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Timeout = DEFAULT_TIMEOUT
@@ -169,7 +169,7 @@ func createNvidiaDcgmHealthPoll(p *l8tpollaris.L8Pollaris) {
 func createNvidiaSystemMemoryPoll(p *l8tpollaris.L8Pollaris) {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = "nvidiaSystemMemory"
-	poll.What = "/api/v1/system/memory"
+	poll.What = "GET::/api/v1/system/memory::"
 	poll.Protocol = l8tpollaris.L8PProtocol_L8PRESTAPI
 	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Timeout = DEFAULT_TIMEOUT
