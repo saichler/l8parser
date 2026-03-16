@@ -16,6 +16,7 @@ limitations under the License.
 package tests
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -72,7 +73,7 @@ func checkPollaris(p *l8tpollaris.L8Pollaris, invalid map[string]string) {
 				if rule.Name == "Set" {
 					from, ok := rule.Params["from"]
 					if ok && !strings.HasPrefix(from.Value, poll.What) {
-						invalid[attr.PropertyId] = poll.Name
+						invalid[fmt.Sprintf("%v", attr.PropertyId)] = poll.Name
 					}
 				}
 			}

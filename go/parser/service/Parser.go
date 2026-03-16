@@ -24,6 +24,7 @@ import (
 
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/pollaris"
+	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 
 	"github.com/saichler/l8srlz/go/serialize/object"
@@ -109,8 +110,14 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 		return resources.Logger().Error("No attributes are defined on pollaris "+job.PollarisName, ":", job.JobName)
 	}
 
+	modelName := targets.Links.Model(job.LinksId)
 	for _, attr := range poll.Attributes {
-		workSpace[rules.PropertyId] = attr.PropertyId
+		propertyId, ok := attr.PropertyId[modelName]
+		if !ok {
+			resources.Logger().Error("No propertyId for model '", modelName, "' in pollaris ", job.PollarisName, ":", job.JobName)
+			continue
+		}
+		workSpace[rules.PropertyId] = propertyId
 		for _, rData := range attr.Rules {
 			if rData.Params != nil {
 				for p, v := range rData.Params {
