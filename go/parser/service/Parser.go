@@ -125,7 +125,7 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 				}
 				availableModels = append(availableModels, k+"="+suffix)
 			}
-			resources.Logger().Error("No propertyId for model '", modelName, "' in pollaris ", job.PollarisName, ":", job.JobName, " available models: ", availableModels)
+			resources.Logger().Debug("No propertyId for model '", modelName, "' in pollaris ", job.PollarisName, ":", job.JobName, " available models: ", availableModels)
 			continue
 		}
 		workSpace[rules.PropertyId] = propertyId
