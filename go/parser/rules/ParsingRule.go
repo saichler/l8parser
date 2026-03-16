@@ -129,7 +129,7 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 		"peers":          "{2}0",           // repeated BgpPeer - use int index
 		"lsas":              "{2}0",           // repeated OspfLsa - use int index
 		"routes":            "{2}0",           // repeated BgpRoute/VrfRoute - use int index
-		"gpus":              "{2}0",           // repeated Gpu - use int index (GpuDevice)
+		"gpus":              "{24}gpu-0",      // map<string, Gpu> - use string key (GpuDevice)
 		"networkinterfaces": "{2}0",           // repeated GpuNetworkInterface - use int index (GpuDeviceSystem)
 		"gpu_links":         "{2}0",           // repeated GpuLink - use int index (GpuTopology)
 		"checks":            "{2}0",           // repeated GpuHealthCheck - use int index (GpuDeviceHealth)

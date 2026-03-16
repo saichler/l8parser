@@ -102,35 +102,31 @@ func (this *SshNvidiaSmiParse) Parse(resources ifs.IResources, workSpace map[str
 // parseNvidiaSmiUtilization parses "nvidia-smi -q -d UTILIZATION" output.
 // Extracts encoder and decoder utilization per GPU.
 func parseNvidiaSmiUtilization(resources ifs.IResources, output, propertyId string, stamp int64, any interface{}) error {
-	gpuIndex := -1
+	gpuKey := ""
 	lines := strings.Split(output, "\n")
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
 		if strings.HasPrefix(trimmed, "GPU ") && strings.Contains(trimmed, ":") {
-			parts := strings.SplitN(trimmed, ":", 2)
-			gpuStr := strings.TrimPrefix(strings.TrimSpace(parts[0]), "GPU ")
-			if idx, err := strconv.Atoi(strings.TrimSpace(gpuStr)); err == nil {
-				gpuIndex = idx
-			}
+			gpuKey = extractGpuPciBusId(trimmed)
 			continue
 		}
 
-		if gpuIndex < 0 {
+		if gpuKey == "" {
 			continue
 		}
 
 		if strings.HasPrefix(trimmed, "Encoder") && strings.Contains(trimmed, ":") {
 			val := extractPercentValue(trimmed)
 			if val >= 0 {
-				setGpuTimeSeries(resources, propertyId, gpuIndex, "encoderutilizationpercent", stamp, val, any)
+				setGpuTimeSeries(resources, propertyId, gpuKey, "encoderutilizationpercent", stamp, val, any)
 			}
 		}
 		if strings.HasPrefix(trimmed, "Decoder") && strings.Contains(trimmed, ":") {
 			val := extractPercentValue(trimmed)
 			if val >= 0 {
-				setGpuTimeSeries(resources, propertyId, gpuIndex, "decoderutilizationpercent", stamp, val, any)
+				setGpuTimeSeries(resources, propertyId, gpuKey, "decoderutilizationpercent", stamp, val, any)
 			}
 		}
 	}
@@ -140,41 +136,37 @@ func parseNvidiaSmiUtilization(resources ifs.IResources, output, propertyId stri
 // parseNvidiaSmiTemperature parses "nvidia-smi -q -d TEMPERATURE" output.
 // Extracts memory temperature, shutdown temp, and slowdown temp per GPU.
 func parseNvidiaSmiTemperature(resources ifs.IResources, output, propertyId string, stamp int64, any interface{}) error {
-	gpuIndex := -1
+	gpuKey := ""
 	lines := strings.Split(output, "\n")
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
 		if strings.HasPrefix(trimmed, "GPU ") && strings.Contains(trimmed, ":") {
-			parts := strings.SplitN(trimmed, ":", 2)
-			gpuStr := strings.TrimPrefix(strings.TrimSpace(parts[0]), "GPU ")
-			if idx, err := strconv.Atoi(strings.TrimSpace(gpuStr)); err == nil {
-				gpuIndex = idx
-			}
+			gpuKey = extractGpuPciBusId(trimmed)
 			continue
 		}
 
-		if gpuIndex < 0 {
+		if gpuKey == "" {
 			continue
 		}
 
 		if strings.Contains(trimmed, "GPU Memory Temp") || strings.Contains(trimmed, "Memory Current Temp") {
 			val := extractTempValue(trimmed)
 			if val >= 0 {
-				setGpuTimeSeries(resources, propertyId, gpuIndex, "memorytemperaturecelsius", stamp, val, any)
+				setGpuTimeSeries(resources, propertyId, gpuKey, "memorytemperaturecelsius", stamp, val, any)
 			}
 		}
 		if strings.Contains(trimmed, "GPU Shutdown Temp") {
 			val := extractTempValue(trimmed)
 			if val >= 0 {
-				setGpuProperty(resources, propertyId, gpuIndex, "shutdowntemperature", float64(val), any)
+				setGpuProperty(resources, propertyId, gpuKey, "shutdowntemperature", float64(val), any)
 			}
 		}
 		if strings.Contains(trimmed, "GPU Slowdown Temp") {
 			val := extractTempValue(trimmed)
 			if val >= 0 {
-				setGpuProperty(resources, propertyId, gpuIndex, "slowdowntemperature", float64(val), any)
+				setGpuProperty(resources, propertyId, gpuKey, "slowdowntemperature", float64(val), any)
 			}
 		}
 	}
@@ -184,22 +176,18 @@ func parseNvidiaSmiTemperature(resources ifs.IResources, output, propertyId stri
 // parseNvidiaSmiPower parses "nvidia-smi -q -d POWER" output.
 // Extracts power limit per GPU.
 func parseNvidiaSmiPower(resources ifs.IResources, output, propertyId string, any interface{}) error {
-	gpuIndex := -1
+	gpuKey := ""
 	lines := strings.Split(output, "\n")
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
 		if strings.HasPrefix(trimmed, "GPU ") && strings.Contains(trimmed, ":") {
-			parts := strings.SplitN(trimmed, ":", 2)
-			gpuStr := strings.TrimPrefix(strings.TrimSpace(parts[0]), "GPU ")
-			if idx, err := strconv.Atoi(strings.TrimSpace(gpuStr)); err == nil {
-				gpuIndex = idx
-			}
+			gpuKey = extractGpuPciBusId(trimmed)
 			continue
 		}
 
-		if gpuIndex < 0 {
+		if gpuKey == "" {
 			continue
 		}
 
@@ -209,7 +197,7 @@ func parseNvidiaSmiPower(resources ifs.IResources, output, propertyId string, an
 			}
 			val := extractWattValue(trimmed)
 			if val >= 0 {
-				setGpuProperty(resources, propertyId, gpuIndex, "powerlimitwatts", val, any)
+				setGpuProperty(resources, propertyId, gpuKey, "powerlimitwatts", val, any)
 			}
 		}
 	}
@@ -281,6 +269,17 @@ func parseLscpu(resources ifs.IResources, output, propertyId string, any interfa
 
 // --- Helper functions ---
 
+// extractGpuPciBusId extracts the PCI Bus ID from a line like "GPU 00000000:07:00.0".
+// The line format is "GPU <pci_bus_id>\n" where pci_bus_id may have trailing whitespace.
+func extractGpuPciBusId(line string) string {
+	trimmed := strings.TrimSpace(line)
+	// Remove "GPU " prefix
+	rest := strings.TrimPrefix(trimmed, "GPU ")
+	// The PCI Bus ID is everything before any trailing content
+	rest = strings.TrimSpace(rest)
+	return rest
+}
+
 // extractPercentValue extracts a percentage value from a line like "Encoder : 45 %".
 func extractPercentValue(line string) float64 {
 	parts := strings.SplitN(line, ":", 2)
@@ -336,9 +335,8 @@ func extractKV(line string) string {
 }
 
 // setGpuTimeSeries sets a time series value on a per-GPU property.
-func setGpuTimeSeries(resources ifs.IResources, propertyId string, gpuIndex int, field string, stamp int64, value float64, any interface{}) {
-	fullId := fmt.Sprintf("%s<{2}%d>.%s", propertyId, gpuIndex, field)
-	fullId = injectIndexOrKey(fullId, nil)
+func setGpuTimeSeries(resources ifs.IResources, propertyId string, gpuKey string, field string, stamp int64, value float64, any interface{}) {
+	fullId := fmt.Sprintf("%s<{24}%s>.%s", propertyId, gpuKey, field)
 	point := &l8api.L8TimeSeriesPoint{Stamp: stamp, Value: value}
 	instance, err := properties.PropertyOf(fullId, resources)
 	if err != nil {
@@ -353,9 +351,8 @@ func setGpuTimeSeries(resources ifs.IResources, propertyId string, gpuIndex int,
 }
 
 // setGpuProperty sets a static value on a per-GPU property.
-func setGpuProperty(resources ifs.IResources, propertyId string, gpuIndex int, field string, value interface{}, any interface{}) {
-	fullId := fmt.Sprintf("%s<{2}%d>.%s", propertyId, gpuIndex, field)
-	fullId = injectIndexOrKey(fullId, nil)
+func setGpuProperty(resources ifs.IResources, propertyId string, gpuKey string, field string, value interface{}, any interface{}) {
+	fullId := fmt.Sprintf("%s<{24}%s>.%s", propertyId, gpuKey, field)
 	instance, err := properties.PropertyOf(fullId, resources)
 	if err != nil {
 		resources.Logger().Error("setGpuProperty: PropertyOf failed for '", fullId, "': ", err.Error())

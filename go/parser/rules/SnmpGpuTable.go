@@ -29,15 +29,16 @@ import (
 )
 
 // SnmpGpuTable is a parsing rule that transforms NVIDIA GPU SNMP table data
-// (indexed OIDs: {base}.{metric_id}.{gpu_index}) into GpuDevice.Gpus repeated fields.
-// It groups entries by GPU index and maps each metric OID suffix to the corresponding
-// property using either Set (static) or SetTimeSeries (dynamic) semantics.
+// (indexed OIDs: {base}.{metric_id}.{gpu_index}) into GpuDevice.Gpus map entries.
+// It uses a two-pass approach: first pass collects PCI Bus IDs (OID suffix 4) per GPU index,
+// second pass sets properties using PCI Bus ID as the map key.
 //
 // Parameters:
 //   - "oid_base": base OID prefix (e.g., "1.3.6.1.4.1.53246.1.1.1.1")
 //   - "mapping": comma-separated "oidSuffix:propertyName:type" triples
 //     type is "set" for static or "ts" for time series
 //     Example: "1:devicename:set,2:deviceuuid:set,5:gpuutilizationpercent:ts"
+//   - "key_oid": OID suffix that contains the map key (PCI Bus ID), default 4
 type SnmpGpuTable struct{}
 
 // Name returns the rule identifier "SnmpGpuTable".
@@ -58,6 +59,8 @@ type gpuFieldMapping struct {
 }
 
 // Parse executes the SnmpGpuTable rule logic.
+// Pass 1: collect PCI Bus IDs (key OID suffix) per GPU index.
+// Pass 2: set properties using PCI Bus ID as the map key.
 func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]interface{},
 	params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 
@@ -87,7 +90,6 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 	}
 
 	oidBase := oidBaseParam.Value
-	// Normalize: ensure oid_base starts with a dot
 	if !strings.HasPrefix(oidBase, ".") {
 		oidBase = "." + oidBase
 	}
@@ -97,13 +99,19 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		return resources.Logger().Error("SnmpGpuTable: no valid mappings parsed from: ", mappingParam.Value)
 	}
 
-	// Build a lookup from OID suffix to mapping
 	suffixMap := make(map[int]*gpuFieldMapping)
 	for i := range mappings {
 		suffixMap[mappings[i].oidSuffix] = &mappings[i]
 	}
 
-	// Get job timestamp for time series
+	// Key OID suffix for map key (default 4 = pcibusid)
+	keyOidSuffix := 4
+	if kp := params["key_oid"]; kp != nil {
+		if v, err := strconv.Atoi(kp.Value); err == nil {
+			keyOidSuffix = v
+		}
+	}
+
 	var stamp int64
 	if ended, ok := workSpace[JobEnded]; ok {
 		if s, ok := ended.(int64); ok {
@@ -111,31 +119,28 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		}
 	}
 
-	// Track which GPU indices we've seen so we can auto-set gpu_index
-	seenGpuIndices := make(map[int]bool)
-
-	// Iterate CMap entries and group by GPU index
+	// Parse all OID entries into (gpuIndex, metricId, value) tuples
+	type oidEntry struct {
+		gpuIndex int
+		metricId int
+		value    interface{}
+	}
+	entries := make([]oidEntry, 0)
 	for oidKey, rawData := range cmap.Data {
 		if len(rawData) == 0 {
 			continue
 		}
-
-		// Extract metric_id and gpu_index from OID key
-		// OID format: {oidBase}.{metric_id}.{gpu_index}
 		if !strings.HasPrefix(oidKey, oidBase) {
 			continue
 		}
-
 		suffix := oidKey[len(oidBase):]
 		if strings.HasPrefix(suffix, ".") {
 			suffix = suffix[1:]
 		}
-
 		parts := strings.SplitN(suffix, ".", 2)
 		if len(parts) != 2 {
 			continue
 		}
-
 		metricId, err := strconv.Atoi(parts[0])
 		if err != nil {
 			continue
@@ -144,44 +149,51 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		if err != nil {
 			continue
 		}
-
-		// Auto-set gpu_index for each GPU we encounter
-		if !seenGpuIndices[gpuIndex] {
-			seenGpuIndices[gpuIndex] = true
-			gpuIndexPropId := fmt.Sprintf("%s<{2}%d>.gpuindex", propertyId, gpuIndex)
-			gpuIndexPropId = injectIndexOrKey(gpuIndexPropId, workSpace)
-			if inst, e := properties.PropertyOf(gpuIndexPropId, resources); e == nil && inst != nil {
-				inst.Set(any, uint32(gpuIndex))
-			}
-		}
-
-		mapping, exists := suffixMap[metricId]
-		if !exists {
-			continue
-		}
-
-		// Decode the value
 		enc := object.NewDecode(rawData, 0, resources.Registry())
 		value, err := enc.Get()
 		if err != nil || value == nil {
 			continue
 		}
-
-		// Skip SNMP error strings
 		if strVal, ok := value.(string); ok {
 			if isSnmpErrorString(strVal) {
 				continue
 			}
 		}
+		entries = append(entries, oidEntry{gpuIndex, metricId, value})
+	}
 
-		// Build the full property path with GPU index injection
-		// e.g., "gpudevice.gpus" -> "gpudevice.gpus<{2}INDEX>.devicename"
-		fullPropertyId := fmt.Sprintf("%s<{2}%d>.%s", propertyId, gpuIndex, mapping.propertyName)
-		fullPropertyId = injectIndexOrKey(fullPropertyId, workSpace)
+	// Pass 1: collect PCI Bus IDs per GPU index
+	gpuKeys := make(map[int]string)
+	for _, e := range entries {
+		if e.metricId == keyOidSuffix {
+			if strVal, ok := e.value.(string); ok {
+				gpuKeys[e.gpuIndex] = strVal
+			}
+		}
+	}
+
+	// Pass 2: set properties using PCI Bus ID as map key
+	for _, e := range entries {
+		mapKey, hasKey := gpuKeys[e.gpuIndex]
+		if !hasKey {
+			mapKey = fmt.Sprintf("gpu-%d", e.gpuIndex)
+		}
+
+		// Set gpu_index
+		gpuIndexPropId := fmt.Sprintf("%s<{24}%s>.gpuindex", propertyId, mapKey)
+		if inst, err := properties.PropertyOf(gpuIndexPropId, resources); err == nil && inst != nil {
+			inst.Set(any, uint32(e.gpuIndex))
+		}
+
+		mapping, exists := suffixMap[e.metricId]
+		if !exists {
+			continue
+		}
+
+		fullPropertyId := fmt.Sprintf("%s<{24}%s>.%s", propertyId, mapKey, mapping.propertyName)
 
 		if mapping.isTimeSeries {
-			// Convert to time series point
-			floatVal, err := toFloat64(value)
+			floatVal, err := toFloat64(e.value)
 			if err != nil {
 				continue
 			}
@@ -192,18 +204,17 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 			}
 			_, _, err = instance.Set(any, point)
 			if err != nil {
-				resources.Logger().Error("SnmpGpuTable: error setting time series for GPU ", gpuIndex, ":", err.Error())
+				resources.Logger().Error("SnmpGpuTable: error setting time series for GPU ", mapKey, ":", err.Error())
 			}
 		} else {
-			// Set static value
 			instance, err := properties.PropertyOf(fullPropertyId, resources)
 			if err != nil || instance == nil {
 				continue
 			}
-			value = coerceValue(resources, value, instance, workSpace)
-			_, _, err = instance.Set(any, value)
+			e.value = coerceValue(resources, e.value, instance, workSpace)
+			_, _, err = instance.Set(any, e.value)
 			if err != nil {
-				resources.Logger().Error("SnmpGpuTable: error setting value for GPU ", gpuIndex, ":", err.Error())
+				resources.Logger().Error("SnmpGpuTable: error setting value for GPU ", mapKey, ":", err.Error())
 			}
 		}
 	}
