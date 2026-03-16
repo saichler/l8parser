@@ -62,6 +62,9 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 			return
 		}
 
+		if job.JobName == "nvidiaGpuPower" {
+			resources.Logger().Info("DEBUG nvidiaGpuPower elem: ", elem)
+		}
 		cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
 		this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
 		//this.vnic.Leader(cacheServiceName, cacheServiceArea, ifs.PATCH, elem)
