@@ -78,7 +78,7 @@ func createDLinkCpuPoll(p *l8tpollaris.L8Pollaris) {
 
 func createDLinkCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.cpuusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.171.12.1.1.6.1.0"))
 	return attr
@@ -96,7 +96,7 @@ func createDLinkMemoryPoll(p *l8tpollaris.L8Pollaris) {
 
 func createDLinkMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.memoryusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.171.12.1.1.9.4.0"))
 	return attr
@@ -114,7 +114,7 @@ func createDLinkTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 
 func createDLinkTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.chassis.temperature"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.171.12.11.1.1.6.1"))
 	return attr
@@ -123,7 +123,7 @@ func createDLinkTemperature() *l8tpollaris.L8PAttribute {
 // D-Link-specific attribute creation functions
 func createDLinkVendor() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.vendor"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("dlink", ".1.3.6.1.2.1.1.1.0", "D-Link"))
 	return attr
@@ -131,7 +131,7 @@ func createDLinkVendor() *l8tpollaris.L8PAttribute {
 
 func createDLinkVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.version"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.version"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.171.12.1.1.1.0"))
 	return attr
@@ -148,7 +148,7 @@ func createDLinkSerialPoll(p *l8tpollaris.L8Pollaris) {
 
 func createDLinkSerial() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.serialnumber"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.171.12.1.1.12.0"))
 	return attr

@@ -101,7 +101,7 @@ func createNvidiaCpuInfoPoll(p *l8tpollaris.L8Pollaris) {
 // createSshNvidiaAttribute creates an attribute that uses SshNvidiaSmiParse with a format parameter.
 func createSshNvidiaAttribute(propertyId, format string) *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = propertyId
+	attr.PropertyId = map[string]string{"gpudevice": propertyId}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	rule := &l8tpollaris.L8PRule{}
 	rule.Name = "SshNvidiaSmiParse"
@@ -183,7 +183,7 @@ func createNvidiaSystemMemoryPoll(p *l8tpollaris.L8Pollaris) {
 // createRestAttribute creates an attribute that uses RestJsonParse with a mapping parameter.
 func createRestAttribute(propertyId, mapping string) *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = propertyId
+	attr.PropertyId = map[string]string{"gpudevice": propertyId}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	rule := &l8tpollaris.L8PRule{}
 	rule.Name = "RestJsonParse"

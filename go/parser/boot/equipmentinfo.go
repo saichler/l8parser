@@ -26,7 +26,7 @@ import (
 // from the standard ENTITY-MIB (RFC 4133).
 func createFirmwareVersionAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.firmwareversion"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.10.1")) // entPhysicalSoftwareRev
 	return attr
@@ -37,7 +37,7 @@ func createFirmwareVersionAttribute() *l8tpollaris.L8PAttribute {
 // without a vendor-specific serial number OID.
 func createGenericSerialAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.serialnumber"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.11.1")) // entPhysicalSerialNum
 	return attr
@@ -47,7 +47,7 @@ func createGenericSerialAttribute() *l8tpollaris.L8PAttribute {
 // which returns the total number of network interfaces on the device.
 func createInterfaceCountAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.interfacecount"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.interfacecount"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.2.1.0")) // ifNumber
 	return attr
@@ -57,7 +57,7 @@ func createInterfaceCountAttribute() *l8tpollaris.L8PAttribute {
 // from the standard ENTITY-MIB (RFC 2737).
 func createVendorTypeOidAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.vendortypeoid"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.vendortypeoid"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.3.1")) // entPhysicalVendorType
 	return attr
@@ -67,7 +67,7 @@ func createVendorTypeOidAttribute() *l8tpollaris.L8PAttribute {
 // from the standard ENTITY-MIB (RFC 2737).
 func createPhysicalAliasAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.physicalalias"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.physicalalias"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.14.1")) // entPhysicalAlias
 	return attr
@@ -77,7 +77,7 @@ func createPhysicalAliasAttribute() *l8tpollaris.L8PAttribute {
 // from the standard ENTITY-MIB (RFC 2737).
 func createAssetIdAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.assetid"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.assetid"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.15.1")) // entPhysicalAssetID
 	return attr
@@ -88,7 +88,7 @@ func createAssetIdAttribute() *l8tpollaris.L8PAttribute {
 // Note: SNMP TruthValue 1=true, 2=false.
 func createIsFruAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.isfru"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.isfru"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.16.1")) // entPhysicalIsFRU
 	return attr
@@ -99,7 +99,7 @@ func createIsFruAttribute() *l8tpollaris.L8PAttribute {
 // Note: DateAndTime SNMP type (OCTET STRING, 8 or 11 bytes).
 func createManufacturingDateAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.manufacturingdate"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.manufacturingdate"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.17.1")) // entPhysicalMfgDate
 	return attr
@@ -109,7 +109,7 @@ func createManufacturingDateAttribute() *l8tpollaris.L8PAttribute {
 // from the standard ENTITY-MIB (RFC 4133).
 func createManufacturerNameAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.manufacturername"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.manufacturername"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.18.1")) // entPhysicalMfgName
 	return attr
@@ -120,7 +120,7 @@ func createManufacturerNameAttribute() *l8tpollaris.L8PAttribute {
 // Contains newline-separated URIs (e.g., CLEI codes).
 func createIdentificationUrisAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.identificationuris"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.identificationuris"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.19.1")) // entPhysicalUris
 	return attr

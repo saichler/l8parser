@@ -82,7 +82,7 @@ func createAristaCpuPoll(p *l8tpollaris.L8Pollaris) {
 
 func createAristaCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.cpuusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.3.3.1.2.1"))
 	return attr
@@ -100,7 +100,7 @@ func createAristaMemoryPoll(p *l8tpollaris.L8Pollaris) {
 
 func createAristaMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.memoryusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.2.3.1.6.1"))
 	return attr
@@ -118,7 +118,7 @@ func createAristaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 
 func createAristaTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.chassis.temperature"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.99.1.1.1.4.100006"))
 	return attr
@@ -127,7 +127,7 @@ func createAristaTemperature() *l8tpollaris.L8PAttribute {
 // Arista-specific attribute creation functions
 func createAristaVendor() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.vendor"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("arista", ".1.3.6.1.2.1.1.1.0", "Arista"))
 	return attr
@@ -135,7 +135,7 @@ func createAristaVendor() *l8tpollaris.L8PAttribute {
 
 func createAristaVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.version"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.version"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.30065.1.3.1.1.0"))
 	return attr
@@ -152,7 +152,7 @@ func createAristaSerialPoll(p *l8tpollaris.L8Pollaris) {
 
 func createAristaSerial() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.serialnumber"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.47.1.1.1.1.11.1")) // entPhysicalSerialNum (Arista supports standard Entity MIB)
 	return attr
@@ -169,7 +169,7 @@ func createAristaFirmwarePoll(p *l8tpollaris.L8Pollaris) {
 
 func createAristaFirmwareVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.firmwareversion"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.30065.1.3.1.1.0")) // ARISTA-GENERAL-MIB
 	return attr

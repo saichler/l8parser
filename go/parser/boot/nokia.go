@@ -80,7 +80,7 @@ func createNokiaCpuPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNokiaCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.cpuusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.5.1"))
 	return attr
@@ -98,7 +98,7 @@ func createNokiaMemoryPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNokiaMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.memoryusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.10.1"))
 	return attr
@@ -116,7 +116,7 @@ func createNokiaTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 
 func createNokiaTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.chassis.temperature"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.6527.3.1.2.1.1.1.1.7.1"))
 	return attr
@@ -125,7 +125,7 @@ func createNokiaTemperature() *l8tpollaris.L8PAttribute {
 // Nokia-specific attribute creation functions
 func createNokiaVendor() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.vendor"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("nokia", ".1.3.6.1.2.1.1.1.0", "Nokia"))
 	return attr
@@ -133,7 +133,7 @@ func createNokiaVendor() *l8tpollaris.L8PAttribute {
 
 func createNokiaVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.version"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.version"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.6527.3.1.2.2.1.4.0"))
 	return attr
@@ -150,7 +150,7 @@ func createNokiaSerialPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNokiaSerial() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.serialnumber"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.6527.3.1.2.2.1.6.0")) // TIMETRA-CHASSIS-MIB
 	return attr

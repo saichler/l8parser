@@ -80,7 +80,7 @@ func createNECCpuPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNECCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.cpuusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.119.2.3.84.3.1.0"))
 	return attr
@@ -98,7 +98,7 @@ func createNECMemoryPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNECMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.memoryusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.119.2.3.84.3.3.0"))
 	return attr
@@ -116,7 +116,7 @@ func createNECTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 
 func createNECTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.chassis.temperature"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.119.2.3.84.3.5.0"))
 	return attr
@@ -125,7 +125,7 @@ func createNECTemperature() *l8tpollaris.L8PAttribute {
 // NEC-specific attribute creation functions
 func createNECVendor() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.vendor"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("nec", ".1.3.6.1.2.1.1.1.0", "NEC"))
 	return attr
@@ -133,7 +133,7 @@ func createNECVendor() *l8tpollaris.L8PAttribute {
 
 func createNECVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.version"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.version"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.119.2.3.84.1.1.0"))
 	return attr
@@ -150,7 +150,7 @@ func createNECSerialPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNECSerial() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.serialnumber"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.119.2.3.84.1.2.0"))
 	return attr

@@ -126,7 +126,7 @@ func createNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNodesTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.nodes"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.nodes"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(10, 0))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -135,7 +135,7 @@ func createNodesTable() *l8tpollaris.L8PAttribute {
 
 func createPodsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.pods"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.pods"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(10, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -144,7 +144,7 @@ func createPodsTable() *l8tpollaris.L8PAttribute {
 
 func createDeplymentsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.deployments"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.deployments"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(9, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -153,7 +153,7 @@ func createDeplymentsTable() *l8tpollaris.L8PAttribute {
 
 func createStatefulsetsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.statefulsets"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.statefulsets"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(6, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -162,7 +162,7 @@ func createStatefulsetsTable() *l8tpollaris.L8PAttribute {
 
 func createDaemonsetsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.daemonsets"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.daemonsets"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(12, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -171,7 +171,7 @@ func createDaemonsetsTable() *l8tpollaris.L8PAttribute {
 
 func createServicesTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.services"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.services"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(8, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -180,7 +180,7 @@ func createServicesTable() *l8tpollaris.L8PAttribute {
 
 func createNamespacesTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.namespaces"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.namespaces"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(3, 0))
 	attr.Rules = append(attr.Rules, createTableToMap())
@@ -189,7 +189,7 @@ func createNamespacesTable() *l8tpollaris.L8PAttribute {
 
 func createNetworkPoliciesTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "k8scluster.networkpolicies"
+	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.networkpolicies"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createToTable(4, 0, 1))
 	attr.Rules = append(attr.Rules, createTableToMap())

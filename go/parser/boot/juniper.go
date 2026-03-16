@@ -82,7 +82,7 @@ func createJuniperCpuPoll(p *l8tpollaris.L8Pollaris) {
 
 func createJuniperCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.cpuusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.cpuusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0"))
 	return attr
@@ -100,7 +100,7 @@ func createJuniperMemoryPoll(p *l8tpollaris.L8Pollaris) {
 
 func createJuniperMemoryUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.performance.memoryusagepercent"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.performance.memoryusagepercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2636.3.1.13.1.11.9.1.0.0"))
 	return attr
@@ -118,7 +118,7 @@ func createJuniperTemperaturePoll(p *l8tpollaris.L8Pollaris) {
 
 func createJuniperTemperature() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.physicals.chassis.temperature"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.physicals.chassis.temperature"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.4.1.2636.3.1.13.1.7.9.1.0.0"))
 	return attr
@@ -127,7 +127,7 @@ func createJuniperTemperature() *l8tpollaris.L8PAttribute {
 // Juniper-specific attribute creation functions
 func createJuniperVendor() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.vendor"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.vendor"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("juniper", ".1.3.6.1.2.1.1.1.0", "Juniper"))
 	return attr
@@ -135,7 +135,7 @@ func createJuniperVendor() *l8tpollaris.L8PAttribute {
 
 func createJuniperVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.version"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.version"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.2.0"))
 	return attr
@@ -152,7 +152,7 @@ func createJuniperSerialPoll(p *l8tpollaris.L8Pollaris) {
 
 func createJuniperSerial() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.serialnumber"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.serialnumber"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.1.3.0")) // jnxBoxSerialNo
 	return attr
@@ -169,7 +169,7 @@ func createJuniperFirmwarePoll(p *l8tpollaris.L8Pollaris) {
 
 func createJuniperFirmwareVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.equipmentinfo.firmwareversion"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.equipmentinfo.firmwareversion"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.2636.3.40.1.4.1.1.1.5")) // jnxFWDetectorVersion
 	return attr

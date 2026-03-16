@@ -35,7 +35,7 @@ func createOspfPoll(p *l8tpollaris.L8Pollaris, pollName string) {
 // to networkdevice.logicals.vrfs.ospfinfo using the SnmpOspfToVrf bulk rule.
 func createOspfAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.logicals.vrfs.ospfinfo"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.logicals.vrfs.ospfinfo"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	rule := &l8tpollaris.L8PRule{}
 	rule.Name = "SnmpOspfToVrf"
@@ -59,7 +59,7 @@ func createBgpPoll(p *l8tpollaris.L8Pollaris, pollName string) {
 // to networkdevice.logicals.vrfs.bgpinfo using the SnmpBgpToVrf bulk rule.
 func createBgpAttribute() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.logicals.vrfs.bgpinfo"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.logicals.vrfs.bgpinfo"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	rule := &l8tpollaris.L8PRule{}
 	rule.Name = "SnmpBgpToVrf"
@@ -89,7 +89,7 @@ func createVrfSshPoll(p *l8tpollaris.L8Pollaris, pollName, sshCommand, format st
 // The format parameter specifies the vendor output format (iosxr, ios, nxos, junos, timos, vrp, eos, voss, univerge).
 func createVrfSshAttribute(format string) *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "networkdevice.logicals.vrfs"
+	attr.PropertyId = map[string]string{"networkdevice": "networkdevice.logicals.vrfs"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	rule := &l8tpollaris.L8PRule{}
 	rule.Name = "SshVrfParse"

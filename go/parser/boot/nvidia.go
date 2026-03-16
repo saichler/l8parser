@@ -133,7 +133,7 @@ func createNvidiaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 
 func createNvidiaVendor() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.vendor"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.vendor"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createContainsRule("53246", ".1.3.6.1.2.1.1.2.0", "NVIDIA"))
 	return attr
@@ -141,7 +141,7 @@ func createNvidiaVendor() *l8tpollaris.L8PAttribute {
 
 func createNvidiaHostname() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.hostname"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.hostname"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.5.0"))
 	return attr
@@ -149,7 +149,7 @@ func createNvidiaHostname() *l8tpollaris.L8PAttribute {
 
 func createNvidiaLocation() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.location"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.location"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.6.0"))
 	return attr
@@ -157,7 +157,7 @@ func createNvidiaLocation() *l8tpollaris.L8PAttribute {
 
 func createNvidiaUptime() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.uptime"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.uptime"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.1.3.0"))
 	return attr
@@ -165,7 +165,7 @@ func createNvidiaUptime() *l8tpollaris.L8PAttribute {
 
 func createNvidiaDeviceStatus() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.devicestatus"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.devicestatus"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createDeviceStatusRule())
 	return attr
@@ -173,7 +173,7 @@ func createNvidiaDeviceStatus() *l8tpollaris.L8PAttribute {
 
 func createNvidiaOsVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.osversion"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.osversion"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// sysDescr typically contains OS info like "Ubuntu 22.04.3 LTS"
 	attr.Rules = append(attr.Rules, createContainsRule("ubuntu", ".1.3.6.1.2.1.1.1.0", "Ubuntu"))
@@ -182,7 +182,7 @@ func createNvidiaOsVersion() *l8tpollaris.L8PAttribute {
 
 func createNvidiaDriverVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.driverversion"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.driverversion"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// Driver version is available per-GPU but also in sysDescr
 	// Use per-GPU OID for primary source (first GPU)
@@ -194,7 +194,7 @@ func createNvidiaDriverVersion() *l8tpollaris.L8PAttribute {
 
 func createNvidiaGpuCount() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.gpucount"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.gpucount"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.53246.1.1.1.0.1.0"))
 	return attr
@@ -202,7 +202,7 @@ func createNvidiaGpuCount() *l8tpollaris.L8PAttribute {
 
 func createNvidiaDcgmVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.dcgmversion"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.dcgmversion"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.53246.1.1.1.0.2.0"))
 	return attr
@@ -212,7 +212,7 @@ func createNvidiaDcgmVersion() *l8tpollaris.L8PAttribute {
 
 func createNvidiaGpuStaticTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.gpus"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.gpus"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSnmpGpuTableRule(
 		nvidiaGpuTableOid,
@@ -225,7 +225,7 @@ func createNvidiaGpuStaticTable() *l8tpollaris.L8PAttribute {
 
 func createNvidiaGpuMetricsTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.gpus"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.gpus"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSnmpGpuTableRule(
 		nvidiaGpuTableOid,
@@ -250,7 +250,7 @@ func createSnmpGpuTableRule(oidBase, mapping string) *l8tpollaris.L8PRule {
 
 func createNvidiaMemoryTotal() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.memorytotalbytes"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.memorytotalbytes"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.2.2.0"))
 	return attr
@@ -258,7 +258,7 @@ func createNvidiaMemoryTotal() *l8tpollaris.L8PAttribute {
 
 func createNvidiaCpuModel() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.cpumodel"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.cpumodel"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.3.2.1.3.1"))
 	return attr
@@ -266,7 +266,7 @@ func createNvidiaCpuModel() *l8tpollaris.L8PAttribute {
 
 func createNvidiaCpuUtilization() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.cpuutilizationpercent"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.cpuutilizationpercent"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.3.3.1.2.1"))
 	return attr
@@ -274,7 +274,7 @@ func createNvidiaCpuUtilization() *l8tpollaris.L8PAttribute {
 
 func createNvidiaStorageDescription() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.storagedescription"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.storagedescription"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.2.3.1.3.2"))
 	return attr
@@ -282,7 +282,7 @@ func createNvidiaStorageDescription() *l8tpollaris.L8PAttribute {
 
 func createNvidiaStorageTotal() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.storagetotalbytes"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.storagetotalbytes"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.2.1.25.2.3.1.5.2"))
 	return attr
@@ -290,7 +290,7 @@ func createNvidiaStorageTotal() *l8tpollaris.L8PAttribute {
 
 func createNvidiaStorageUsed() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.storageusedbytes"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.storageusedbytes"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.2.3.1.6.2"))
 	return attr
@@ -300,7 +300,7 @@ func createNvidiaStorageUsed() *l8tpollaris.L8PAttribute {
 
 func createNvidiaCudaVersion() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.deviceinfo.cudaversion"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.deviceinfo.cudaversion"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// CUDA version from GPU 0 static data
 	attr.Rules = append(attr.Rules, createSetRule(".1.3.6.1.4.1.53246.1.1.1.1.14.0"))
@@ -309,7 +309,7 @@ func createNvidiaCudaVersion() *l8tpollaris.L8PAttribute {
 
 func createNvidiaMemoryUsed() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.memoryusedbytes"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.memoryusedbytes"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// Physical Memory used from HR MIB storage index 1
 	attr.Rules = append(attr.Rules, createSetTimeSeriesRule(".1.3.6.1.2.1.25.2.3.1.6.1"))
@@ -320,7 +320,7 @@ func createNvidiaMemoryUsed() *l8tpollaris.L8PAttribute {
 
 func createNvidiaIfTable() *l8tpollaris.L8PAttribute {
 	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = "gpudevice.system.networkinterfaces"
+	attr.PropertyId = map[string]string{"gpudevice": "gpudevice.system.networkinterfaces"}
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	// Parse IF-MIB table: 8 columns (ifIndex, ifDescr, ifType, ifSpeed, ifAdminStatus, ifOperStatus, ifInOctets, ifOutOctets)
 	attr.Rules = append(attr.Rules, createToTable(8, 0))
