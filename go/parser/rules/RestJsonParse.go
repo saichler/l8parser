@@ -24,6 +24,7 @@ import (
 
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8reflect/go/reflect/properties"
+	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -54,21 +55,28 @@ func (this *RestJsonParse) Parse(resources ifs.IResources, workSpace map[string]
 		return nil
 	}
 
-	// Parse JSON input
-	var jsonData map[string]interface{}
-	switch v := input.(type) {
-	case string:
-		if err := json.Unmarshal([]byte(v), &jsonData); err != nil {
-			return errors.New("RestJsonParse: failed to parse JSON: " + err.Error())
+	// Extract JSON string from CMap (key "json") sent by RestCollector
+	var jsonStr string
+	if cmap, ok := input.(*l8tpollaris.CMap); ok {
+		jsonBytes, exists := cmap.Data["json"]
+		if !exists || len(jsonBytes) == 0 {
+			return errors.New("RestJsonParse: CMap has no 'json' key")
 		}
-	case []byte:
-		if err := json.Unmarshal(v, &jsonData); err != nil {
-			return errors.New("RestJsonParse: failed to parse JSON: " + err.Error())
+		dec := object.NewDecode(jsonBytes, 0, resources.Registry())
+		val, err := dec.Get()
+		if err != nil {
+			return errors.New("RestJsonParse: failed to decode json from CMap: " + err.Error())
 		}
-	case map[string]interface{}:
-		jsonData = v
-	default:
+		jsonStr, _ = val.(string)
+	} else if s, ok := input.(string); ok {
+		jsonStr = s
+	} else {
 		return errors.New("RestJsonParse: unsupported input type: " + fmt.Sprintf("%T", input))
+	}
+
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal([]byte(jsonStr), &jsonData); err != nil {
+		return errors.New("RestJsonParse: failed to parse JSON: " + err.Error())
 	}
 
 	if len(jsonData) == 0 {
