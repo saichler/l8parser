@@ -191,6 +191,7 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		}
 
 		fullPropertyId := fmt.Sprintf("%s<{24}%s>.%s", propertyId, mapKey, mapping.propertyName)
+		fmt.Println("DEBUG SnmpGpuTable: setting", fullPropertyId, "=", e.value, "ts=", mapping.isTimeSeries)
 
 		if mapping.isTimeSeries {
 			floatVal, err := toFloat64(e.value)

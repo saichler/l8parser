@@ -76,8 +76,10 @@ func (this *RestGpuParse) Parse(resources ifs.IResources, workSpace map[string]i
 	}
 
 	// Get the GPU array from JSON
+	fmt.Println("DEBUG RestGpuParse: arrayPath=", arrayPathParam.Value, "mapping=", mappingParam.Value)
 	arrValue := getJsonValue(jsonData, arrayPathParam.Value)
 	if arrValue == nil {
+		fmt.Println("DEBUG RestGpuParse: array not found at path", arrayPathParam.Value)
 		return nil
 	}
 	gpuArray, ok := arrValue.([]interface{})
@@ -124,17 +126,21 @@ func (this *RestGpuParse) Parse(resources ifs.IResources, workSpace map[string]i
 			continue
 		}
 
+		fmt.Println("DEBUG RestGpuParse: GPU mapKey=", mapKey)
 		for _, m := range mappings {
 			val, exists := gpuMap[m.jsonField]
 			if !exists || val == nil {
+				fmt.Println("DEBUG RestGpuParse: field not found:", m.jsonField)
 				continue
 			}
 			fullId := fmt.Sprintf("%s<{24}%s>.%s", propertyId, mapKey, m.propertyName)
 			instance, err := properties.PropertyOf(fullId, resources)
 			if err != nil || instance == nil {
+				fmt.Println("DEBUG RestGpuParse: PropertyOf failed for", fullId, "err=", err)
 				continue
 			}
 			coerced := coerceJsonValue(val, instance, resources, workSpace)
+			fmt.Println("DEBUG RestGpuParse: setting", fullId, "=", coerced)
 			instance.Set(any, coerced)
 		}
 	}
