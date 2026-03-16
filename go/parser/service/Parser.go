@@ -21,6 +21,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/pollaris"
@@ -115,8 +116,12 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 		propertyId, ok := attr.PropertyId[modelName]
 		if !ok {
 			availableModels := make([]string, 0, len(attr.PropertyId))
-			for k := range attr.PropertyId {
-				availableModels = append(availableModels, k)
+			for k, v := range attr.PropertyId {
+				suffix := v
+				if idx := strings.LastIndex(v, "."); idx != -1 {
+					suffix = v[idx+1:]
+				}
+				availableModels = append(availableModels, k+"="+suffix)
 			}
 			resources.Logger().Error("No propertyId for model '", modelName, "' in pollaris ", job.PollarisName, ":", job.JobName, " available models: ", availableModels)
 			continue
