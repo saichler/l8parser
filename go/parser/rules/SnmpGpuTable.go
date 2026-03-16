@@ -70,7 +70,12 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 	propertyId := _propertyId.(string)
 
 	cmap, ok := input.(*l8tpollaris.CMap)
-	if !ok || cmap == nil || len(cmap.Data) == 0 {
+	if !ok {
+		resources.Logger().Error("SnmpGpuTable: input is not a CMap, got ", fmt.Sprintf("%T", input))
+		return nil
+	}
+	if cmap == nil || len(cmap.Data) == 0 {
+		resources.Logger().Error("SnmpGpuTable: CMap is empty for propertyId ", _propertyId)
 		return nil
 	}
 

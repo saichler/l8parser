@@ -32,13 +32,14 @@ func CreateNvidiaGpuBootPolls() *l8tpollaris.L8Pollaris {
 	polaris.Name = "nvidia-gpu"
 	polaris.Groups = []string{"nvidia", "nvidia-gpu"}
 	polaris.Polling = make(map[string]*l8tpollaris.L8Poll)
-	// SNMP polls (1-6)
+	// SNMP polls (1-7)
 	createNvidiaSystemPoll(polaris)
 	createNvidiaGpuModulePoll(polaris)
 	createNvidiaGpuInfoPoll(polaris)
 	createNvidiaGpuMetricsPoll(polaris)
 	createNvidiaHostResourcesPoll(polaris)
 	createNvidiaInterfacesPoll(polaris)
+	createNvidiaDeviceStatusPoll(polaris)
 	// SSH polls (7-11)
 	createNvidiaGpuUtilizationPoll(polaris)
 	createNvidiaGpuTemperaturePoll(polaris)
@@ -63,7 +64,6 @@ func createNvidiaSystemPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Attributes = append(poll.Attributes, createNvidiaHostname())
 	poll.Attributes = append(poll.Attributes, createNvidiaLocation())
 	poll.Attributes = append(poll.Attributes, createNvidiaUptime())
-	poll.Attributes = append(poll.Attributes, createNvidiaDeviceStatus())
 	poll.Attributes = append(poll.Attributes, createNvidiaOsVersion())
 	poll.Attributes = append(poll.Attributes, createNvidiaDriverVersion())
 	p.Polling[poll.Name] = poll
@@ -126,6 +126,18 @@ func createNvidiaInterfacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.Cadence = EVERY_15_MINUTES_ALWAYS
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	poll.Attributes = append(poll.Attributes, createNvidiaIfTable())
+	p.Polling[poll.Name] = poll
+}
+
+// Poll 7: Device Status — dedicated poll for device status (same pattern as SNMP boot)
+func createNvidiaDeviceStatusPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseSNMPPoll("nvidiaDevStatus")
+	poll.What = "devicestatus"
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Map
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Always = true
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createNvidiaDeviceStatus())
 	p.Polling[poll.Name] = poll
 }
 
