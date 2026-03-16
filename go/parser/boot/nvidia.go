@@ -51,6 +51,14 @@ func CreateNvidiaGpuBootPolls() *l8tpollaris.L8Pollaris {
 	createNvidiaGpuTopologyPoll(polaris)
 	createNvidiaDcgmHealthPoll(polaris)
 	createNvidiaSystemMemoryPoll(polaris)
+	// Execution order: SNMP first, then SSH, then REST
+	polaris.Order = []string{
+		"nvidiaSystem", "nvidiaGpuModule", "nvidiaGpuInfo", "nvidiaGpuMetrics",
+		"nvidiaHostResources", "nvidiaInterfaces", "nvidiaDevStatus",
+		"nvidiaGpuUtilization", "nvidiaGpuTemperature", "nvidiaGpuPower",
+		"nvidiaVersion", "nvidiaCpuInfo",
+		"nvidiaGpuDevices", "nvidiaGpuTopology", "nvidiaDcgmHealth", "nvidiaSystemMemory",
+	}
 	return polaris
 }
 
