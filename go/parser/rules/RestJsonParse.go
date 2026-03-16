@@ -116,6 +116,9 @@ func (this *RestJsonParse) Parse(resources ifs.IResources, workSpace map[string]
 			continue
 		}
 		coerced := coerceJsonValue(value, instance, resources, workSpace)
+		if coerced == nil {
+			continue
+		}
 		instance.Set(any, coerced)
 	}
 
