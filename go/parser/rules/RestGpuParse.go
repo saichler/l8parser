@@ -49,7 +49,9 @@ func (this *RestGpuParse) Parse(resources ifs.IResources, workSpace map[string]i
 	params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
 
 	input := workSpace[Input]
+	fmt.Println("DEBUG RestGpuParse: Parse called, pollWhat=", pollWhat, "input=", input == nil)
 	if input == nil {
+		fmt.Println("DEBUG RestGpuParse: input is nil, returning")
 		return nil
 	}
 

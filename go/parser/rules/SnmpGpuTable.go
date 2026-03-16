@@ -66,6 +66,7 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 
 	input := workSpace[Input]
 	_propertyId := workSpace[PropertyId]
+	fmt.Println("DEBUG SnmpGpuTable: Parse called, pollWhat=", pollWhat, "input=", input == nil, "propertyId=", _propertyId)
 	if input == nil || _propertyId == nil {
 		return nil
 	}
