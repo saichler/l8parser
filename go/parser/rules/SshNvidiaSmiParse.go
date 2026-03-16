@@ -62,6 +62,7 @@ func (this *SshNvidiaSmiParse) Parse(resources ifs.IResources, workSpace map[str
 	}
 
 	if strings.TrimSpace(sshOutput) == "" {
+		resources.Logger().Error("SshNvidiaSmiParse: empty SSH output for ", pollWhat)
 		return nil
 	}
 
@@ -340,7 +341,12 @@ func setGpuTimeSeries(resources ifs.IResources, propertyId string, gpuIndex int,
 	fullId = injectIndexOrKey(fullId, nil)
 	point := &l8api.L8TimeSeriesPoint{Stamp: stamp, Value: value}
 	instance, err := properties.PropertyOf(fullId, resources)
-	if err != nil || instance == nil {
+	if err != nil {
+		resources.Logger().Error("setGpuTimeSeries: PropertyOf failed for '", fullId, "': ", err.Error())
+		return
+	}
+	if instance == nil {
+		resources.Logger().Error("setGpuTimeSeries: PropertyOf returned nil for '", fullId, "'")
 		return
 	}
 	instance.Set(any, point)
@@ -351,7 +357,12 @@ func setGpuProperty(resources ifs.IResources, propertyId string, gpuIndex int, f
 	fullId := fmt.Sprintf("%s<{2}%d>.%s", propertyId, gpuIndex, field)
 	fullId = injectIndexOrKey(fullId, nil)
 	instance, err := properties.PropertyOf(fullId, resources)
-	if err != nil || instance == nil {
+	if err != nil {
+		resources.Logger().Error("setGpuProperty: PropertyOf failed for '", fullId, "': ", err.Error())
+		return
+	}
+	if instance == nil {
+		resources.Logger().Error("setGpuProperty: PropertyOf returned nil for '", fullId, "'")
 		return
 	}
 	instance.Set(any, value)
@@ -361,7 +372,12 @@ func setGpuProperty(resources ifs.IResources, propertyId string, gpuIndex int, f
 func setProperty(resources ifs.IResources, propertyId string, value interface{}, any interface{}) {
 	modifiedId := injectIndexOrKey(propertyId, nil)
 	instance, err := properties.PropertyOf(modifiedId, resources)
-	if err != nil || instance == nil {
+	if err != nil {
+		resources.Logger().Error("setProperty: PropertyOf failed for '", modifiedId, "': ", err.Error())
+		return
+	}
+	if instance == nil {
+		resources.Logger().Error("setProperty: PropertyOf returned nil for '", modifiedId, "'")
 		return
 	}
 	instance.Set(any, value)
