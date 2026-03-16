@@ -16,6 +16,7 @@ limitations under the License.
 package service
 
 import (
+	"fmt"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
@@ -63,7 +64,7 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 		}
 
 		if job.JobName == "nvidiaGpuPower" {
-			resources.Logger().Info("DEBUG nvidiaGpuPower elem: ", elem)
+			fmt.Println("DEBUG nvidiaGpuPower elem:", elem)
 		}
 		cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
 		this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
