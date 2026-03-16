@@ -114,7 +114,11 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 	for _, attr := range poll.Attributes {
 		propertyId, ok := attr.PropertyId[modelName]
 		if !ok {
-			resources.Logger().Error("No propertyId for model '", modelName, "' in pollaris ", job.PollarisName, ":", job.JobName)
+			availableModels := make([]string, 0, len(attr.PropertyId))
+			for k := range attr.PropertyId {
+				availableModels = append(availableModels, k)
+			}
+			resources.Logger().Error("No propertyId for model '", modelName, "' in pollaris ", job.PollarisName, ":", job.JobName, " available models: ", availableModels)
 			continue
 		}
 		workSpace[rules.PropertyId] = propertyId
