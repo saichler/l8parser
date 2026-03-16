@@ -82,6 +82,8 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		return nil
 	}
 
+	resources.Logger().Debug("SnmpGpuTable: CMap has ", fmt.Sprintf("%d", len(cmap.Data)), " entries for propertyId ", propertyId)
+
 	// Parse parameters
 	oidBaseParam := params["oid_base"]
 	mappingParam := params["mapping"]
@@ -126,11 +128,13 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		value    interface{}
 	}
 	entries := make([]oidEntry, 0)
+	skippedNoPrefix := 0
 	for oidKey, rawData := range cmap.Data {
 		if len(rawData) == 0 {
 			continue
 		}
 		if !strings.HasPrefix(oidKey, oidBase) {
+			skippedNoPrefix++
 			continue
 		}
 		suffix := oidKey[len(oidBase):]
@@ -162,6 +166,8 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		entries = append(entries, oidEntry{gpuIndex, metricId, value})
 	}
 
+	resources.Logger().Debug("SnmpGpuTable: parsed ", fmt.Sprintf("%d", len(entries)), " OID entries, skipped ", fmt.Sprintf("%d", skippedNoPrefix), " (no oidBase prefix)")
+
 	// Pass 1: collect PCI Bus IDs per GPU index
 	gpuKeys := make(map[int]string)
 	for _, e := range entries {
@@ -171,6 +177,8 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 			}
 		}
 	}
+
+	resources.Logger().Debug("SnmpGpuTable: found ", fmt.Sprintf("%d", len(gpuKeys)), " GPU keys (PCI Bus IDs): ", fmt.Sprintf("%v", gpuKeys))
 
 	// Pass 2: set properties using PCI Bus ID as map key
 	for _, e := range entries {
