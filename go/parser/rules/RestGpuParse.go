@@ -133,6 +133,9 @@ func (this *RestGpuParse) Parse(resources ifs.IResources, workSpace map[string]i
 			continue
 		}
 
+		// Set the PCI Bus ID as a property on the GPU instance
+		setGpuProperty(resources, propertyId, mapKey, "pcibusid", mapKey, any)
+
 		for _, m := range mappings {
 			val, exists := gpuMap[m.jsonField]
 			if !exists || val == nil {

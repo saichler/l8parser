@@ -110,6 +110,9 @@ func parseNvidiaSmiUtilization(resources ifs.IResources, output, propertyId stri
 
 		if strings.HasPrefix(trimmed, "GPU ") && strings.Contains(trimmed, ":") {
 			gpuKey = extractGpuPciBusId(trimmed)
+			if gpuKey != "" {
+				setGpuProperty(resources, propertyId, gpuKey, "pcibusid", gpuKey, any)
+			}
 			continue
 		}
 
@@ -144,6 +147,9 @@ func parseNvidiaSmiTemperature(resources ifs.IResources, output, propertyId stri
 
 		if strings.HasPrefix(trimmed, "GPU ") && strings.Contains(trimmed, ":") {
 			gpuKey = extractGpuPciBusId(trimmed)
+			if gpuKey != "" {
+				setGpuProperty(resources, propertyId, gpuKey, "pcibusid", gpuKey, any)
+			}
 			continue
 		}
 
@@ -184,6 +190,9 @@ func parseNvidiaSmiPower(resources ifs.IResources, output, propertyId string, an
 
 		if strings.HasPrefix(trimmed, "GPU ") && strings.Contains(trimmed, ":") {
 			gpuKey = extractGpuPciBusId(trimmed)
+			if gpuKey != "" {
+				setGpuProperty(resources, propertyId, gpuKey, "pcibusid", gpuKey, any)
+			}
 			continue
 		}
 
