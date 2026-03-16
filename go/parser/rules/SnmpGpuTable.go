@@ -167,7 +167,7 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 	for _, e := range entries {
 		if e.metricId == keyOidSuffix {
 			if strVal, ok := e.value.(string); ok {
-				gpuKeys[e.gpuIndex] = strVal
+				gpuKeys[e.gpuIndex] = strings.TrimSpace(strVal)
 			}
 		}
 	}
