@@ -82,8 +82,6 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		return nil
 	}
 
-	fmt.Println("SnmpGpuTable: CMap has", len(cmap.Data), "entries for propertyId", propertyId)
-
 	// Parse parameters
 	oidBaseParam := params["oid_base"]
 	mappingParam := params["mapping"]
@@ -166,8 +164,6 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		entries = append(entries, oidEntry{gpuIndex, metricId, value})
 	}
 
-	fmt.Println("SnmpGpuTable: parsed", len(entries), "OID entries, skipped", skippedNoPrefix, "(no oidBase prefix)")
-
 	// Pass 1: collect PCI Bus IDs per GPU index
 	gpuKeys := make(map[int]string)
 	for _, e := range entries {
@@ -177,8 +173,6 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 			}
 		}
 	}
-
-	fmt.Println("SnmpGpuTable: found", len(gpuKeys), "GPU keys (PCI Bus IDs):", gpuKeys)
 
 	// Pass 2: set properties using PCI Bus ID as map key
 	for _, e := range entries {

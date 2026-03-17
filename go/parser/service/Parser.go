@@ -21,7 +21,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/saichler/l8parser/go/parser/rules"
@@ -89,7 +88,6 @@ func newParser() *_Parser {
 // Parameters: job (completed collection job), any (target object to populate), resources (system resources).
 func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs.IResources) error {
 	if job.Error != "" {
-		fmt.Println("Parser: job", job.PollarisName+":"+job.JobName, "for target", job.TargetId, "has error:", job.Error)
 		return errors.New(job.Error)
 	}
 
@@ -116,7 +114,6 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 	}
 
 	modelName := targets.Links.Model(job.LinksId)
-	fmt.Println("Parser: processing poll", job.PollarisName+":"+job.JobName, "for model '"+modelName+"', target", job.TargetId, "attributes:", len(poll.Attributes))
 	for _, attr := range poll.Attributes {
 		propertyId, ok := attr.PropertyId[modelName]
 		if !ok {
@@ -132,7 +129,6 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 			continue
 		}
 		workSpace[rules.PropertyId] = propertyId
-		fmt.Println("Parser: attribute propertyId='"+propertyId+"' has", len(attr.Rules), "rules")
 		for _, rData := range attr.Rules {
 			if rData.Params != nil {
 				for p, v := range rData.Params {
@@ -143,7 +139,6 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 			if !ok {
 				return resources.Logger().Error("Cannot find parsing rule ", rData.Name)
 			}
-			fmt.Println("Parser: executing rule '"+rData.Name+"' for propertyId='"+propertyId+"'")
 			err = ruleImpl.Parse(resources, workSpace, rData.Params, any, poll.What)
 			if err != nil {
 				return err
