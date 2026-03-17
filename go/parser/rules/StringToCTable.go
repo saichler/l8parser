@@ -41,7 +41,14 @@ func (this *StringToCTable) ParamNames() []string {
 }
 
 // Parse executes the StringToCTable rule, converting a string input to a CTable structure.
+// If the input is already a CTable (e.g., from an SNMP table walk), it passes it through directly.
 func (this *StringToCTable) Parse(resources ifs.IResources, workSpace map[string]interface{}, params map[string]*l8tpollaris.L8PParameter, any interface{}, pollWhat string) error {
+	// If input is already a CTable (from SNMP table walk), pass it through
+	if table, ok := workSpace[Input].(*l8tpollaris.CTable); ok {
+		workSpace[Output] = table
+		return nil
+	}
+
 	input, ok := workSpace[Input].(string)
 	if !ok {
 		return nil
