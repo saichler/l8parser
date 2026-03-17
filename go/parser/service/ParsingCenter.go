@@ -16,6 +16,7 @@ limitations under the License.
 package service
 
 import (
+	"fmt"
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
@@ -50,7 +51,7 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 		return
 	}
 
-	resources.Logger().Debug("ParsingCenter: JobComplete for target ", job.TargetId, ", pollaris ", job.PollarisName, ", job ", job.JobName, ", resultLen=", len(job.Result))
+	fmt.Println("ParsingCenter: JobComplete for target", job.TargetId, "pollaris", job.PollarisName, "job", job.JobName, "resultLen=", len(job.Result))
 
 	if job.Error == "" && poll.Attributes != nil {
 		elem := this.createElementInstance(job)
