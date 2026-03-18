@@ -169,7 +169,7 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 		entries = append(entries, oidEntry{gpuIndex, metricId, value})
 	}
 
-	resources.Logger().Info("SnmpGpuTable [", pollId, "]: CMap=", len(cmap.Data),
+	fmt.Println("SnmpGpuTable [", pollId, "]: CMap=", len(cmap.Data),
 		" matched=", len(entries), " skippedPrefix=", skippedNoPrefix)
 
 	// Pass 1: collect PCI Bus IDs per GPU index
@@ -179,20 +179,20 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 			if strVal, ok := e.value.(string); ok {
 				gpuKeys[e.gpuIndex] = strings.Trim(strings.TrimSpace(strVal), "\"")
 			} else {
-				resources.Logger().Warning("SnmpGpuTable [", pollId, "]: suffix ", keyOidSuffix,
-					" GPU ", e.gpuIndex, " value is NOT string, type=", fmt.Sprintf("%T", e.value))
+				fmt.Println("SnmpGpuTable [", pollId, "]: suffix", keyOidSuffix,
+					"GPU", e.gpuIndex, "value is NOT string, type=", fmt.Sprintf("%T", e.value))
 			}
 		}
 	}
-	resources.Logger().Info("SnmpGpuTable [", pollId, "]: found ", len(gpuKeys), " PCI Bus IDs")
+	fmt.Println("SnmpGpuTable [", pollId, "]: found", len(gpuKeys), "PCI Bus IDs")
 
 	// Pass 2: set properties using PCI Bus ID as map key
 	for _, e := range entries {
 		mapKey, hasKey := gpuKeys[e.gpuIndex]
 		if !hasKey {
 			mapKey = fmt.Sprintf("gpu-%d", e.gpuIndex)
-			resources.Logger().Warning("SnmpGpuTable [", pollId, "]: using fallback key '", mapKey,
-				"' for gpuIndex=", e.gpuIndex, " metricId=", e.metricId)
+			fmt.Println("SnmpGpuTable [", pollId, "]: using fallback key", mapKey,
+				"for gpuIndex=", e.gpuIndex, "metricId=", e.metricId)
 		}
 
 		// Set gpu_index
