@@ -250,7 +250,7 @@ func createNvidiaGpuMetricsTable() *l8tpollaris.L8PAttribute {
 	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
 	attr.Rules = append(attr.Rules, createSnmpGpuTableRule(
 		nvidiaGpuTableOid,
-		"5:gpuutilizationpercent:ts,6:vramusedmib:ts,"+
+		"4:pcibusid:set,5:gpuutilizationpercent:ts,6:vramusedmib:ts,"+
 			"8:temperaturecelsius:ts,9:powerdrawwatts:ts,10:fanspeedpercent:ts,"+
 			"11:smclockmhz:ts,12:memclockmhz:ts",
 	))
