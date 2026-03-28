@@ -171,6 +171,32 @@ func injectIndexOrKey(propertyId string, workSpace map[string]interface{}) strin
 	return modifiedId
 }
 
+// isValidPciBusId checks if a string is a valid PCI Bus ID in the format
+// "HHHHHHHH:HH:HH.D" (8 hex digits, colon, 2 hex digits, colon, 2 hex digits, dot, 1 digit).
+// Example: "00000000:87:00.0"
+func isValidPciBusId(s string) bool {
+	if len(s) != 16 {
+		return false
+	}
+	for i, c := range s {
+		switch i {
+		case 8, 11: // colon positions
+			if c != ':' {
+				return false
+			}
+		case 14: // dot position
+			if c != '.' {
+				return false
+			}
+		default: // hex digit positions
+			if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // isSnmpErrorString checks if a string value is an SNMP error indicator
 // rather than actual data. Devices that don't support a particular OID
 // return these strings instead of values.

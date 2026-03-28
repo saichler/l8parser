@@ -280,18 +280,12 @@ func parseLscpu(resources ifs.IResources, output, propertyId string, any interfa
 
 // extractGpuPciBusId extracts the PCI Bus ID from a line like "GPU 00000000:07:00.0".
 // Returns empty string if the line doesn't contain a valid PCI Bus ID.
-// PCI Bus ID format: hex digits, colons, and dots (e.g., "00000000:07:00.0").
+// PCI Bus ID format: HHHHHHHH:HH:HH.D (e.g., "00000000:07:00.0").
 func extractGpuPciBusId(line string) string {
 	trimmed := strings.TrimSpace(line)
 	rest := strings.TrimPrefix(trimmed, "GPU ")
 	rest = strings.TrimSpace(rest)
-	// Validate PCI Bus ID format: must contain hex digits, colons, and dots only
-	for _, c := range rest {
-		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || c == ':' || c == '.') {
-			return ""
-		}
-	}
-	if len(rest) == 0 {
+	if !isValidPciBusId(rest) {
 		return ""
 	}
 	return rest

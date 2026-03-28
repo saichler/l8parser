@@ -133,6 +133,9 @@ func (this *RestGpuParse) Parse(resources ifs.IResources, workSpace map[string]i
 			continue
 		}
 		mapKey = strings.TrimSpace(mapKey)
+		if !isValidPciBusId(mapKey) {
+			continue
+		}
 
 		// Set the PCI Bus ID as a property on the GPU instance
 		setGpuProperty(resources, propertyId, mapKey, "pcibusid", mapKey, any)

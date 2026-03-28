@@ -167,7 +167,12 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 	for _, e := range entries {
 		if e.metricId == keyOidSuffix {
 			if strVal, ok := e.value.(string); ok {
-				gpuKeys[e.gpuIndex] = strings.Trim(strings.TrimSpace(strVal), "\"")
+				candidate := strings.Trim(strings.TrimSpace(strVal), "\"")
+				if isValidPciBusId(candidate) {
+					gpuKeys[e.gpuIndex] = candidate
+				} else {
+					resources.Logger().Error("SnmpGpuTable: invalid PCI Bus ID '", candidate, "' for GPU index ", fmt.Sprintf("%d", e.gpuIndex), ", skipping")
+				}
 			}
 		}
 	}
@@ -175,7 +180,8 @@ func (this *SnmpGpuTable) Parse(resources ifs.IResources, workSpace map[string]i
 	for _, e := range entries {
 		mapKey, hasKey := gpuKeys[e.gpuIndex]
 		if !hasKey {
-			mapKey = fmt.Sprintf("gpu-%d", e.gpuIndex)
+			// No valid PCI Bus ID found for this GPU index, skip entirely
+			continue
 		}
 
 		// Set gpu_index
