@@ -191,6 +191,7 @@ func GetAllPolarisModels() []*l8tpollaris.L8Pollaris {
 
 	//Generic K8s
 	models = append(models, CreateK8sBootPolls())
+	models = append(models, CreateK8sClientBootPolls())
 
 	// Generic Pre Boot
 	models = append(models, CreateBoot00())

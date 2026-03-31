@@ -16,6 +16,8 @@ limitations under the License.
 package boot
 
 import (
+	"fmt"
+
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
@@ -49,6 +51,25 @@ func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
 	createNamespaceDetails(k8sPollaris)
 	createNetworkPolicyDetails(k8sPollaris)
 
+	return k8sPollaris
+}
+
+// CreateK8sClientBootPolls creates the cache-backed Kubernetes polling
+// configuration for the client-go collector. It includes equivalents for the
+// active kubectl table polls only.
+func CreateK8sClientBootPolls() *l8tpollaris.L8Pollaris {
+	k8sPollaris := &l8tpollaris.L8Pollaris{}
+	k8sPollaris.Name = "kubernetesapi"
+	k8sPollaris.Groups = []string{common.BOOT_STAGE_00}
+	k8sPollaris.Polling = make(map[string]*l8tpollaris.L8Poll)
+	createClientNodesPoll(k8sPollaris)
+	createClientPodsPoll(k8sPollaris)
+	createClientDeploymentsPoll(k8sPollaris)
+	createClientStatefulsetsPoll(k8sPollaris)
+	createClientDaemonsetsPoll(k8sPollaris)
+	createClientServicesPoll(k8sPollaris)
+	createClientNamespacesPoll(k8sPollaris)
+	createClientNetworkPoliciesPoll(k8sPollaris)
 	return k8sPollaris
 }
 
@@ -120,6 +141,78 @@ func createNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
 	poll.What = "get netpol -A -o wide"
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	poll.Attributes = append(poll.Attributes, createNetworkPoliciesTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientNodesPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("nodes")
+	poll.What = createClientTableSpec("v1/nodes",
+		[]string{"metadata.name", "metadata.creationTimestamp", "status.nodeInfo.kubeletVersion", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
+		[]string{"NAME", "AGE", "VERSION", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"})
+	poll.Attributes = append(poll.Attributes, createNodesTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientPodsPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("pods")
+	poll.What = createClientTableSpec("v1/pods",
+		[]string{"metadata.namespace", "metadata.name", "status.phase", "metadata.creationTimestamp", "status.podIP", "spec.nodeName"},
+		[]string{"NAMESPACE", "NAME", "STATUS", "AGE", "IP", "NODE"})
+	poll.Attributes = append(poll.Attributes, createPodsTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientDeploymentsPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("deployments")
+	poll.What = createClientTableSpec("apps/v1/deployments",
+		[]string{"metadata.namespace", "metadata.name", "spec.replicas", "status.updatedReplicas", "status.availableReplicas", "metadata.creationTimestamp"},
+		[]string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE"})
+	poll.Attributes = append(poll.Attributes, createDeplymentsTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientStatefulsetsPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("statefulsets")
+	poll.What = createClientTableSpec("apps/v1/statefulsets",
+		[]string{"metadata.namespace", "metadata.name", "status.readyReplicas", "metadata.creationTimestamp"},
+		[]string{"NAMESPACE", "NAME", "READY", "AGE"})
+	poll.Attributes = append(poll.Attributes, createStatefulsetsTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientDaemonsetsPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("daemonsets")
+	poll.What = createClientTableSpec("apps/v1/daemonsets",
+		[]string{"metadata.namespace", "metadata.name", "status.desiredNumberScheduled", "status.currentNumberScheduled", "status.numberReady", "metadata.creationTimestamp"},
+		[]string{"NAMESPACE", "NAME", "DESIRED", "CURRENT", "READY", "AGE"})
+	poll.Attributes = append(poll.Attributes, createDaemonsetsTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientServicesPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("services")
+	poll.What = createClientTableSpec("v1/services",
+		[]string{"metadata.namespace", "metadata.name", "spec.type", "spec.clusterIP", "metadata.creationTimestamp"},
+		[]string{"NAMESPACE", "NAME", "TYPE", "CLUSTER-IP", "AGE"})
+	poll.Attributes = append(poll.Attributes, createServicesTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientNamespacesPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("namespaces")
+	poll.What = createClientTableSpec("v1/namespaces",
+		[]string{"metadata.name", "status.phase", "metadata.creationTimestamp"},
+		[]string{"NAME", "STATUS", "AGE"})
+	poll.Attributes = append(poll.Attributes, createNamespacesTable())
+	p.Polling[poll.Name] = poll
+}
+
+func createClientNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
+	poll := createBaseK8sClientPoll("networkpolicies")
+	poll.What = createClientTableSpec("networking.k8s.io/v1/networkpolicies",
+		[]string{"metadata.namespace", "metadata.name", "metadata.creationTimestamp"},
+		[]string{"NAMESPACE", "NAME", "AGE"})
 	poll.Attributes = append(poll.Attributes, createNetworkPoliciesTable())
 	p.Polling[poll.Name] = poll
 }
@@ -203,6 +296,35 @@ func createBaseK8sPoll(name string) *l8tpollaris.L8Poll {
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Protocol = l8tpollaris.L8PProtocol_L8PKubectl
 	return poll
+}
+
+func createBaseK8sClientPoll(name string) *l8tpollaris.L8Poll {
+	poll := &l8tpollaris.L8Poll{}
+	poll.Name = name
+	poll.Timeout = DEFAULT_TIMEOUT
+	poll.Cadence = EVERY_5_MINUTES_ALWAYS
+	poll.Protocol = l8tpollaris.L8PProtocol(9)
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
+	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
+	return poll
+}
+
+func createClientTableSpec(gvr string, fields, columnNames []string) string {
+	return fmt.Sprintf(`{"result":"table","mode":"list","gvr":"%s","fields":["%s"],"columnNames":["%s"]}`,
+		gvr,
+		stringsJoin(fields),
+		stringsJoin(columnNames))
+}
+
+func stringsJoin(values []string) string {
+	if len(values) == 0 {
+		return ""
+	}
+	result := values[0]
+	for i := 1; i < len(values); i++ {
+		result += `","` + values[i]
+	}
+	return result
 }
 
 func createLogs(p *l8tpollaris.L8Pollaris) {
