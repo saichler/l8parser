@@ -303,7 +303,7 @@ func createBaseK8sClientPoll(name string) *l8tpollaris.L8Poll {
 	poll.Name = name
 	poll.Timeout = DEFAULT_TIMEOUT
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
-	poll.Protocol = l8tpollaris.L8PProtocol(9)
+	poll.Protocol = l8tpollaris.L8PProtocol_L8PKubernetesAPI
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
 	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
 	return poll
