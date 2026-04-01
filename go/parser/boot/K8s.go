@@ -148,8 +148,8 @@ func createNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
 func createClientNodesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("nodes")
 	poll.What = createClientTableSpec("v1/nodes",
-		[]string{"metadata.name", "metadata.creationTimestamp", "status.nodeInfo.kubeletVersion", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
-		[]string{"NAME", "AGE", "VERSION", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"})
+		[]string{"metadata.name", "_k.roles", "_k.age", "status.nodeInfo.kubeletVersion", "_k.internalip", "_k.externalip", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
+		[]string{"NAME", "ROLES", "AGE", "VERSION", "INTERNAL-IP", "EXTERNAL-IP", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"})
 	poll.Attributes = append(poll.Attributes, createNodesTable())
 	p.Polling[poll.Name] = poll
 }
@@ -157,8 +157,8 @@ func createClientNodesPoll(p *l8tpollaris.L8Pollaris) {
 func createClientPodsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("pods")
 	poll.What = createClientTableSpec("v1/pods",
-		[]string{"metadata.namespace", "metadata.name", "status.phase", "metadata.creationTimestamp", "status.podIP", "spec.nodeName"},
-		[]string{"NAMESPACE", "NAME", "STATUS", "AGE", "IP", "NODE"})
+		[]string{"metadata.namespace", "metadata.name", "_k.ready", "status.phase", "_k.restarts", "_k.age", "status.podIP", "spec.nodeName", "_k.nominatednode"},
+		[]string{"NAMESPACE", "NAME", "READY", "STATUS", "RESTARTS", "AGE", "IP", "NODE", "NOMINATED NODE"})
 	poll.Attributes = append(poll.Attributes, createPodsTable())
 	p.Polling[poll.Name] = poll
 }
@@ -166,8 +166,8 @@ func createClientPodsPoll(p *l8tpollaris.L8Pollaris) {
 func createClientDeploymentsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("deployments")
 	poll.What = createClientTableSpec("apps/v1/deployments",
-		[]string{"metadata.namespace", "metadata.name", "spec.replicas", "status.updatedReplicas", "status.availableReplicas", "metadata.creationTimestamp"},
-		[]string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE"})
+		[]string{"metadata.namespace", "metadata.name", "_k.ready", "status.updatedReplicas", "status.availableReplicas", "_k.age", "_k.containers", "_k.images", "_k.selector"},
+		[]string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"})
 	poll.Attributes = append(poll.Attributes, createDeplymentsTable())
 	p.Polling[poll.Name] = poll
 }
@@ -175,8 +175,8 @@ func createClientDeploymentsPoll(p *l8tpollaris.L8Pollaris) {
 func createClientStatefulsetsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("statefulsets")
 	poll.What = createClientTableSpec("apps/v1/statefulsets",
-		[]string{"metadata.namespace", "metadata.name", "status.readyReplicas", "metadata.creationTimestamp"},
-		[]string{"NAMESPACE", "NAME", "READY", "AGE"})
+		[]string{"metadata.namespace", "metadata.name", "_k.ready", "_k.age", "_k.containers", "_k.images"},
+		[]string{"NAMESPACE", "NAME", "READY", "AGE", "CONTAINERS", "IMAGES"})
 	poll.Attributes = append(poll.Attributes, createStatefulsetsTable())
 	p.Polling[poll.Name] = poll
 }
@@ -184,8 +184,8 @@ func createClientStatefulsetsPoll(p *l8tpollaris.L8Pollaris) {
 func createClientDaemonsetsPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("daemonsets")
 	poll.What = createClientTableSpec("apps/v1/daemonsets",
-		[]string{"metadata.namespace", "metadata.name", "status.desiredNumberScheduled", "status.currentNumberScheduled", "status.numberReady", "metadata.creationTimestamp"},
-		[]string{"NAMESPACE", "NAME", "DESIRED", "CURRENT", "READY", "AGE"})
+		[]string{"metadata.namespace", "metadata.name", "status.desiredNumberScheduled", "status.currentNumberScheduled", "status.numberReady", "_k.uptodate", "_k.available", "_k.nodeselector", "_k.age", "_k.containers", "_k.images", "_k.selector"},
+		[]string{"NAMESPACE", "NAME", "DESIRED", "CURRENT", "READY", "UP-TO-DATE", "AVAILABLE", "NODE SELECTOR", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"})
 	poll.Attributes = append(poll.Attributes, createDaemonsetsTable())
 	p.Polling[poll.Name] = poll
 }
@@ -193,8 +193,8 @@ func createClientDaemonsetsPoll(p *l8tpollaris.L8Pollaris) {
 func createClientServicesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("services")
 	poll.What = createClientTableSpec("v1/services",
-		[]string{"metadata.namespace", "metadata.name", "spec.type", "spec.clusterIP", "metadata.creationTimestamp"},
-		[]string{"NAMESPACE", "NAME", "TYPE", "CLUSTER-IP", "AGE"})
+		[]string{"metadata.namespace", "metadata.name", "spec.type", "spec.clusterIP", "_k.externalip", "_k.ports", "_k.age"},
+		[]string{"NAMESPACE", "NAME", "TYPE", "CLUSTER-IP", "EXTERNAL-IP", "PORT(S)", "AGE"})
 	poll.Attributes = append(poll.Attributes, createServicesTable())
 	p.Polling[poll.Name] = poll
 }
@@ -202,7 +202,7 @@ func createClientServicesPoll(p *l8tpollaris.L8Pollaris) {
 func createClientNamespacesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("namespaces")
 	poll.What = createClientTableSpec("v1/namespaces",
-		[]string{"metadata.name", "status.phase", "metadata.creationTimestamp"},
+		[]string{"metadata.name", "status.phase", "_k.age"},
 		[]string{"NAME", "STATUS", "AGE"})
 	poll.Attributes = append(poll.Attributes, createNamespacesTable())
 	p.Polling[poll.Name] = poll
@@ -211,7 +211,7 @@ func createClientNamespacesPoll(p *l8tpollaris.L8Pollaris) {
 func createClientNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
 	poll := createBaseK8sClientPoll("networkpolicies")
 	poll.What = createClientTableSpec("networking.k8s.io/v1/networkpolicies",
-		[]string{"metadata.namespace", "metadata.name", "metadata.creationTimestamp"},
+		[]string{"metadata.namespace", "metadata.name", "_k.age"},
 		[]string{"NAMESPACE", "NAME", "AGE"})
 	poll.Attributes = append(poll.Attributes, createNetworkPoliciesTable())
 	p.Polling[poll.Name] = poll
