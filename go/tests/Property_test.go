@@ -16,7 +16,6 @@ limitations under the License.
 package tests
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/saichler/l8reflect/go/reflect/cloning"
@@ -45,8 +44,5 @@ func TestProperty(t *testing.T) {
 		vnic.Resources().Logger().Fail(t, err.Error())
 		return
 	}
-	for _, chg := range updater.Changes() {
-		fmt.Println("PropertyId=", chg.PropertyId())
-	}
-
+	_ = updater.Changes()
 }

@@ -16,7 +16,6 @@ limitations under the License.
 package tests
 
 import (
-	"fmt"
 	"github.com/saichler/l8collector/go/tests/utils_collector"
 	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	common2 "github.com/saichler/probler/go/prob/common"
@@ -86,39 +85,15 @@ func TestPhysicalFromPersistency(t *testing.T) {
 	elem := inv.ElementByElement(filter)
 	networkDevice := elem.(*types2.NetworkDevice)
 
-	fmt.Printf("DEBUG: NetworkDevice has %d physicals\n", len(networkDevice.Physicals))
-
 	if len(networkDevice.Physicals) == 0 {
 		vnic.Resources().Logger().Fail(t, "No physicals found in NetworkDevice")
 		return
 	}
 
-	for physicalKey, physical := range networkDevice.Physicals {
-		fmt.Printf("DEBUG: Physical key '%s' has %d ports\n", physicalKey, len(physical.Ports))
-
+	for _, physical := range networkDevice.Physicals {
 		if physical.Ports == nil || len(physical.Ports) < 2 {
-			fmt.Printf("DEBUG: Physical '%s' has insufficient ports. Expected > 2, got %d\n", physicalKey, len(physical.Ports))
-
-			// Let's check what we actually have
-			if physical.Ports != nil {
-				for portKey, port := range physical.Ports {
-					fmt.Printf("DEBUG: Port key '%v': %+v\n", portKey, port)
-					if port.Interfaces != nil {
-						fmt.Printf("DEBUG: Port '%v' has %d interfaces\n", portKey, len(port.Interfaces))
-						for ifKey, iface := range port.Interfaces {
-							fmt.Printf("DEBUG: Interface '%v': Name='%s', ID='%s'\n", ifKey, iface.Name, iface.Id)
-						}
-					} else {
-						fmt.Printf("DEBUG: Port '%v' has no interfaces\n", portKey)
-					}
-				}
-			}
-
 			vnic.Resources().Logger().Fail(t, "Expected more ports")
 			return
-		}
-		for portKey, port := range physical.Ports {
-			fmt.Printf("Port '%v': %+v\n", portKey, port)
 		}
 	}
 }

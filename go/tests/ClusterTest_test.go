@@ -16,7 +16,6 @@ limitations under the License.
 package tests
 
 import (
-	"fmt"
 	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	common2 "github.com/saichler/probler/go/prob/common"
@@ -95,8 +94,6 @@ func TestCluster(t *testing.T) {
 	elem := inv.ElementByElement(filter)
 	k8sCluster := elem.(*types2.K8SCluster)
 	list := &types2.K8SClusterList{List: []*types2.K8SCluster{k8sCluster}}
-
-	fmt.Println(len(k8sCluster.Pods))
 
 	jsn, _ := protojson.Marshal(list)
 	os.WriteFile("./clusters.json", jsn, 0777)
