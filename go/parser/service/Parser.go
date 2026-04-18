@@ -41,6 +41,13 @@ type _Parser struct {
 // Parser is the singleton instance of the parser engine, initialized with all available rules.
 var Parser = newParser()
 
+// RegisterRule adds an external parsing rule to the parser singleton.
+// This allows projects to register project-specific rules at runtime
+// without creating circular import dependencies.
+func RegisterRule(rule rules.ParsingRule) {
+	Parser.rules[rule.Name()] = rule
+}
+
 // newParser creates and initializes a new Parser instance with all registered parsing rules.
 func newParser() *_Parser {
 	p := &_Parser{}
