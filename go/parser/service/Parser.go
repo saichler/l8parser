@@ -86,6 +86,8 @@ func newParser() *_Parser {
 	p.rules[restJsonParse.Name()] = restJsonParse
 	restGpuParse := &rules.RestGpuParse{}
 	p.rules[restGpuParse.Name()] = restGpuParse
+	cTableToInstances := &rules.CTableToInstances{}
+	p.rules[cTableToInstances.Name()] = cTableToInstances
 	return p
 }
 
@@ -116,6 +118,7 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 	}
 	workSpace[rules.Input] = data
 	workSpace[rules.JobEnded] = job.Ended
+	workSpace[rules.TargetId] = job.TargetId
 	if poll.Attributes == nil {
 		return resources.Logger().Error("No attributes are defined on pollaris "+job.PollarisName, ":", job.JobName)
 	}
@@ -153,4 +156,64 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 		}
 	}
 	return nil
+}
+
+// ParseMulti executes parsing rules and returns any multi-instance output from CTableToInstances.
+// Returns the workspace so the caller can check for the Instances key.
+func (this *_Parser) ParseMulti(job *l8tpollaris.CJob, any interface{}, resources ifs.IResources) ([]interface{}, error) {
+	if job.Error != "" {
+		return nil, errors.New(job.Error)
+	}
+
+	if job.Result == nil || len(job.Result) < 4 {
+		return nil, resources.Logger().Error("Invalid job result ", job.TargetId, " - ", job.PollarisName,
+			" - ", job.JobName, " - ", string(job.Result))
+	}
+
+	workSpace := make(map[string]interface{})
+	enc := object.NewDecode(job.Result, 0, resources.Registry())
+	data, err := enc.Get()
+	if err != nil {
+		return nil, resources.Logger().Error(err)
+	}
+
+	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
+	if err != nil {
+		return nil, resources.Logger().Error("cannot find poll for polaris ", job.PollarisName, ":", job.JobName)
+	}
+	workSpace[rules.Input] = data
+	workSpace[rules.JobEnded] = job.Ended
+	workSpace[rules.TargetId] = job.TargetId
+	if poll.Attributes == nil {
+		return nil, resources.Logger().Error("No attributes are defined on pollaris " + job.PollarisName + ":" + job.JobName)
+	}
+
+	modelName := targets.Links.Model(job.LinksId)
+	for _, attr := range poll.Attributes {
+		propertyId, ok := attr.PropertyId[modelName]
+		if !ok {
+			continue
+		}
+		workSpace[rules.PropertyId] = propertyId
+		for _, rData := range attr.Rules {
+			if rData.Params != nil {
+				for p, v := range rData.Params {
+					workSpace[p] = v.Value
+				}
+			}
+			ruleImpl, ok := this.rules[rData.Name]
+			if !ok {
+				return nil, resources.Logger().Error("Cannot find parsing rule ", rData.Name)
+			}
+			err = ruleImpl.Parse(resources, workSpace, rData.Params, any, poll.What)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if instances, ok := workSpace[rules.Instances].([]interface{}); ok {
+		return instances, nil
+	}
+	return nil, nil
 }

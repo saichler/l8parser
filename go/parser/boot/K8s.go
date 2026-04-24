@@ -22,23 +22,94 @@ import (
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
 
-// CreateK8sBootPolls creates the Kubernetes polling configuration for cluster monitoring.
-// It configures polling for all major K8s resources including nodes, pods, deployments,
-// statefulsets, daemonsets, services, namespaces, and network policies.
-// It also sets up on-demand detail queries and log collection jobs.
+// K8sResourcePollDef defines a K8s resource type for data-driven poll registration.
+type K8sResourcePollDef struct {
+	Name      string
+	GVR       string
+	Fields    []string
+	Headers   []string
+	ModelName string
+	ColCount  int
+	KeyIdx    []int
+}
+
+// registerClientResourcePoll registers a client-go API poll for a K8s resource.
+func registerClientResourcePoll(p *l8tpollaris.L8Pollaris, def K8sResourcePollDef) {
+	poll := createBaseK8sClientPoll(def.Name)
+	poll.What = createClientTableSpec(def.GVR, def.Fields, def.Headers)
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = map[string]string{def.ModelName: def.ModelName}
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createToTable(def.ColCount, def.KeyIdx...))
+	attr.Rules = append(attr.Rules, createTableToInstances())
+	poll.Attributes = append(poll.Attributes, attr)
+	p.Polling[poll.Name] = poll
+}
+
+// registerKubectlResourcePoll registers a kubectl-based poll for a K8s resource.
+func registerKubectlResourcePoll(p *l8tpollaris.L8Pollaris, name, what, modelName string, colCount int, keyIdx []int) {
+	poll := createBaseK8sPoll(name)
+	poll.What = what
+	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
+	attr := &l8tpollaris.L8PAttribute{}
+	attr.PropertyId = map[string]string{modelName: modelName}
+	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
+	attr.Rules = append(attr.Rules, createToTable(colCount, keyIdx...))
+	attr.Rules = append(attr.Rules, createTableToInstances())
+	poll.Attributes = []*l8tpollaris.L8PAttribute{attr}
+	p.Polling[poll.Name] = poll
+}
+
+func createTableToInstances() *l8tpollaris.L8PRule {
+	rule := &l8tpollaris.L8PRule{}
+	rule.Name = "CTableToInstances"
+	rule.Params = make(map[string]*l8tpollaris.L8PParameter)
+	return rule
+}
+
+// Core workload polls (nodes, pods, deployments, statefulsets, daemonsets, services, namespaces, networkpolicies)
+var k8sCoreClientPolls = []K8sResourcePollDef{
+	{Name: "nodes", GVR: "v1/nodes", ModelName: "k8snode", ColCount: 10, KeyIdx: []int{0},
+		Fields:  []string{"metadata.name", "_k.roles", "_k.age", "status.nodeInfo.kubeletVersion", "_k.internalip", "_k.externalip", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
+		Headers: []string{"NAME", "ROLES", "AGE", "VERSION", "INTERNAL-IP", "EXTERNAL-IP", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"}},
+	{Name: "pods", GVR: "v1/pods", ModelName: "k8spod", ColCount: 10, KeyIdx: []int{0, 1},
+		Fields:  []string{"metadata.namespace", "metadata.name", "_k.ready", "status.phase", "_k.restarts", "_k.age", "status.podIP", "spec.nodeName", "_k.nominatednode"},
+		Headers: []string{"NAMESPACE", "NAME", "READY", "STATUS", "RESTARTS", "AGE", "IP", "NODE", "NOMINATED NODE"}},
+	{Name: "deployments", GVR: "apps/v1/deployments", ModelName: "k8sdeployment", ColCount: 9, KeyIdx: []int{0, 1},
+		Fields:  []string{"metadata.namespace", "metadata.name", "_k.ready", "status.updatedReplicas", "status.availableReplicas", "_k.age", "_k.containers", "_k.images", "_k.selector"},
+		Headers: []string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"}},
+	{Name: "statefulsets", GVR: "apps/v1/statefulsets", ModelName: "k8sstatefulset", ColCount: 6, KeyIdx: []int{0, 1},
+		Fields:  []string{"metadata.namespace", "metadata.name", "_k.ready", "_k.age", "_k.containers", "_k.images"},
+		Headers: []string{"NAMESPACE", "NAME", "READY", "AGE", "CONTAINERS", "IMAGES"}},
+	{Name: "daemonsets", GVR: "apps/v1/daemonsets", ModelName: "k8sdaemonset", ColCount: 12, KeyIdx: []int{0, 1},
+		Fields:  []string{"metadata.namespace", "metadata.name", "status.desiredNumberScheduled", "status.currentNumberScheduled", "status.numberReady", "_k.uptodate", "_k.available", "_k.nodeselector", "_k.age", "_k.containers", "_k.images", "_k.selector"},
+		Headers: []string{"NAMESPACE", "NAME", "DESIRED", "CURRENT", "READY", "UP-TO-DATE", "AVAILABLE", "NODE SELECTOR", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"}},
+	{Name: "services", GVR: "v1/services", ModelName: "k8sservice", ColCount: 8, KeyIdx: []int{0, 1},
+		Fields:  []string{"metadata.namespace", "metadata.name", "spec.type", "spec.clusterIP", "_k.externalip", "_k.ports", "_k.age"},
+		Headers: []string{"NAMESPACE", "NAME", "TYPE", "CLUSTER-IP", "EXTERNAL-IP", "PORT(S)", "AGE"}},
+	{Name: "namespaces", GVR: "v1/namespaces", ModelName: "k8snamespace", ColCount: 3, KeyIdx: []int{0},
+		Fields:  []string{"metadata.name", "status.phase", "_k.age"},
+		Headers: []string{"NAME", "STATUS", "AGE"}},
+	{Name: "networkpolicies", GVR: "networking.k8s.io/v1/networkpolicies", ModelName: "k8snetworkpolicy", ColCount: 4, KeyIdx: []int{0, 1},
+		Fields:  []string{"metadata.namespace", "metadata.name", "_k.podsel", "_k.age"},
+		Headers: []string{"NAMESPACE", "NAME", "POD-SELECTOR", "AGE"}},
+}
+
+// CreateK8sBootPolls creates the kubectl-based Kubernetes polling configuration.
 func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
 	k8sPollaris := &l8tpollaris.L8Pollaris{}
 	k8sPollaris.Name = "kubernetes"
 	k8sPollaris.Groups = []string{common.BOOT_STAGE_00}
 	k8sPollaris.Polling = make(map[string]*l8tpollaris.L8Poll)
-	createNodesPoll(k8sPollaris)
-	createPodsPoll(k8sPollaris)
-	createDeploymentsPoll(k8sPollaris)
-	createStatefulsetsPoll(k8sPollaris)
-	createDaemonsetsPoll(k8sPollaris)
-	createServicesPoll(k8sPollaris)
-	createNamespacesPoll(k8sPollaris)
-	createNetworkPoliciesPoll(k8sPollaris)
+
+	registerKubectlResourcePoll(k8sPollaris, "nodes", "get nodes -o wide", "k8snode", 10, []int{0})
+	registerKubectlResourcePoll(k8sPollaris, "pods", "get pods -A -o wide", "k8spod", 10, []int{0, 1})
+	registerKubectlResourcePoll(k8sPollaris, "deployments", "get deployments -A -o wide", "k8sdeployment", 9, []int{0, 1})
+	registerKubectlResourcePoll(k8sPollaris, "statefulsets", "get statefulsets -A -o wide", "k8sstatefulset", 6, []int{0, 1})
+	registerKubectlResourcePoll(k8sPollaris, "daemonsets", "get daemonsets -A -o wide", "k8sdaemonset", 12, []int{0, 1})
+	registerKubectlResourcePoll(k8sPollaris, "services", "get services -A -o wide", "k8sservice", 8, []int{0, 1})
+	registerKubectlResourcePoll(k8sPollaris, "namespaces", "get namespaces -A -o wide", "k8snamespace", 3, []int{0})
+	registerKubectlResourcePoll(k8sPollaris, "networkpolicies", "get netpol -A -o wide", "k8snetworkpolicy", 4, []int{0, 1})
 
 	createLogs(k8sPollaris)
 
@@ -54,239 +125,25 @@ func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
 	return k8sPollaris
 }
 
-// CreateK8sClientBootPolls creates the cache-backed Kubernetes polling
-// configuration for the client-go collector. It includes equivalents for the
-// active kubectl table polls only.
+// CreateK8sClientBootPolls creates the client-go Kubernetes polling configuration.
 func CreateK8sClientBootPolls() *l8tpollaris.L8Pollaris {
 	k8sPollaris := &l8tpollaris.L8Pollaris{}
 	k8sPollaris.Name = "kubernetesapi"
 	k8sPollaris.Groups = []string{common.BOOT_STAGE_00}
 	k8sPollaris.Polling = make(map[string]*l8tpollaris.L8Poll)
-	createClientNodesPoll(k8sPollaris)
-	createClientPodsPoll(k8sPollaris)
-	createClientDeploymentsPoll(k8sPollaris)
-	createClientStatefulsetsPoll(k8sPollaris)
-	createClientDaemonsetsPoll(k8sPollaris)
-	createClientServicesPoll(k8sPollaris)
-	createClientNamespacesPoll(k8sPollaris)
-	createClientNetworkPoliciesPoll(k8sPollaris)
+	for _, def := range k8sCoreClientPolls {
+		registerClientResourcePoll(k8sPollaris, def)
+	}
+	for _, def := range k8sExtendedClientPolls {
+		registerClientResourcePoll(k8sPollaris, def)
+	}
+	for _, def := range k8sIstioClientPolls {
+		registerClientResourcePoll(k8sPollaris, def)
+	}
+	for _, def := range k8sVClusterClientPolls {
+		registerClientResourcePoll(k8sPollaris, def)
+	}
 	return k8sPollaris
-}
-
-func createNodesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("nodes")
-	poll.What = "get nodes -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNodesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createPodsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("pods")
-	poll.What = "get pods -A -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createPodsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createDeploymentsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("deployments")
-	poll.What = "get deployments -A -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createDeplymentsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createStatefulsetsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("statefulsets")
-	poll.What = "get statefulsets -A -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createStatefulsetsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createDaemonsetsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("daemonsets")
-	poll.What = "get daemonsets -A -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createDaemonsetsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createServicesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("services")
-	poll.What = "get services -A -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createServicesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createNamespacesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("namespaces")
-	poll.What = "get namespaces -A -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNamespacesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sPoll("networkpolicies")
-	poll.What = "get netpol -A -o wide"
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	poll.Attributes = append(poll.Attributes, createNetworkPoliciesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientNodesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("nodes")
-	poll.What = createClientTableSpec("v1/nodes",
-		[]string{"metadata.name", "_k.roles", "_k.age", "status.nodeInfo.kubeletVersion", "_k.internalip", "_k.externalip", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
-		[]string{"NAME", "ROLES", "AGE", "VERSION", "INTERNAL-IP", "EXTERNAL-IP", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"})
-	poll.Attributes = append(poll.Attributes, createNodesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientPodsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("pods")
-	poll.What = createClientTableSpec("v1/pods",
-		[]string{"metadata.namespace", "metadata.name", "_k.ready", "status.phase", "_k.restarts", "_k.age", "status.podIP", "spec.nodeName", "_k.nominatednode"},
-		[]string{"NAMESPACE", "NAME", "READY", "STATUS", "RESTARTS", "AGE", "IP", "NODE", "NOMINATED NODE"})
-	poll.Attributes = append(poll.Attributes, createPodsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientDeploymentsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("deployments")
-	poll.What = createClientTableSpec("apps/v1/deployments",
-		[]string{"metadata.namespace", "metadata.name", "_k.ready", "status.updatedReplicas", "status.availableReplicas", "_k.age", "_k.containers", "_k.images", "_k.selector"},
-		[]string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"})
-	poll.Attributes = append(poll.Attributes, createDeplymentsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientStatefulsetsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("statefulsets")
-	poll.What = createClientTableSpec("apps/v1/statefulsets",
-		[]string{"metadata.namespace", "metadata.name", "_k.ready", "_k.age", "_k.containers", "_k.images"},
-		[]string{"NAMESPACE", "NAME", "READY", "AGE", "CONTAINERS", "IMAGES"})
-	poll.Attributes = append(poll.Attributes, createStatefulsetsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientDaemonsetsPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("daemonsets")
-	poll.What = createClientTableSpec("apps/v1/daemonsets",
-		[]string{"metadata.namespace", "metadata.name", "status.desiredNumberScheduled", "status.currentNumberScheduled", "status.numberReady", "_k.uptodate", "_k.available", "_k.nodeselector", "_k.age", "_k.containers", "_k.images", "_k.selector"},
-		[]string{"NAMESPACE", "NAME", "DESIRED", "CURRENT", "READY", "UP-TO-DATE", "AVAILABLE", "NODE SELECTOR", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"})
-	poll.Attributes = append(poll.Attributes, createDaemonsetsTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientServicesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("services")
-	poll.What = createClientTableSpec("v1/services",
-		[]string{"metadata.namespace", "metadata.name", "spec.type", "spec.clusterIP", "_k.externalip", "_k.ports", "_k.age"},
-		[]string{"NAMESPACE", "NAME", "TYPE", "CLUSTER-IP", "EXTERNAL-IP", "PORT(S)", "AGE"})
-	poll.Attributes = append(poll.Attributes, createServicesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientNamespacesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("namespaces")
-	poll.What = createClientTableSpec("v1/namespaces",
-		[]string{"metadata.name", "status.phase", "_k.age"},
-		[]string{"NAME", "STATUS", "AGE"})
-	poll.Attributes = append(poll.Attributes, createNamespacesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createClientNetworkPoliciesPoll(p *l8tpollaris.L8Pollaris) {
-	poll := createBaseK8sClientPoll("networkpolicies")
-	poll.What = createClientTableSpec("networking.k8s.io/v1/networkpolicies",
-		[]string{"metadata.namespace", "metadata.name", "_k.age"},
-		[]string{"NAMESPACE", "NAME", "AGE"})
-	poll.Attributes = append(poll.Attributes, createNetworkPoliciesTable())
-	p.Polling[poll.Name] = poll
-}
-
-func createNodesTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.nodes"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(10, 0))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
-}
-
-func createPodsTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.pods"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(10, 0, 1))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
-}
-
-func createDeplymentsTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.deployments"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(9, 0, 1))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
-}
-
-func createStatefulsetsTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.statefulsets"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(6, 0, 1))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
-}
-
-func createDaemonsetsTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.daemonsets"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(12, 0, 1))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
-}
-
-func createServicesTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.services"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(8, 0, 1))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
-}
-
-func createNamespacesTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.namespaces"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(3, 0))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
-}
-
-func createNetworkPoliciesTable() *l8tpollaris.L8PAttribute {
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{"k8scluster": "k8scluster.networkpolicies"}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(4, 0, 1))
-	attr.Rules = append(attr.Rules, createTableToMap())
-	return attr
 }
 
 func createBaseK8sPoll(name string) *l8tpollaris.L8Poll {
@@ -400,7 +257,6 @@ func createNetworkPolicyDetails(p *l8tpollaris.L8Pollaris) {
 }
 
 // LogsJob creates a collection job for retrieving pod logs from a Kubernetes cluster.
-// Parameters: cluster (target cluster ID), context (kubectl context), namespace, podname.
 func LogsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -411,7 +267,7 @@ func LogsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
 	return job
 }
 
-// NodeDetailsJob creates a collection job for retrieving detailed node information in JSON format.
+// NodeDetailsJob creates a collection job for retrieving detailed node information.
 func NodeDetailsJob(cluster, context, nodename string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster
@@ -422,7 +278,7 @@ func NodeDetailsJob(cluster, context, nodename string) *l8tpollaris.CJob {
 	return job
 }
 
-// PodDetailsJob creates a collection job for retrieving detailed pod information in JSON format.
+// PodDetailsJob creates a collection job for retrieving detailed pod information.
 func PodDetailsJob(cluster, context, namespace, podname string) *l8tpollaris.CJob {
 	job := &l8tpollaris.CJob{}
 	job.TargetId = cluster

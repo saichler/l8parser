@@ -38,6 +38,7 @@ func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interfa
 // JobComplete is called when a collection job completes. It parses the job results
 // using the Parser, creates an element instance, and sends the parsed data to the
 // inventory cache service via PATCH operation.
+// For polls using CTableToInstances, it sends each created instance individually.
 func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IResources) {
 	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
 	if err != nil {
@@ -52,7 +53,7 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 
 	if job.Error == "" && poll.Attributes != nil {
 		elem := this.createElementInstance(job)
-		err = Parser.Parse(job, elem, resources)
+		instances, err := Parser.ParseMulti(job, elem, resources)
 		if err != nil {
 			resources.Logger().Error("ParsingCenter.JobComplete: ", job.TargetId, " - ", job.PollarisName, " - ", job.JobName, " - ", err.Error())
 			return
@@ -63,7 +64,12 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 		}
 
 		cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
-		this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
-		//this.vnic.Leader(cacheServiceName, cacheServiceArea, ifs.PATCH, elem)
+		if len(instances) > 0 {
+			for _, inst := range instances {
+				this.agg.AddElement(inst, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
+			}
+		} else {
+			this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
+		}
 	}
 }

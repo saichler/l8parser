@@ -35,4 +35,8 @@ const (
 	KeyColumn = "key_column"
 	// JobEnded is the workspace key for the job's end timestamp (unix seconds).
 	JobEnded = "job_ended"
+	// Instances is the workspace key for storing multiple model instances created by CTableToInstances.
+	Instances = "instances"
+	// TargetId is the workspace key for the collection job's target ID (e.g., cluster name).
+	TargetId = "target_id"
 )
