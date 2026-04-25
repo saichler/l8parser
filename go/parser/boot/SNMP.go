@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/saichler/l8collector/go/collector/common"
+	"github.com/saichler/l8parser/go/parser/boot/k8s"
 	"github.com/saichler/l8parser/go/parser/rules"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	strings2 "github.com/saichler/l8utils/go/utils/strings"
@@ -189,9 +190,10 @@ func GetPollarisByOid(sysOid string) *l8tpollaris.L8Pollaris {
 func GetAllPolarisModels() []*l8tpollaris.L8Pollaris {
 	models := make([]*l8tpollaris.L8Pollaris, 0)
 
-	//Generic K8s
+	//Generic K8s — kubectl-based config (single Pollaris) and the per-PrimeObject
+	//client-go configs (one Pollaris per K8s/Istio prime object, named after its LinksId).
 	models = append(models, CreateK8sBootPolls())
-	models = append(models, CreateK8sClientBootPolls())
+	models = append(models, k8s.CreateClientBootPolls()...)
 
 	// Generic Pre Boot
 	models = append(models, CreateBoot00())

@@ -16,35 +16,9 @@ limitations under the License.
 package boot
 
 import (
-	"fmt"
-
 	"github.com/saichler/l8collector/go/collector/common"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 )
-
-// K8sResourcePollDef defines a K8s resource type for data-driven poll registration.
-type K8sResourcePollDef struct {
-	Name      string
-	GVR       string
-	Fields    []string
-	Headers   []string
-	ModelName string
-	ColCount  int
-	KeyIdx    []int
-}
-
-// registerClientResourcePoll registers a client-go API poll for a K8s resource.
-func registerClientResourcePoll(p *l8tpollaris.L8Pollaris, def K8sResourcePollDef) {
-	poll := createBaseK8sClientPoll(def.Name)
-	poll.What = createClientTableSpec(def.GVR, def.Fields, def.Headers)
-	attr := &l8tpollaris.L8PAttribute{}
-	attr.PropertyId = map[string]string{def.ModelName: def.ModelName}
-	attr.Rules = make([]*l8tpollaris.L8PRule, 0)
-	attr.Rules = append(attr.Rules, createToTable(def.ColCount, def.KeyIdx...))
-	attr.Rules = append(attr.Rules, createTableToInstances())
-	poll.Attributes = append(poll.Attributes, attr)
-	p.Polling[poll.Name] = poll
-}
 
 // registerKubectlResourcePoll registers a kubectl-based poll for a K8s resource.
 func registerKubectlResourcePoll(p *l8tpollaris.L8Pollaris, name, what, modelName string, colCount int, keyIdx []int) {
@@ -65,34 +39,6 @@ func createTableToInstances() *l8tpollaris.L8PRule {
 	rule.Name = "CTableToInstances"
 	rule.Params = make(map[string]*l8tpollaris.L8PParameter)
 	return rule
-}
-
-// Core workload polls (nodes, pods, deployments, statefulsets, daemonsets, services, namespaces, networkpolicies)
-var k8sCoreClientPolls = []K8sResourcePollDef{
-	{Name: "nodes", GVR: "v1/nodes", ModelName: "k8snode", ColCount: 10, KeyIdx: []int{0},
-		Fields:  []string{"metadata.name", "_k.roles", "_k.age", "status.nodeInfo.kubeletVersion", "_k.internalip", "_k.externalip", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
-		Headers: []string{"NAME", "ROLES", "AGE", "VERSION", "INTERNAL-IP", "EXTERNAL-IP", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"}},
-	{Name: "pods", GVR: "v1/pods", ModelName: "k8spod", ColCount: 10, KeyIdx: []int{0, 1},
-		Fields:  []string{"metadata.namespace", "metadata.name", "_k.ready", "status.phase", "_k.restarts", "_k.age", "status.podIP", "spec.nodeName", "_k.nominatednode"},
-		Headers: []string{"NAMESPACE", "NAME", "READY", "STATUS", "RESTARTS", "AGE", "IP", "NODE", "NOMINATED NODE"}},
-	{Name: "deployments", GVR: "apps/v1/deployments", ModelName: "k8sdeployment", ColCount: 9, KeyIdx: []int{0, 1},
-		Fields:  []string{"metadata.namespace", "metadata.name", "_k.ready", "status.updatedReplicas", "status.availableReplicas", "_k.age", "_k.containers", "_k.images", "_k.selector"},
-		Headers: []string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"}},
-	{Name: "statefulsets", GVR: "apps/v1/statefulsets", ModelName: "k8sstatefulset", ColCount: 6, KeyIdx: []int{0, 1},
-		Fields:  []string{"metadata.namespace", "metadata.name", "_k.ready", "_k.age", "_k.containers", "_k.images"},
-		Headers: []string{"NAMESPACE", "NAME", "READY", "AGE", "CONTAINERS", "IMAGES"}},
-	{Name: "daemonsets", GVR: "apps/v1/daemonsets", ModelName: "k8sdaemonset", ColCount: 12, KeyIdx: []int{0, 1},
-		Fields:  []string{"metadata.namespace", "metadata.name", "status.desiredNumberScheduled", "status.currentNumberScheduled", "status.numberReady", "_k.uptodate", "_k.available", "_k.nodeselector", "_k.age", "_k.containers", "_k.images", "_k.selector"},
-		Headers: []string{"NAMESPACE", "NAME", "DESIRED", "CURRENT", "READY", "UP-TO-DATE", "AVAILABLE", "NODE SELECTOR", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"}},
-	{Name: "services", GVR: "v1/services", ModelName: "k8sservice", ColCount: 8, KeyIdx: []int{0, 1},
-		Fields:  []string{"metadata.namespace", "metadata.name", "spec.type", "spec.clusterIP", "_k.externalip", "_k.ports", "_k.age"},
-		Headers: []string{"NAMESPACE", "NAME", "TYPE", "CLUSTER-IP", "EXTERNAL-IP", "PORT(S)", "AGE"}},
-	{Name: "namespaces", GVR: "v1/namespaces", ModelName: "k8snamespace", ColCount: 3, KeyIdx: []int{0},
-		Fields:  []string{"metadata.name", "status.phase", "_k.age"},
-		Headers: []string{"NAME", "STATUS", "AGE"}},
-	{Name: "networkpolicies", GVR: "networking.k8s.io/v1/networkpolicies", ModelName: "k8snetworkpolicy", ColCount: 4, KeyIdx: []int{0, 1},
-		Fields:  []string{"metadata.namespace", "metadata.name", "_k.podsel", "_k.age"},
-		Headers: []string{"NAMESPACE", "NAME", "POD-SELECTOR", "AGE"}},
 }
 
 // CreateK8sBootPolls creates the kubectl-based Kubernetes polling configuration.
@@ -125,27 +71,6 @@ func CreateK8sBootPolls() *l8tpollaris.L8Pollaris {
 	return k8sPollaris
 }
 
-// CreateK8sClientBootPolls creates the client-go Kubernetes polling configuration.
-func CreateK8sClientBootPolls() *l8tpollaris.L8Pollaris {
-	k8sPollaris := &l8tpollaris.L8Pollaris{}
-	k8sPollaris.Name = "kubernetesapi"
-	k8sPollaris.Groups = []string{common.BOOT_STAGE_00}
-	k8sPollaris.Polling = make(map[string]*l8tpollaris.L8Poll)
-	for _, def := range k8sCoreClientPolls {
-		registerClientResourcePoll(k8sPollaris, def)
-	}
-	for _, def := range k8sExtendedClientPolls {
-		registerClientResourcePoll(k8sPollaris, def)
-	}
-	for _, def := range k8sIstioClientPolls {
-		registerClientResourcePoll(k8sPollaris, def)
-	}
-	for _, def := range k8sVClusterClientPolls {
-		registerClientResourcePoll(k8sPollaris, def)
-	}
-	return k8sPollaris
-}
-
 func createBaseK8sPoll(name string) *l8tpollaris.L8Poll {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = name
@@ -153,35 +78,6 @@ func createBaseK8sPoll(name string) *l8tpollaris.L8Poll {
 	poll.Cadence = EVERY_5_MINUTES_ALWAYS
 	poll.Protocol = l8tpollaris.L8PProtocol_L8PKubectl
 	return poll
-}
-
-func createBaseK8sClientPoll(name string) *l8tpollaris.L8Poll {
-	poll := &l8tpollaris.L8Poll{}
-	poll.Name = name
-	poll.Timeout = DEFAULT_TIMEOUT
-	poll.Cadence = EVERY_5_MINUTES_ALWAYS
-	poll.Protocol = l8tpollaris.L8PProtocol_L8PKubernetesAPI
-	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
-	poll.Attributes = make([]*l8tpollaris.L8PAttribute, 0)
-	return poll
-}
-
-func createClientTableSpec(gvr string, fields, columnNames []string) string {
-	return fmt.Sprintf(`{"result":"table","mode":"list","gvr":"%s","fields":["%s"],"columnNames":["%s"]}`,
-		gvr,
-		stringsJoin(fields),
-		stringsJoin(columnNames))
-}
-
-func stringsJoin(values []string) string {
-	if len(values) == 0 {
-		return ""
-	}
-	result := values[0]
-	for i := 1; i < len(values); i++ {
-		result += `","` + values[i]
-	}
-	return result
 }
 
 func createLogs(p *l8tpollaris.L8Pollaris) {
