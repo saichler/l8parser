@@ -20,8 +20,13 @@ var Pod = K8sResourcePollDef{
 	Name:      "pods",
 	GVR:       "v1/pods",
 	ModelName: "k8spod",
-	ColCount:  10,
-	KeyIdx:    []int{0, 1},
-	Fields:    []string{"metadata.namespace", "metadata.name", "_k.ready", "status.phase", "_k.restarts", "_k.age", "status.podIP", "spec.nodeName", "_k.nominatednode"},
-	Headers:   []string{"NAMESPACE", "NAME", "READY", "STATUS", "RESTARTS", "AGE", "IP", "NODE", "NOMINATED NODE"},
+	// CONTAINERS_JSON carries the JSON-encoded container array produced by
+	// l8collector's enrichPodContainers. The parser stores the raw string
+	// in K8sPod.containers_json and the UI's pod detail popup parses it to
+	// render image / imagePullPolicy / ports / env / resources / volumeMounts
+	// per container.
+	ColCount: 11,
+	KeyIdx:   []int{0, 1},
+	Fields:   []string{"metadata.namespace", "metadata.name", "_k.ready", "status.phase", "_k.restarts", "_k.age", "status.podIP", "spec.nodeName", "_k.nominatednode", "_k.containers_json"},
+	Headers:  []string{"NAMESPACE", "NAME", "READY", "STATUS", "RESTARTS", "AGE", "IP", "NODE", "NOMINATED NODE", "CONTAINERS_JSON"},
 }

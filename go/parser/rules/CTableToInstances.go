@@ -124,33 +124,95 @@ func (this *CTableToInstances) Parse(resources ifs.IResources, workSpace map[str
 	return nil
 }
 
+// findFieldByJsonName resolves a CTable column name (already lowered by the
+// collector's getAttributeNameFromColumn — dashes, spaces and parens stripped,
+// but underscores preserved) to a field on the target proto struct.
+//
+// Two facts make this trickier than it looks:
+//
+//  1. The collector's column normalization strips dashes (e.g. INTERNAL-IP →
+//     "internalip") but keeps underscores (CONTAINERS_JSON → "containers_json").
+//     So a single column name can be either the camelCase proto JSON name
+//     ("internalip") OR the snake_case Go field tag ("containers_json").
+//  2. protoc emits TWO json identifiers per field — the camelCase one inside
+//     the `protobuf:"...,json=foo,proto3"` tag, and the snake_case one in the
+//     plain Go `json:"foo,omitempty"` tag — and it OMITS the `json=` clause
+//     entirely for single-word fields. Either tag alone is insufficient:
+//     - protobuf json= alone misses single-word fields (name, age, roles…)
+//     - go json: alone misses snake_case (internal_ip ≠ internalip)
+//
+// The fix: try BOTH candidate names per field, plus a third comparison that
+// strips underscores from both sides (so "internal_ip" matches "internalip").
+// Order doesn't matter — EqualFold is symmetric.
 func findFieldByJsonName(v reflect.Value, jsonName string) reflect.Value {
 	t := v.Type()
+	target := stripUnderscores(jsonName)
 	for i := 0; i < t.NumField(); i++ {
 		sf := t.Field(i)
 		if !sf.IsExported() {
 			continue
 		}
-		// Use the canonical Go `json:` tag (the part before the first comma).
-		// The previous implementation read `json=` out of the protobuf: tag,
-		// which protoc only emits when the JSON name differs from the proto
-		// field name. For single-word / camelCase fields (e.g. `name`, `roles`,
-		// `age`, `version`) protoc omits `json=` entirely, so the lookup
-		// returned "" and never matched — leaving those fields empty on every
-		// parsed instance.
-		jsonTag := sf.Tag.Get("json")
-		if jsonTag == "" {
-			continue
+
+		// Candidate 1: name from the protobuf tag's `json=` clause (camelCase
+		// when present, e.g. internal_ip → internalIp).
+		if pbName := protobufJSONName(sf.Tag.Get("protobuf")); pbName != "" {
+			if strings.EqualFold(pbName, jsonName) || strings.EqualFold(stripUnderscores(pbName), target) {
+				return v.Field(i)
+			}
 		}
-		name := jsonTag
-		if comma := indexOf(name, ","); comma != -1 {
-			name = name[:comma]
-		}
-		if strings.EqualFold(name, jsonName) {
-			return v.Field(i)
+
+		// Candidate 2: name from the Go `json:` struct tag (snake_case for
+		// underscore fields, plain word otherwise — covers single-word fields
+		// the protobuf clause omits).
+		if goJSON := sf.Tag.Get("json"); goJSON != "" {
+			name := goJSON
+			if comma := indexOf(name, ","); comma != -1 {
+				name = name[:comma]
+			}
+			if name != "" && (strings.EqualFold(name, jsonName) || strings.EqualFold(stripUnderscores(name), target)) {
+				return v.Field(i)
+			}
 		}
 	}
 	return reflect.Value{}
+}
+
+// protobufJSONName extracts the value of `json=...` from a protoc-emitted
+// protobuf struct tag. Returns "" when the clause is absent (which happens
+// for single-word fields whose JSON name equals the proto field name).
+func protobufJSONName(protobufTag string) string {
+	const marker = "json="
+	idx := indexOfSubstr(protobufTag, marker)
+	if idx == -1 {
+		return ""
+	}
+	rest := protobufTag[idx+len(marker):]
+	if comma := indexOf(rest, ","); comma != -1 {
+		rest = rest[:comma]
+	}
+	return rest
+}
+
+func stripUnderscores(s string) string {
+	if !containsByte(s, '_') {
+		return s
+	}
+	out := make([]byte, 0, len(s))
+	for i := 0; i < len(s); i++ {
+		if s[i] != '_' {
+			out = append(out, s[i])
+		}
+	}
+	return string(out)
+}
+
+func containsByte(s string, b byte) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] == b {
+			return true
+		}
+	}
+	return false
 }
 
 func indexOf(s, substr string) int {
@@ -161,6 +223,11 @@ func indexOf(s, substr string) int {
 	}
 	return -1
 }
+
+// indexOfSubstr is a separate name to avoid a self-shadow with indexOf.
+// (Both call sites currently want the same behavior; the duplication is
+// kept for symmetry / readability.)
+func indexOfSubstr(s, substr string) int { return indexOf(s, substr) }
 
 func setFieldValue(field reflect.Value, val interface{}) {
 	valRef := reflect.ValueOf(val)
