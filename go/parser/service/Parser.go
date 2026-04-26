@@ -118,7 +118,12 @@ func (this *_Parser) Parse(job *l8tpollaris.CJob, any interface{}, resources ifs
 	}
 	workSpace[rules.Input] = data
 	workSpace[rules.JobEnded] = job.Ended
-	workSpace[rules.TargetId] = job.TargetId
+	// Workspace key is named TargetId for historical reasons but holds the
+	// HostId — i.e. the cluster/device identity used as the cluster-name
+	// primary key on parsed instances. TargetId may be unique-per-link in
+	// multi-target-per-host setups (probler K8s) and would corrupt the
+	// resulting instance's ClusterName field.
+	workSpace[rules.TargetId] = job.HostId
 	if poll.Attributes == nil {
 		return resources.Logger().Error("No attributes are defined on pollaris "+job.PollarisName, ":", job.JobName)
 	}
@@ -183,7 +188,12 @@ func (this *_Parser) ParseMulti(job *l8tpollaris.CJob, any interface{}, resource
 	}
 	workSpace[rules.Input] = data
 	workSpace[rules.JobEnded] = job.Ended
-	workSpace[rules.TargetId] = job.TargetId
+	// Workspace key is named TargetId for historical reasons but holds the
+	// HostId — i.e. the cluster/device identity used as the cluster-name
+	// primary key on parsed instances. TargetId may be unique-per-link in
+	// multi-target-per-host setups (probler K8s) and would corrupt the
+	// resulting instance's ClusterName field.
+	workSpace[rules.TargetId] = job.HostId
 	if poll.Attributes == nil {
 		return nil, resources.Logger().Error("No attributes are defined on pollaris " + job.PollarisName + ":" + job.JobName)
 	}

@@ -27,8 +27,9 @@ import (
 
 // CTableToInstances converts a CTable into individual model instances, one per row.
 // Each row becomes a separate proto instance with fields mapped from table columns.
-// ClusterName is set from the job's target ID (stored in workspace as TargetId),
-// and Key is built from the key columns (e.g., "namespace/name").
+// ClusterName is set from the job's host ID (stored in workspace under the
+// TargetId key for historical reasons — see Parser.go), and Key is built from
+// the key columns (e.g., "namespace/name").
 type CTableToInstances struct{}
 
 func (this *CTableToInstances) Name() string {
