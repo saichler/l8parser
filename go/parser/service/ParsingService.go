@@ -16,13 +16,14 @@ limitations under the License.
 package service
 
 import (
-	"github.com/saichler/l8pollaris/go/pollaris/targets"
-	"github.com/saichler/l8utils/go/utils/aggregator"
+	"fmt"
 	"os"
 	"sync"
 
+	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8utils/go/utils/aggregator"
 	"github.com/saichler/l8utils/go/utils/strings"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -54,6 +55,8 @@ type ParsingService struct {
 // persist (whether to save jobs to disk), vnic (virtual NIC for communication), primaryKeys (keys for the service item).
 func Activate(linksID string, serviceItem interface{}, persist bool, vnic ifs.IVNic, primaryKeys ...string) {
 	parserServiceName, parserServiceArea := targets.Links.Parser(linksID)
+	fmt.Printf("[PARSER-ACTIVATE] linksId=%s parser=(%s,%d) elem=%T\n",
+		linksID, parserServiceName, parserServiceArea, serviceItem)
 	vnic.Resources().Logger().Info("Activating parser service ", parserServiceName, " area ", parserServiceArea, " with ", linksID)
 	sla := ifs.NewServiceLevelAgreement(&ParsingService{}, parserServiceName, parserServiceArea, true, nil)
 	sla.SetServiceItem(serviceItem)
@@ -103,6 +106,7 @@ func (this *ParsingService) DeActivate() error {
 // Post handles incoming collection job results. It optionally persists jobs to disk
 // and triggers the JobComplete handler for each received job.
 func (this *ParsingService) Post(pbs ifs.IElements, vnic ifs.IVNic) ifs.IElements {
+	fmt.Printf("[PARSER-POST] elements=%d\n", len(pbs.Elements()))
 	for _, pb := range pbs.Elements() {
 		job := pb.(*l8tpollaris.CJob)
 		if this.persistJobs {
