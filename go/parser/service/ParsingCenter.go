@@ -26,14 +26,19 @@ import (
 )
 
 // createElementInstance creates a new instance of the configured element type
-// and initializes its primary key field with the job's target ID.
+// and initializes its primary key field with the job's host ID.
+//
+// HostId is used (not TargetId) so that callers can post multiple targets per
+// host without the host's identifying primary key (e.g. ClusterName for K8s
+// resources) inheriting per-target uniqueness suffixes. For setups where one
+// target == one host, HostId == TargetId and behavior is unchanged.
 func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interface{} {
 	newElem := reflect.New(reflect.ValueOf(this.elem).Elem().Type())
 	field := newElem.Elem().FieldByName(this.primaryKey)
 	if !field.CanSet() {
 		panic("cannot set field " + this.primaryKey)
 	}
-	field.Set(reflect.ValueOf(job.TargetId))
+	field.Set(reflect.ValueOf(job.HostId))
 	return newElem.Interface()
 }
 
