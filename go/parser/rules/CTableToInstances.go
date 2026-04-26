@@ -164,13 +164,33 @@ func indexOf(s, substr string) int {
 
 func setFieldValue(field reflect.Value, val interface{}) {
 	valRef := reflect.ValueOf(val)
+
+	// String → typed-int32 enum lookup MUST come before AssignableTo /
+	// ConvertibleTo. Go allows `string → int32` via Convert (it produces a
+	// rune-valued int32), which would silently store garbage in the field.
+	// The enum registry resolves "Running" → 1 etc. for registered enum
+	// types and short-circuits before that path is taken. Unregistered
+	// types (or unmapped raw values) fall through to the existing logic.
+	if valRef.Kind() == reflect.String {
+		if v, ok := enumValueForField(field, valRef.String()); ok {
+			field.SetInt(int64(v))
+			return
+		}
+	}
+
 	if valRef.Type().AssignableTo(field.Type()) {
 		field.Set(valRef)
 		return
 	}
 	if valRef.Type().ConvertibleTo(field.Type()) {
-		field.Set(valRef.Convert(field.Type()))
-		return
+		// Skip the rune-producing string→int conversion explicitly. If the
+		// target was a typed enum, we already tried the registry above; if
+		// the target is a raw int32 the parser had no way to interpret a
+		// string anyway, and storing a rune would mask the missing mapping.
+		if !(valRef.Kind() == reflect.String && field.Kind() == reflect.Int32) {
+			field.Set(valRef.Convert(field.Type()))
+			return
+		}
 	}
 	if field.Kind() == reflect.String {
 		// Fallback: stringify the source value without a type prefix. Including

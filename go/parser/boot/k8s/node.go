@@ -20,8 +20,12 @@ var Node = K8sResourcePollDef{
 	Name:      "nodes",
 	GVR:       "v1/nodes",
 	ModelName: "k8snode",
-	ColCount:  10,
-	KeyIdx:    []int{0},
-	Fields:    []string{"metadata.name", "_k.roles", "_k.age", "status.nodeInfo.kubeletVersion", "_k.internalip", "_k.externalip", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
-	Headers:   []string{"NAME", "ROLES", "AGE", "VERSION", "INTERNAL-IP", "EXTERNAL-IP", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"},
+	// Adding STATUS as the second column to match `kubectl get nodes`
+	// layout. The collector's enrichNode() computes the Ready/NotReady
+	// string from status.conditions[type=Ready].status; the parser maps
+	// it through the EnumRegistry to the K8SNodeStatus enum field.
+	ColCount: 11,
+	KeyIdx:   []int{0},
+	Fields:   []string{"metadata.name", "_k.status", "_k.roles", "_k.age", "status.nodeInfo.kubeletVersion", "_k.internalip", "_k.externalip", "status.nodeInfo.osImage", "status.nodeInfo.kernelVersion", "status.nodeInfo.containerRuntimeVersion"},
+	Headers:  []string{"NAME", "STATUS", "ROLES", "AGE", "VERSION", "INTERNAL-IP", "EXTERNAL-IP", "OS-IMAGE", "KERNEL-VERSION", "CONTAINER-RUNTIME"},
 }

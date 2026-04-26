@@ -22,6 +22,9 @@ var Deploy = K8sResourcePollDef{
 	ModelName: "k8sdeployment",
 	ColCount:  9,
 	KeyIdx:    []int{0, 1},
-	Fields:    []string{"metadata.namespace", "metadata.name", "_k.ready", "status.updatedReplicas", "status.availableReplicas", "_k.age", "_k.containers", "_k.images", "_k.selector"},
-	Headers:   []string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"},
+	// _k.uptodate / _k.available are pre-stringified by enrichDeployment in
+	// l8collector. Reading the raw status.* paths produced empty cells when
+	// the fields were omitted by K8s and "[]"-decoded values otherwise.
+	Fields:  []string{"metadata.namespace", "metadata.name", "_k.ready", "_k.uptodate", "_k.available", "_k.age", "_k.containers", "_k.images", "_k.selector"},
+	Headers: []string{"NAMESPACE", "NAME", "READY", "UP-TO-DATE", "AVAILABLE", "AGE", "CONTAINERS", "IMAGES", "SELECTOR"},
 }
