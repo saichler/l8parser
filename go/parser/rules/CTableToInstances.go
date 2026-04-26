@@ -17,6 +17,7 @@ package rules
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -59,11 +60,18 @@ func (this *CTableToInstances) Parse(resources ifs.IResources, workSpace map[str
 	targetId, _ := workSpace[TargetId].(string)
 
 	elemType := reflect.ValueOf(any).Elem().Type()
+	// Plain string conversion (no type prefix). The Key field is just a flat
+	// identifier (e.g. "namespace/name"). Earlier versions left TypesPrefix=true
+	// here, which produced "{24}namespace/{24}name" — visible in the UI and
+	// breaking any consumer that expected a clean composite key.
 	toString := strings2.New()
-	toString.TypesPrefix = true
+	toString.TypesPrefix = false
+
+	fmt.Printf("[CTABLE->INSTANCES] elemType=%s rows=%d cols=%d keyCols=%v targetId=%q\n",
+		elemType.Name(), len(table.Rows), len(table.Columns), keyColumns, targetId)
 
 	instances := make([]interface{}, 0, len(table.Rows))
-	for _, row := range table.Rows {
+	for rowIdx, row := range table.Rows {
 		inst := reflect.New(elemType)
 		instElem := inst.Elem()
 
@@ -101,8 +109,16 @@ func (this *CTableToInstances) Parse(resources ifs.IResources, workSpace map[str
 			keyField.Set(reflect.ValueOf(keyBuilder.String()))
 		}
 
+		if rowIdx < 3 {
+			fmt.Printf("[CTABLE->INSTANCE] row=%d cluster=%q key=%q\n",
+				rowIdx, targetId, keyBuilder.String())
+		}
+
 		instances = append(instances, inst.Interface())
 	}
+
+	fmt.Printf("[CTABLE->INSTANCES-DONE] elemType=%s instances=%d\n",
+		elemType.Name(), len(instances))
 
 	workSpace[Instances] = instances
 	return nil
@@ -157,8 +173,10 @@ func setFieldValue(field reflect.Value, val interface{}) {
 		return
 	}
 	if field.Kind() == reflect.String {
+		// Fallback: stringify the source value without a type prefix. Including
+		// the prefix (e.g. "{2}123") would corrupt user-visible string fields.
 		str := strings2.New()
-		str.TypesPrefix = true
+		str.TypesPrefix = false
 		field.Set(reflect.ValueOf(str.ToString(valRef)))
 	}
 }
