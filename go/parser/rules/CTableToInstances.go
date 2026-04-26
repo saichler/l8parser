@@ -115,34 +115,26 @@ func findFieldByJsonName(v reflect.Value, jsonName string) reflect.Value {
 		if !sf.IsExported() {
 			continue
 		}
-		tag := sf.Tag.Get("protobuf")
-		if tag == "" {
+		// Use the canonical Go `json:` tag (the part before the first comma).
+		// The previous implementation read `json=` out of the protobuf: tag,
+		// which protoc only emits when the JSON name differs from the proto
+		// field name. For single-word / camelCase fields (e.g. `name`, `roles`,
+		// `age`, `version`) protoc omits `json=` entirely, so the lookup
+		// returned "" and never matched — leaving those fields empty on every
+		// parsed instance.
+		jsonTag := sf.Tag.Get("json")
+		if jsonTag == "" {
 			continue
 		}
-		name := extractJsonName(tag)
+		name := jsonTag
+		if comma := indexOf(name, ","); comma != -1 {
+			name = name[:comma]
+		}
 		if strings.EqualFold(name, jsonName) {
 			return v.Field(i)
 		}
 	}
 	return reflect.Value{}
-}
-
-func extractJsonName(tag string) string {
-	const prefix = "json="
-	idx := 0
-	for idx < len(tag) {
-		pos := indexOf(tag[idx:], prefix)
-		if pos == -1 {
-			return ""
-		}
-		start := idx + pos + len(prefix)
-		end := indexOf(tag[start:], ",")
-		if end == -1 {
-			return tag[start:]
-		}
-		return tag[start : start+end]
-	}
-	return ""
 }
 
 func indexOf(s, substr string) int {
