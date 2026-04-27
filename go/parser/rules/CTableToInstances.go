@@ -97,7 +97,7 @@ func (this *CTableToInstances) Parse(resources ifs.IResources, workSpace map[str
 			if !field.IsValid() || !field.CanSet() {
 				continue
 			}
-			setFieldValue(field, val)
+			setFieldValue(field, val, resources)
 		}
 
 		clusterField := instElem.FieldByName("ClusterName")
@@ -229,7 +229,7 @@ func indexOf(s, substr string) int {
 // kept for symmetry / readability.)
 func indexOfSubstr(s, substr string) int { return indexOf(s, substr) }
 
-func setFieldValue(field reflect.Value, val interface{}) {
+func setFieldValue(field reflect.Value, val interface{}, resources ifs.IResources) {
 	valRef := reflect.ValueOf(val)
 
 	// String → typed-int32 enum lookup MUST come before AssignableTo /
@@ -241,6 +241,21 @@ func setFieldValue(field reflect.Value, val interface{}) {
 	if valRef.Kind() == reflect.String {
 		if v, ok := enumValueForField(field, valRef.String()); ok {
 			field.SetInt(int64(v))
+			return
+		}
+	}
+
+	// String → registered-serializer struct (e.g. "1/2" → *K8SReadyState).
+	// Mirrors the lookup pattern in l8reflect/properties/Setter.go: ask the
+	// type registry for a STRING-mode serializer for the field's element
+	// type, and use it to unmarshal the raw string into a struct instance.
+	// Without this, every K8s field whose proto type is a custom struct
+	// (K8sReadyState, K8sRestartsState, …) stays nil and renders blank in
+	// the UI. Falls through cleanly when no serializer is registered, so
+	// unrelated parsers see no behavior change.
+	if valRef.Kind() == reflect.String && resources != nil {
+		if newVal, ok := serializerStringToStruct(field, valRef.String(), resources); ok {
+			field.Set(newVal)
 			return
 		}
 	}
@@ -266,4 +281,66 @@ func setFieldValue(field reflect.Value, val interface{}) {
 		str.TypesPrefix = false
 		field.Set(reflect.ValueOf(str.ToString(valRef)))
 	}
+}
+
+// serializerStringToStruct asks the type registry for a STRING-mode
+// serializer registered against the field's struct type, and returns
+// the unmarshalled instance as a reflect.Value. Returns (zero, false)
+// when:
+//   - the target type is not Ptr/Struct (primitives go through other paths)
+//   - the target type has no registered Info (uncommon — most proto types
+//     get registered via Registry().Register())
+//   - no STRING-mode serializer is registered against that Info
+//   - the serializer's Unmarshal returns an error or nil instance
+//
+// The non-silent-fallback policy applies: when Unmarshal genuinely errors
+// on a registered type we emit a `[CTABLE-SERIALIZE-WARN]` log so the
+// failure is visible during dev, but we still fall through so the row
+// can still be processed (other fields may parse fine).
+func serializerStringToStruct(field reflect.Value, raw string, resources ifs.IResources) (reflect.Value, bool) {
+	typ := field.Type()
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	if typ.Kind() != reflect.Struct {
+		return reflect.Value{}, false
+	}
+	typeName := typ.Name()
+	if typeName == "" {
+		return reflect.Value{}, false
+	}
+	registry := resources.Registry()
+	if registry == nil {
+		return reflect.Value{}, false
+	}
+	info, err := registry.Info(typeName)
+	if err != nil || info == nil {
+		return reflect.Value{}, false
+	}
+	serializer := info.Serializer(ifs.STRING)
+	if serializer == nil {
+		return reflect.Value{}, false
+	}
+	inst, sErr := serializer.Unmarshal([]byte(raw), resources)
+	if sErr != nil {
+		fmt.Printf("[CTABLE-SERIALIZE-WARN] %s.Unmarshal(%q) failed: %s\n",
+			typeName, raw, sErr.Error())
+		return reflect.Value{}, false
+	}
+	if inst == nil {
+		return reflect.Value{}, false
+	}
+	v := reflect.ValueOf(inst)
+	// The serializer typically returns a pointer (e.g. &K8SReadyState{...}).
+	// If the target field is the struct value (not a pointer), unwrap.
+	if v.Kind() == reflect.Ptr && field.Kind() != reflect.Ptr {
+		v = v.Elem()
+	}
+	if !v.Type().AssignableTo(field.Type()) {
+		// Defensive: serializer produced an incompatible type. Don't crash.
+		fmt.Printf("[CTABLE-SERIALIZE-WARN] %s serializer returned %s, not assignable to %s\n",
+			typeName, v.Type().String(), field.Type().String())
+		return reflect.Value{}, false
+	}
+	return v, true
 }
