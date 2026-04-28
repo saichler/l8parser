@@ -303,22 +303,28 @@ func serializerStringToStruct(field reflect.Value, raw string, resources ifs.IRe
 		typ = typ.Elem()
 	}
 	if typ.Kind() != reflect.Struct {
+		// Not a struct/pointer-to-struct target — silent (this branch
+		// fires for every string field; logging here would be deafening).
 		return reflect.Value{}, false
 	}
 	typeName := typ.Name()
 	if typeName == "" {
+		fmt.Printf("[CTABLE-SERIALIZE-MISS] anonymous struct, raw=%q\n", raw)
 		return reflect.Value{}, false
 	}
 	registry := resources.Registry()
 	if registry == nil {
+		fmt.Printf("[CTABLE-SERIALIZE-MISS] no registry on resources, type=%s raw=%q\n", typeName, raw)
 		return reflect.Value{}, false
 	}
 	info, err := registry.Info(typeName)
 	if err != nil || info == nil {
+		fmt.Printf("[CTABLE-SERIALIZE-MISS] no Info for %q raw=%q err=%v\n", typeName, raw, err)
 		return reflect.Value{}, false
 	}
 	serializer := info.Serializer(ifs.STRING)
 	if serializer == nil {
+		fmt.Printf("[CTABLE-SERIALIZE-MISS] no STRING serializer for %s raw=%q\n", typeName, raw)
 		return reflect.Value{}, false
 	}
 	inst, sErr := serializer.Unmarshal([]byte(raw), resources)
@@ -328,6 +334,7 @@ func serializerStringToStruct(field reflect.Value, raw string, resources ifs.IRe
 		return reflect.Value{}, false
 	}
 	if inst == nil {
+		fmt.Printf("[CTABLE-SERIALIZE-MISS] %s.Unmarshal(%q) returned nil\n", typeName, raw)
 		return reflect.Value{}, false
 	}
 	v := reflect.ValueOf(inst)
@@ -342,5 +349,6 @@ func serializerStringToStruct(field reflect.Value, raw string, resources ifs.IRe
 			typeName, v.Type().String(), field.Type().String())
 		return reflect.Value{}, false
 	}
+	fmt.Printf("[CTABLE-SERIALIZE-OK] %s ← %q\n", typeName, raw)
 	return v, true
 }
