@@ -205,6 +205,19 @@ func coerceValue(resources ifs.IResources, value interface{}, instance *properti
 	// Check if the value type matches the node type
 	valueType := reflect.TypeOf(value).String()
 	if valueType != typeName {
+		// String → struct via registered STRING serializer.
+		// Setter.go (l8reflect/properties) will pick up the serializer when
+		// it sees a string value targeting a struct field with a registered
+		// info.Serializer(STRING). Don't clobber the string here — let it
+		// flow through. This restores the original behavior of the Set rule
+		// before coerceValue's defaultValueForType fallback was added.
+		if valueKind == reflect.String && !isBasicTypeName(typeName) {
+			if info, err := resources.Registry().Info(typeName); err == nil && info != nil {
+				if info.Serializer(ifs.STRING) != nil {
+					return value
+				}
+			}
+		}
 		propertyId, _ := instance.PropertyId()
 		resources.Logger().Debug("coerceValue type mismatch: property=", propertyId, ", nodeType=", typeName, ", valueType=", valueType, ", value=", value)
 		return defaultValueForType(typeName)
