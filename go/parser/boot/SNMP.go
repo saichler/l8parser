@@ -51,6 +51,15 @@ var DEFAULT_TIMEOUT int64 = 60
 // stringConvert is a utility for converting values to strings with type prefixes.
 var stringConvert = &strings2.String{TypesPrefix: true}
 
+// externalModels holds pollaris configs registered by external projects via RegisterPollaris.
+var externalModels []*l8tpollaris.L8Pollaris
+
+// RegisterPollaris allows external projects to register their pollaris configs
+// so they are included in GetAllPolarisModels() and loaded on every node.
+func RegisterPollaris(p *l8tpollaris.L8Pollaris) {
+	externalModels = append(externalModels, p)
+}
+
 // CreateBoot00 creates the initial boot stage Pollaris model for IP address collection.
 // This is the first stage in the device discovery process.
 func CreateBoot00() *l8tpollaris.L8Pollaris {
@@ -251,6 +260,9 @@ func GetAllPolarisModels() []*l8tpollaris.L8Pollaris {
 
 	// NVIDIA GPU servers
 	models = append(models, CreateNvidiaGpuBootPolls())
+
+	// External project-registered pollaris configs
+	models = append(models, externalModels...)
 
 	return models
 }
