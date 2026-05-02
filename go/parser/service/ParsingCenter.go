@@ -16,7 +16,6 @@ limitations under the License.
 package service
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
@@ -47,19 +46,13 @@ func (this *ParsingService) createElementInstance(job *l8tpollaris.CJob) interfa
 // inventory cache service via PATCH operation.
 // For polls using CTableToInstances, it sends each created instance individually.
 func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IResources) {
-	fmt.Printf("[PARSER-RECV] target=%s linksId=%s pollaris=%s job=%s err=%q resultBytes=%d\n",
-		job.TargetId, job.LinksId, job.PollarisName, job.JobName, job.Error, len(job.Result))
 	poll, err := pollaris.Poll(job.PollarisName, job.JobName, resources)
 	if err != nil {
-		fmt.Printf("[PARSER-ERR] target=%s linksId=%s job=%s pollLookupErr=%s\n",
-			job.TargetId, job.LinksId, job.JobName, err.Error())
 		resources.Logger().Error("ParsingCenter:" + err.Error())
 		return
 	}
 
 	if job.Error != "" {
-		fmt.Printf("[PARSER-JOBERR] target=%s linksId=%s job=%s err=%s\n",
-			job.TargetId, job.LinksId, job.JobName, job.Error)
 		resources.Logger().Error("ParsingCenter: job error = ", job.Error)
 		return
 	}
@@ -68,21 +61,15 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 		elem := this.createElementInstance(job)
 		instances, err := Parser.ParseMulti(job, elem, resources)
 		if err != nil {
-			fmt.Printf("[PARSER-PARSEERR] target=%s linksId=%s job=%s err=%s\n",
-				job.TargetId, job.LinksId, job.JobName, err.Error())
 			resources.Logger().Error("ParsingCenter.JobComplete: ", job.TargetId, " - ", job.PollarisName, " - ", job.JobName, " - ", err.Error())
 			return
 		}
 		if this.vnic == nil {
-			fmt.Printf("[PARSER-NOVNIC] target=%s linksId=%s job=%s\n",
-				job.TargetId, job.LinksId, job.JobName)
 			resources.Logger().Error("No Vnic to notify inventory")
 			return
 		}
 
 		cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
-		fmt.Printf("[PARSER-FWD-CACHE] target=%s linksId=%s job=%s -> cache=(%s,%d) instances=%d\n",
-			job.TargetId, job.LinksId, job.JobName, cacheServiceName, cacheServiceArea, len(instances))
 		if len(instances) > 0 {
 			for _, inst := range instances {
 				this.agg.AddElement(inst, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
@@ -90,8 +77,5 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 		} else {
 			this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
 		}
-	} else {
-		fmt.Printf("[PARSER-SKIP] target=%s linksId=%s job=%s reason=no-attributes\n",
-			job.TargetId, job.LinksId, job.JobName)
 	}
 }

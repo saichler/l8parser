@@ -17,7 +17,6 @@ package rules
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -67,11 +66,9 @@ func (this *CTableToInstances) Parse(resources ifs.IResources, workSpace map[str
 	toString := strings2.New()
 	toString.TypesPrefix = false
 
-	fmt.Printf("[CTABLE->INSTANCES] elemType=%s rows=%d cols=%d keyCols=%v targetId=%q\n",
-		elemType.Name(), len(table.Rows), len(table.Columns), keyColumns, targetId)
 
 	instances := make([]interface{}, 0, len(table.Rows))
-	for rowIdx, row := range table.Rows {
+	for _, row := range table.Rows {
 		inst := reflect.New(elemType)
 		instElem := inst.Elem()
 
@@ -109,16 +106,10 @@ func (this *CTableToInstances) Parse(resources ifs.IResources, workSpace map[str
 			keyField.Set(reflect.ValueOf(keyBuilder.String()))
 		}
 
-		if rowIdx < 3 {
-			fmt.Printf("[CTABLE->INSTANCE] row=%d cluster=%q key=%q\n",
-				rowIdx, targetId, keyBuilder.String())
-		}
 
 		instances = append(instances, inst.Interface())
 	}
 
-	fmt.Printf("[CTABLE->INSTANCES-DONE] elemType=%s instances=%d\n",
-		elemType.Name(), len(instances))
 
 	workSpace[Instances] = instances
 	return nil
