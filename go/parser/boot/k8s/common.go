@@ -51,9 +51,10 @@ type K8sResourcePollDef struct {
 // constants so this sub-package can stand alone (avoids an import cycle that
 // would form if boot imports k8s and k8s imports boot).
 var (
-	every5MinutesAlways = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300}, Enabled: true}
-	defaultTimeout      = int64(60)
-	stringConvert       = &strings2.String{TypesPrefix: true}
+	every30SecondsAlways = &l8tpollaris.L8PCadencePlan{Cadences: []int64{30}, Enabled: true}
+	every5MinutesAlways  = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300}, Enabled: true}
+	defaultTimeout       = int64(60)
+	stringConvert        = &strings2.String{TypesPrefix: true}
 )
 
 // makeClientPollaris builds one *L8Pollaris per prime object. Pollaris.Name is
@@ -68,7 +69,7 @@ func makeClientPollaris(def K8sResourcePollDef) *l8tpollaris.L8Pollaris {
 	poll := &l8tpollaris.L8Poll{}
 	poll.Name = def.Name
 	poll.Timeout = defaultTimeout
-	poll.Cadence = every5MinutesAlways
+	poll.Cadence = every30SecondsAlways
 	poll.Protocol = l8tpollaris.L8PProtocol_L8PKubernetesAPI
 	poll.Operation = l8tpollaris.L8C_Operation_L8C_Table
 	poll.What = clientTableSpec(def.GVR, def.Fields, def.Headers)

@@ -37,6 +37,9 @@ var DEFAULT_CADENCE = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 900, 36
 // EVERY_5_MINUTES defines polling intervals starting at 5 minutes with backoff to 1hr and 2hr.
 var EVERY_5_MINUTES = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300, 3600, 7200}, Enabled: true}
 
+// EVERY_30_SECONDS_ALWAYS defines a constant 30-second polling interval without backoff.
+var EVERY_30_SECONDS_ALWAYS = &l8tpollaris.L8PCadencePlan{Cadences: []int64{30}, Enabled: true}
+
 // EVERY_5_MINUTES_ALWAYS defines a constant 5-minute polling interval without backoff.
 var EVERY_5_MINUTES_ALWAYS = &l8tpollaris.L8PCadencePlan{Cadences: []int64{300}, Enabled: true}
 
