@@ -16,12 +16,14 @@ limitations under the License.
 package service
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/saichler/l8pollaris/go/pollaris"
 	"github.com/saichler/l8pollaris/go/pollaris/targets"
 	"github.com/saichler/l8pollaris/go/types/l8tpollaris"
 	"github.com/saichler/l8types/go/ifs"
+	"google.golang.org/protobuf/proto"
 )
 
 // createElementInstance creates a new instance of the configured element type
@@ -78,4 +80,39 @@ func (this *ParsingService) JobComplete(job *l8tpollaris.CJob, resources ifs.IRe
 			this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.PATCH)
 		}
 	}
+}
+
+// HandleDelete processes a delete CJob from the collector. It decodes the
+// resource keys from CJob.Result (a serialized CMap), constructs a minimal
+// proto instance with primary key fields set, and forwards it to the
+// inventory cache with ifs.DELETE action.
+func (this *ParsingService) HandleDelete(job *l8tpollaris.CJob) {
+	cmap := &l8tpollaris.CMap{}
+	if err := proto.Unmarshal(job.Result, cmap); err != nil {
+		this.resources.Logger().Error("HandleDelete unmarshal: ", err.Error())
+		return
+	}
+
+	namespace := string(cmap.Data["namespace"])
+	name := string(cmap.Data["name"])
+
+	key := name
+	if namespace != "" {
+		key = namespace + "/" + name
+	}
+
+	cacheServiceName, cacheServiceArea := targets.Links.Cache(job.LinksId)
+
+	elem := this.createElementInstance(job)
+	// Set the Key field for the composite primary key
+	v := reflect.ValueOf(elem).Elem()
+	keyField := v.FieldByName("Key")
+	if keyField.IsValid() && keyField.CanSet() {
+		keyField.Set(reflect.ValueOf(key))
+	}
+
+	fmt.Printf("[PARSER-FWD-DELETE] linksId=%s cluster=%s key=%s -> cache=(%s,%d)\n",
+		job.LinksId, job.HostId, key, cacheServiceName, cacheServiceArea)
+
+	this.agg.AddElement(elem, ifs.Leader, "", cacheServiceName, cacheServiceArea, ifs.DELETE)
 }

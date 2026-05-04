@@ -128,6 +128,13 @@ func (this *ParsingService) Patch(pb ifs.IElements, vnic ifs.IVNic) ifs.IElement
 	return nil
 }
 func (this *ParsingService) Delete(pb ifs.IElements, vnic ifs.IVNic) ifs.IElements {
+	for _, elem := range pb.Elements() {
+		job, ok := elem.(*l8tpollaris.CJob)
+		if !ok {
+			continue
+		}
+		this.HandleDelete(job)
+	}
 	return nil
 }
 func (this *ParsingService) Get(pb ifs.IElements, vnic ifs.IVNic) ifs.IElements {
